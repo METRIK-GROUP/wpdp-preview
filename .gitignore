@@ -1,5 +1,6 @@
 _measure.ps1
 _measure_after.ps1
 _optimize.ps1
+_audit.sh
 _originals/
 images/_originals/
