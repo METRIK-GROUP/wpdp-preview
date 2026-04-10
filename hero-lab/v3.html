@@ -38,19 +38,16 @@
 <!-- ===== BLOCO 1 — HERO (v2: Glassmorphism dark) ===== -->
 <header id="hero" class="relative flex flex-col overflow-hidden" style="min-height:100svh;background:#0A0A0B">
 
-  <!-- BG ambient orbs (source of glow behind the glass card) -->
-  <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <!-- Large teal orb center-left -->
-    <div style="position:absolute;width:720px;height:720px;top:20%;left:-10%;background:radial-gradient(circle,rgba(15,118,110,0.45) 0%,rgba(15,118,110,0) 60%);filter:blur(40px);animation:orb-float 18s ease-in-out infinite"></div>
-    <!-- Cyan orb center-right -->
-    <div style="position:absolute;width:640px;height:640px;bottom:5%;right:-8%;background:radial-gradient(circle,rgba(45,212,191,0.30) 0%,rgba(45,212,191,0) 60%);filter:blur(40px);animation:orb-float 22s ease-in-out infinite reverse"></div>
-    <!-- Small accent orb top -->
-    <div style="position:absolute;width:420px;height:420px;top:-5%;left:40%;background:radial-gradient(circle,rgba(15,118,110,0.25) 0%,rgba(15,118,110,0) 55%);filter:blur(50px);animation:orb-float 26s ease-in-out 2s infinite"></div>
-    <!-- Soft bottom accent -->
-    <div style="position:absolute;width:500px;height:500px;bottom:-15%;left:30%;background:radial-gradient(circle,rgba(45,212,191,0.20) 0%,rgba(45,212,191,0) 60%);filter:blur(60px);animation:orb-float 30s ease-in-out 4s infinite"></div>
-    <!-- Subtle grid pattern overlay -->
-    <div style="position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.04) 1px,transparent 0);background-size:32px 32px;opacity:0.5"></div>
-  </div>
+  <!-- Video background -->
+  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none" autoplay muted loop playsinline preload="auto" poster="../images/imagefx-dia1.jpg" style="z-index:0">
+    <source src="../images/depoimentos.mp4" type="video/mp4">
+  </video>
+  <!-- Dark gradient overlay for legibility -->
+  <div class="absolute inset-0 pointer-events-none" style="z-index:1;background:linear-gradient(180deg,rgba(10,10,11,0.55) 0%,rgba(10,10,11,0.70) 50%,rgba(10,10,11,0.88) 100%)"></div>
+  <!-- Teal color wash to unify with brand -->
+  <div class="absolute inset-0 pointer-events-none" style="z-index:2;background:radial-gradient(ellipse at center,rgba(15,118,110,0.18) 0%,transparent 70%),radial-gradient(circle at 80% 80%,rgba(45,212,191,0.10) 0%,transparent 50%)"></div>
+  <!-- Subtle grid pattern overlay -->
+  <div class="absolute inset-0 pointer-events-none" style="z-index:3;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.04) 1px,transparent 0);background-size:32px 32px;opacity:0.4"></div>
 
   <!-- Top bar: Logo left, Rodrigo right -->
   <div class="relative z-10 flex items-center justify-between px-4 sm:px-6 lg:px-12 pt-5 lg:pt-8">
@@ -72,8 +69,8 @@
   <div class="relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6 py-10">
     <div class="max-w-4xl w-full mx-auto">
 
-      <!-- Glassmorphic card -->
-      <div class="relative rounded-[28px] px-6 py-10 sm:px-10 sm:py-14 lg:px-16 lg:py-16 text-center" style="background:rgba(255,255,255,0.05);backdrop-filter:blur(30px) saturate(140%);-webkit-backdrop-filter:blur(30px) saturate(140%);border:1px solid rgba(255,255,255,0.12);box-shadow:0 25px 80px -20px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08)">
+      <!-- Glassmorphic card (heavier blur to abstract the video behind) -->
+      <div class="relative rounded-[28px] px-6 py-10 sm:px-10 sm:py-14 lg:px-16 lg:py-16 text-center" style="background:rgba(10,10,11,0.35);backdrop-filter:blur(40px) saturate(140%);-webkit-backdrop-filter:blur(40px) saturate(140%);border:1px solid rgba(255,255,255,0.14);box-shadow:0 30px 90px -20px rgba(0,0,0,0.75),inset 0 1px 0 rgba(255,255,255,0.1)">
 
         <!-- Subtle top gradient on card edge -->
         <div class="absolute inset-x-0 top-0 h-px rounded-t-[28px]" style="background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)"></div>
