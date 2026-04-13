@@ -152,6 +152,29 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   initMatAccordion();
 
+  // Animated count-up (data-count-to="2034")
+  const countEls = document.querySelectorAll('[data-count-to]');
+  if (countEls.length) {
+    const countObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        countObs.unobserve(el);
+        const target = parseInt(el.getAttribute('data-count-to'), 10);
+        const duration = 1800;
+        const start = performance.now();
+        function tick(now) {
+          const t = Math.min((now - start) / duration, 1);
+          const ease = 1 - Math.pow(1 - t, 3);
+          el.textContent = Math.round(ease * target).toLocaleString('pt-BR');
+          if (t < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.3 });
+    countEls.forEach(el => countObs.observe(el));
+  }
+
   // Price reveal animation
   const priceObs = new IntersectionObserver(e => {
     e.forEach(x => { if (x.isIntersecting) { x.target.classList.add('is'); priceObs.unobserve(x.target); } });

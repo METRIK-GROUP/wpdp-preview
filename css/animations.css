@@ -310,20 +310,31 @@ h1, h2, h3, .sec p, .sec h2 + p {
   max-width: 360px;
   margin-top: 4px;
 }
-/* Collapsed state: show vertical number */
+/* Collapsed state: show number + title vertical */
 .mat-acc-item:not(.active)::after {
-  content: attr(data-mat-num);
+  content: attr(data-mat-num) " · " attr(data-mat-title);
   position: absolute;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.75);
   writing-mode: vertical-rl;
   text-orientation: mixed;
   letter-spacing: 0.05em;
   transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+/* Collapsed hover: brighten to signal clickable */
+.mat-acc-item:not(.active):hover {
+  flex: 0 0 72px;
+}
+.mat-acc-item:not(.active):hover .mat-acc-overlay {
+  background: rgba(30,30,30,0.40);
+}
+.mat-acc-item:not(.active):hover::after {
+  color: rgba(255,255,255,0.95);
 }
 /* Mobile: stack vertically */
 @media (max-width: 640px) {
@@ -342,7 +353,11 @@ h1, h2, h3, .sec p, .sec h2 + p {
     writing-mode: horizontal-tb;
     bottom: auto;
     top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
+  }
+  .mat-acc-item:not(.active):hover {
+    flex: 0 0 64px;
   }
 }
 
