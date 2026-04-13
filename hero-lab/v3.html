@@ -38,16 +38,12 @@
 <!-- ===== BLOCO 1 — HERO (v2: Glassmorphism dark) ===== -->
 <header id="hero" class="relative flex flex-col overflow-hidden" style="min-height:100svh;background:#0A0A0B">
 
-  <!-- Video background: modern interior architecture loop (Pexels — Curtis Adams, CC0) -->
-  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none" autoplay muted loop playsinline preload="auto" poster="../images/imagefx-dia1.jpg" style="z-index:0">
-    <source src="../images/hero-bg.mp4" type="video/mp4">
+  <!-- Video background: luminous sphere transition -->
+  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none" autoplay muted loop playsinline preload="auto" style="z-index:0;opacity:0.6">
+    <source src="../images/hero-sphere.mp4" type="video/mp4">
   </video>
-  <!-- Dark gradient overlay for legibility -->
-  <div class="absolute inset-0 pointer-events-none" style="z-index:1;background:linear-gradient(180deg,rgba(10,10,11,0.55) 0%,rgba(10,10,11,0.70) 50%,rgba(10,10,11,0.88) 100%)"></div>
-  <!-- Teal color wash to unify with brand -->
-  <div class="absolute inset-0 pointer-events-none" style="z-index:2;background:radial-gradient(ellipse at center,rgba(15,118,110,0.18) 0%,transparent 70%),radial-gradient(circle at 80% 80%,rgba(45,212,191,0.10) 0%,transparent 50%)"></div>
-  <!-- Subtle grid pattern overlay -->
-  <div class="absolute inset-0 pointer-events-none" style="z-index:3;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.04) 1px,transparent 0);background-size:32px 32px;opacity:0.4"></div>
+  <!-- Soft darken overlay for legibility over the sphere -->
+  <div class="absolute inset-0 pointer-events-none" style="z-index:1;background:radial-gradient(ellipse at center,rgba(10,10,11,0.3) 0%,rgba(10,10,11,0.7) 70%,rgba(10,10,11,0.92) 100%)"></div>
 
   <!-- Top bar: Logo left, Rodrigo right -->
   <div class="relative z-10 flex items-center justify-between px-4 sm:px-6 lg:px-12 pt-5 lg:pt-8">
