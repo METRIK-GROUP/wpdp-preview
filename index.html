@@ -776,26 +776,49 @@
       <span class="text-[11px] tracking-[.15em] uppercase text-m-3 font-medium">30+ anos de escritório</span>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5" data-s>
-      <div data-r class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-        <div class="bg-m-off flex items-center justify-center p-3 sm:p-4" style="aspect-ratio:4/3">
-          <img src="images/print01.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+    <!-- Carrossel horizontal com snap + setas (mobile e desktop) -->
+    <div class="relative" data-r>
+      <div id="prints-slider" data-drag-scroll class="flex gap-4 sm:gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-4 select-none" style="-webkit-overflow-scrolling:touch;cursor:grab">
+        <div class="snap-center shrink-0 w-[78%] sm:w-[46%] lg:w-[23.5%]">
+          <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div class="bg-m-off flex items-center justify-center p-3 sm:p-4" style="aspect-ratio:4/3">
+              <img src="images/print01.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+            </div>
+          </div>
         </div>
+        <div class="snap-center shrink-0 w-[78%] sm:w-[46%] lg:w-[23.5%]">
+          <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div class="bg-m-off flex items-center justify-center p-3 sm:p-4" style="aspect-ratio:4/3">
+              <img src="images/print02.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="snap-center shrink-0 w-[78%] sm:w-[46%] lg:w-[23.5%]">
+          <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div class="bg-m-off flex items-center justify-center p-3 sm:p-4" style="aspect-ratio:4/3">
+              <img src="images/print03.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="snap-center shrink-0 w-[78%] sm:w-[46%] lg:w-[23.5%]">
+          <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div class="bg-m-off flex items-center justify-center p-3 sm:p-4" style="aspect-ratio:4/3">
+              <img src="images/print04.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="shrink-0 w-2"></div>
       </div>
-      <div data-r class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-        <div class="bg-m-off flex items-center justify-center p-3 sm:p-4" style="aspect-ratio:4/3">
-          <img src="images/print02.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div data-r class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-        <div class="bg-m-off flex items-center justify-center p-3 sm:p-4" style="aspect-ratio:4/3">
-          <img src="images/print03.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div data-r class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-        <div class="bg-m-off flex items-center justify-center p-3 sm:p-4" style="aspect-ratio:4/3">
-          <img src="images/print04.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
-        </div>
+
+      <!-- Nav arrows -->
+      <div class="flex items-center justify-center gap-3 mt-4">
+        <button data-slider-prev="prints-slider" aria-label="Depoimento anterior" class="w-10 h-10 rounded-full border border-m-1 flex items-center justify-center hover:bg-m-black hover:text-white hover:border-m-black transition-all cursor-pointer text-m-5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <span class="text-m-3 text-[12px]">Deslize para ver todos</span>
+        <button data-slider-next="prints-slider" aria-label="Próximo depoimento" class="w-10 h-10 rounded-full border border-m-1 flex items-center justify-center hover:bg-m-black hover:text-white hover:border-m-black transition-all cursor-pointer text-m-5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
       </div>
     </div>
   </div>
