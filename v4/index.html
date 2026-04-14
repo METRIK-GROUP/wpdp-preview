@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workshop PDP + IA — Projeto de Primeira com Inteligência Artificial</title>
+  <meta name="description" content="2 dias ao vivo para transformar seu processo de projeto em uma máquina de aprovações de primeira, acelerada com IA. +3.100 participantes já passaram por aqui.">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <link rel="preload" href="../fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/dmserif-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{m:{black:'#1E1E1E',gr:'#3D3D3A','7':'#5F5E5A','5':'#888780','3':'#B4B2A9','1':'#D3D1C7',off:'#F5F4F0',w:'#FFFFFF'},cta:'#0F766E','cta-h':'#0D6B63'},fontFamily:{sans:['Inter','sans-serif'],ed:['DM Serif Display','Georgia','serif']}}}}</script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../css/animations.css">
+  <style>
+    @font-face{font-family:'Inter';font-style:normal;font-weight:300 600;font-display:swap;src:url('../fonts/inter-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+    @font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/dmserif-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+    html,body{overflow-x:hidden;max-width:100vw;position:relative}
+    body{font-family:'Inter',sans-serif;color:#1E1E1E;-webkit-font-smoothing:antialiased}
+    [data-panel]{transition:opacity .3s ease,transform .3s ease}
+  </style>
+</head>
+<body class="bg-m-black">
+
+<!-- ===== STICKY NAV ===== -->
+<nav id="sn" class="sn fixed top-0 inset-x-0 z-50 border-b border-white/8" style="background:rgba(30,30,30,0.55);backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%)" role="navigation" aria-label="Navegação principal">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-12 flex items-center justify-between">
+    <span class="text-white/70 text-[12px] sm:text-[13px] font-medium tracking-wide">16 e 17 de maio · Ao vivo no Zoom</span>
+    <a href="https://pay.hotmart.com/K98392503A?checkoutMode=10" target="_blank" rel="noopener noreferrer" class="bg-cta hover:bg-cta-h active:scale-95 text-white text-[12px] sm:text-[13px] font-semibold px-5 sm:px-6 py-2 rounded-full transition-all whitespace-nowrap flex-shrink-0 shadow-lg shadow-cta/20">Garantir ingresso</a>
+  </div>
+</nav>
+
+<!-- ===== BLOCO 1 — HERO (light version) ===== -->
+<header id="hero" class="relative flex flex-col bg-white overflow-hidden" style="min-height:100svh">
+  <!-- BG animated gradient rings -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="hero-ring" style="width:700px;height:700px;top:50%;left:50%;transform:translate(-50%,-50%);border:2px solid rgba(15,118,110,0.15);border-radius:50%;animation:ring-pulse 7s ease-in-out infinite"></div>
+    <div class="hero-ring" style="width:1000px;height:1000px;top:50%;left:50%;transform:translate(-50%,-50%);border:1.5px solid rgba(15,118,110,0.10);border-radius:50%;animation:ring-pulse 7s ease-in-out 1.5s infinite"></div>
+    <div class="hero-ring" style="width:1300px;height:1300px;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid rgba(15,118,110,0.07);border-radius:50%;animation:ring-pulse 7s ease-in-out 3s infinite"></div>
+    <div class="hero-ring" style="width:1600px;height:1600px;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid rgba(15,118,110,0.04);border-radius:50%;animation:ring-pulse 7s ease-in-out 4.5s infinite"></div>
+    <div class="hero-orb" style="width:500px;height:500px;top:15%;left:-5%;background:radial-gradient(circle,rgba(15,118,110,0.10) 0%,transparent 55%);animation:orb-float 18s ease-in-out infinite"></div>
+    <div class="hero-orb" style="width:400px;height:400px;bottom:10%;right:-3%;background:radial-gradient(circle,rgba(15,118,110,0.08) 0%,transparent 55%);animation:orb-float 22s ease-in-out infinite reverse"></div>
+  </div>
+
+  <!-- Top bar: Logo left, Rodrigo right -->
+  <div class="relative z-10 flex items-center justify-between px-4 sm:px-6 lg:px-12 pt-5 lg:pt-8">
+    <!-- Logo -->
+    <div class="flex items-center shrink-0">
+      <img src="../images/Logotipo_Interiores_com_IA_final.png" alt="Interiores com IA — Workshop" class="h-7 lg:h-10" loading="eager" fetchpriority="high" decoding="async">
+    </div>
+
+    <!-- Rodrigo -->
+    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      <p class="text-m-black/70 text-[12px] sm:text-[13px] font-medium">Rodrigo Rosar</p>
+      <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-m-black border-2 border-m-black/10 overflow-hidden shrink-0">
+        <img src="../images/rodrigo-bio-color.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover object-top" fetchpriority="high" decoding="async" width="44" height="44">
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero content (centered) -->
+  <div class="relative z-10 flex-1 flex items-center justify-center">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <div class="h-in">
+        <div class="inline-flex items-center gap-2 bg-m-black/5 border border-m-black/8 backdrop-blur-sm rounded-full px-5 py-2 mb-8">
+          <span class="text-m-black/60 text-[13px] font-medium">16 e 17 de maio · Ao vivo · Zoom</span>
+        </div>
+      </div>
+
+      <h1 class="h-in text-m-black font-bold leading-[1.08] tracking-tight mb-5 sm:mb-6" style="font-size:clamp(28px,5.5vw,60px);">
+        Dois dias para transformar seu processo de projeto em uma máquina de aprovações de primeira, acelerada com IA
+      </h1>
+
+      <p class="h-in text-m-7 text-[15px] sm:text-[16px] leading-[1.7] mb-8 sm:mb-10 mx-auto" style="max-width:520px;">
+        Em um final de semana, vamos acabar com a desorganização e construir juntos um processo de projeto profissional, com IA do briefing aos executivos.
+      </p>
+
+      <div class="h-in flex flex-wrap items-center justify-center gap-3 sm:gap-5 mt-6 sm:mt-8 px-2">
+        <div class="flex items-center gap-2"><div class="flex -space-x-2"><div class="w-7 h-7 rounded-full bg-m-off border-2 border-white overflow-hidden"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy" style="filter:blur(2px)"></div><div class="w-7 h-7 rounded-full bg-m-off border-2 border-white overflow-hidden"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy" style="filter:blur(2px)"></div><div class="w-7 h-7 rounded-full bg-m-off border-2 border-white overflow-hidden"><img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy" style="filter:blur(2px)"></div><div class="w-7 h-7 rounded-full bg-m-black border-2 border-white flex items-center justify-center text-white text-[9px] font-bold">+3k</div></div><span class="text-m-5 text-[12px]">+3.100 participantes</span></div>
+        <div class="flex items-center gap-1.5"><span class="text-cta text-[13px]" aria-label="Nota 4.9 de 5">★★★★★</span><span class="text-m-5 text-[12px]">4.9 · 1389 avaliações</span></div>
+        <span class="text-m-3 text-[12px]">5 edições realizadas</span>
+      </div>
+    </div>
+  </div>
+
+</header>
+
+<!-- ===== MARQUEE ===== -->
+<div class="py-4 overflow-hidden border-y border-m-1/60" style="background:#F5F4F0">
+  <div class="mq text-m-7 text-[11px] tracking-[.16em] uppercase font-medium">
+    <span class="flex items-center gap-8 px-8">Aprovação de Primeira<span class="text-m-3">·</span>Fim do retrabalho<span class="text-m-3">·</span>Mais margem, menos horas<span class="text-m-3">·</span>IA no processo real<span class="text-m-3">·</span>Processo de Projeto redondo<span class="text-m-3">·</span></span>
+    <span class="flex items-center gap-8 px-8" aria-hidden="true">Aprovação de Primeira<span class="text-m-3">·</span>Fim do retrabalho<span class="text-m-3">·</span>Mais margem, menos horas<span class="text-m-3">·</span>IA no processo real<span class="text-m-3">·</span>Processo de Projeto redondo<span class="text-m-3">·</span></span>
+    <span class="flex items-center gap-8 px-8" aria-hidden="true">Aprovação de Primeira<span class="text-m-3">·</span>Fim do retrabalho<span class="text-m-3">·</span>Mais margem, menos horas<span class="text-m-3">·</span>IA no processo real<span class="text-m-3">·</span>Processo de Projeto redondo<span class="text-m-3">·</span></span>
+  </div>
+</div>
+
+<!-- ===== BLOCO 2 — O QUE VAI ACONTECER ===== -->
+<section id="metodo" class="sec bg-m-black">
+  <div class="max-w-6xl mx-auto px-6">
+    <div data-r class="text-center mb-3"><span class="sl-light">Método</span></div>
+    <h2 data-r class="text-white text-center font-medium tracking-tight mb-3" style="font-size:clamp(26px,4vw,44px)">O que vai acontecer nesses 2 dias</h2>
+    <p data-r class="text-white/40 text-[15px] sm:text-[16px] text-center leading-[1.7] mb-10 sm:mb-14 mx-auto" style="max-width:500px">Sem teoria solta. Sem prompts copiados da internet. Tudo validado em projetos reais.</p>
+
+    <!-- Dia 1 -->
+    <div data-r class="mb-16 sm:mb-20">
+      <span class="inline-block text-[13px] font-semibold tracking-[.12em] uppercase text-white/60 bg-white/6 border border-white/10 rounded-full px-4 py-1.5 mb-8">Dia 1</span>
+      <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+        <div data-r="clip" class="img-card aspect-[4/3] lg:sticky-panel">
+          <img src="../images/imagefx-dia1.jpg" alt="Processo de projeto" class="w-full h-full object-cover" loading="lazy" decoding="async">
+        </div>
+        <div>
+          <span class="text-[#2DD4BF] text-[12px] font-medium tracking-[.1em] uppercase mb-3 inline-block">Sábado · 9h às 17h</span>
+          <h3 class="text-white text-[28px] font-semibold tracking-tight mb-4">Processo de Projeto</h3>
+          <p class="text-white/50 text-[15px] leading-[1.7] mb-8">Vamos organizar sua cabeça, sua rotina e todo o processo do seu escritório. Juntos, a gente documenta cada etapa de forma profissional e monta a estrutura certa pra crescer.</p>
+          <div class="space-y-5">
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="brain-circuit" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Organização pessoal e de rotina</span><p class="text-white/40 text-[13px] mt-0.5">Vamos tirar peso da sua cabeça e blindar sua agenda</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="layers" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Processo de projeto documentado</span><p class="text-white/40 text-[13px] mt-0.5">A gente leva você do caos à previsibilidade em cada etapa</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="clipboard-list" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Estrutura profissional de documentos</span><p class="text-white/40 text-[13px] mt-0.5">Vamos montar fluxogramas, playbooks e checklists que guiam cada etapa</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="check-circle" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Projeto aprovado de primeira</span><p class="text-white/40 text-[13px] mt-0.5">A gente te entrega a metodologia que elimina retrabalho e alterações</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dia 2 -->
+    <div data-r>
+      <div class="h-px bg-white/8 mb-10 sm:mb-14"></div>
+      <span class="inline-block text-[13px] font-semibold tracking-[.12em] uppercase text-white/60 bg-white/6 border border-white/10 rounded-full px-4 py-1.5 mb-8">Dia 2</span>
+      <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+        <div data-r="clip" class="img-card aspect-[4/3] lg:sticky-panel">
+          <img src="../images/imagefx-dia2.jpg" alt="IA aplicada ao design" class="w-full h-full object-cover" loading="lazy" decoding="async">
+        </div>
+        <div>
+          <span class="text-[#2DD4BF] text-[12px] font-medium tracking-[.1em] uppercase mb-3 inline-block">Domingo · 9h às 17h</span>
+          <h3 class="text-white text-[28px] font-semibold tracking-tight mb-4">Processo com IA</h3>
+          <p class="text-white/50 text-[15px] leading-[1.7] mb-8">A gente vai ligar a IA dentro do processo que você montou no sábado. Do briefing ao executivo, das imagens ao orçamento, dos documentos ao acompanhamento.</p>
+          <div class="space-y-5">
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="workflow" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">IA no seu processo inteiro</span><p class="text-white/40 text-[13px] mt-0.5">Vamos plugar a IA em cada fase, do briefing à entrega</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="bot" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Seus próprios assistentes</span><p class="text-white/40 text-[13px] mt-0.5">Você vai criar agentes de IA feitos pra realidade do seu escritório</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="image" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Renders e vídeos em minutos</span><p class="text-white/40 text-[13px] mt-0.5">Você vai gerar imagens fotorrealistas e vídeos do projeto em movimento</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="wrench" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Ferramentas sob medida</span><p class="text-white/40 text-[13px] mt-0.5">A gente te mostra como a IA monta planilhas, calculadoras e painéis pra você</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SEÇÃO MÃO NA MASSA ===== -->
+<section class="sec bg-m-off">
+  <div class="max-w-6xl mx-auto px-6">
+    <div data-r class="text-center mb-4">
+      <span class="sl-light">Na prática</span>
+    </div>
+    <h2 data-r class="text-m-black text-center font-medium tracking-tight mb-4" style="font-size:clamp(26px,4vw,44px)">Veja o que você vai conseguir fazer em apenas um final de semana</h2>
+    <p data-r class="text-m-5 text-[15px] sm:text-[16px] text-center leading-[1.7] mb-10 sm:mb-14 mx-auto" style="max-width:560px">Primeiro vamos organizar a estrutura do seu escritório. Depois, desenhar juntos o seu processo de projeto. Só então a gente pluga a IA no lugar exato onde ela escala tudo. Você executa, a gente guia. No domingo à noite, sai tudo pronto.</p>
+
+    <!-- ===== PILAR 1 — ORGANIZAÇÃO ===== -->
+    <div data-r class="mb-16 sm:mb-24">
+      <div class="text-center mb-10 sm:mb-14">
+        <span class="inline-block text-[11px] font-medium tracking-[0.15em] uppercase text-m-5 mb-4 px-3 py-1 rounded-full border border-m-3/40">Organização</span>
+        <h3 class="text-m-black text-[24px] sm:text-[32px] font-semibold tracking-tight mb-4">Você vai sair do modo sobrevivência</h3>
+        <p class="text-m-7 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:560px">Sem processo, seu resultado é uma montanha-russa. Um mês bom, outro ruim. Com processo, estabiliza. Com tecnologia no topo, escala. No workshop, você vai entender exatamente onde está nessa curva e o que fazer pra avançar.</p>
+      </div>
+      <!-- Gráfico G4: SVG responsivo, linha contínua -->
+      <div class="bg-white rounded-2xl border border-m-1/60 mx-auto" style="max-width:760px" id="g4-chart">
+        <div class="p-5 sm:p-8">
+          <svg viewBox="0 0 720 240" fill="none" class="w-full" style="max-height:300px">
+            <!-- Vertical dividers -->
+            <line x1="260" y1="20" x2="260" y2="195" stroke="var(--g1)" stroke-width="1" stroke-dasharray="5 4" opacity="0.5"/>
+            <line x1="490" y1="20" x2="490" y2="195" stroke="var(--g1)" stroke-width="1" stroke-dasharray="5 4" opacity="0.5"/>
+            <!-- Y axis -->
+            <text x="12" y="115" font-size="10" fill="var(--g5)" letter-spacing="0.1em" transform="rotate(-90 12 115)" text-anchor="middle" style="text-transform:uppercase">Resultado</text>
+            <!-- Main line: gray oscillating -->
+            <path class="g4-line" d="M40,145 Q70,105 95,135 Q120,168 150,125 Q175,85 205,140 Q225,158 255,128" stroke="var(--g3)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="800" stroke-dashoffset="800"/>
+            <!-- Stable line: black -->
+            <path class="g4-stable-line" d="M255,128 Q300,122 345,118 Q390,115 435,118 Q465,120 488,116" stroke="var(--black)" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0"/>
+            <!-- Growth line: gold -->
+            <path class="g4-growth-line" d="M488,116 Q520,105 555,80 Q600,45 660,22 Q685,14 705,10" stroke="#B8860B" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0"/>
+            <!-- X axis line -->
+            <line x1="40" y1="195" x2="710" y2="195" stroke="var(--g1)" stroke-width="1"/>
+            <!-- X axis labels -->
+            <text x="150" y="218" font-size="12" font-weight="500" fill="var(--gr)" text-anchor="middle" letter-spacing="0.08em" style="text-transform:uppercase">Pessoas</text>
+            <text x="375" y="218" font-size="12" font-weight="500" fill="var(--gr)" text-anchor="middle" letter-spacing="0.08em" style="text-transform:uppercase">Processos</text>
+            <text x="600" y="218" font-size="12" font-weight="500" fill="var(--gr)" text-anchor="middle" letter-spacing="0.08em" style="text-transform:uppercase">Tecnologia</text>
+            <text x="375" y="234" font-size="9" fill="var(--g5)" text-anchor="middle" letter-spacing="0.15em" style="text-transform:uppercase">Tempo</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PILAR 2 — PROCESSO ===== -->
+    <div data-r class="mb-16 sm:mb-24">
+      <div class="text-center mb-10 sm:mb-14">
+        <span class="inline-block text-[11px] font-medium tracking-[0.15em] uppercase text-m-5 mb-4 px-3 py-1 rounded-full border border-m-3/40">Processo</span>
+        <h3 class="text-m-black text-[24px] sm:text-[32px] font-semibold tracking-tight mb-4">Você vai documentar seu processo inteiro em um dia</h3>
+        <p class="text-m-7 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:620px">Do briefing à entrega da obra, vamos mapear cada etapa e deixar cada passo pronto pra delegar. O que hoje vive só na sua cabeça vira um sistema replicável. Você para de reinventar a roda em cada projeto, e sua equipe, atual ou futura, passa a seguir o caminho sem precisar te chamar a cada decisão.</p>
+      </div>
+      <!-- Fluxograma SVG com nós conectados -->
+      <div class="bg-white rounded-2xl border border-m-1/60 p-5 sm:p-8 mx-auto" style="max-width:860px" id="process-flow">
+        <!-- Mobile: grid 2 colunas -->
+        <div class="grid grid-cols-2 gap-2.5 sm:hidden" id="process-phases">
+          <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#3B82F6]/6 border border-[#3B82F6]/15" style="transition-delay:0ms">
+            <i data-lucide="handshake" class="w-5 h-5 mx-auto mb-1 text-[#3B82F6]"></i>
+            <div class="text-[11px] font-semibold text-m-black">Comercial</div>
+          </div>
+          <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#8B5CF6]/6 border border-[#8B5CF6]/15" style="transition-delay:60ms">
+            <i data-lucide="clipboard-list" class="w-5 h-5 mx-auto mb-1 text-[#8B5CF6]"></i>
+            <div class="text-[11px] font-semibold text-m-black">Pré-projeto</div>
+          </div>
+          <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#EC4899]/6 border border-[#EC4899]/15" style="transition-delay:120ms">
+            <i data-lucide="layout-dashboard" class="w-5 h-5 mx-auto mb-1 text-[#EC4899]"></i>
+            <div class="text-[11px] font-semibold text-m-black">Layout</div>
+          </div>
+          <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#F59E0B]/6 border border-[#F59E0B]/15" style="transition-delay:180ms">
+            <i data-lucide="palette" class="w-5 h-5 mx-auto mb-1 text-[#F59E0B]"></i>
+            <div class="text-[11px] font-semibold text-m-black">Criação</div>
+          </div>
+          <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#10B981]/6 border border-[#10B981]/15" style="transition-delay:240ms">
+            <i data-lucide="ruler" class="w-5 h-5 mx-auto mb-1 text-[#10B981]"></i>
+            <div class="text-[11px] font-semibold text-m-black">Executivo</div>
+          </div>
+          <div class="process-phase rounded-xl py-3 px-2 text-center bg-cta/6 border border-cta/15" style="transition-delay:300ms">
+            <i data-lucide="gift" class="w-5 h-5 mx-auto mb-1 text-cta"></i>
+            <div class="text-[11px] font-semibold text-m-black">Entrega</div>
+          </div>
+          <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#EF4444]/6 border border-[#EF4444]/15 col-span-2" style="transition-delay:360ms">
+            <i data-lucide="hard-hat" class="w-5 h-5 mx-auto mb-1 text-[#EF4444]"></i>
+            <div class="text-[11px] font-semibold text-m-black">Obra</div>
+          </div>
+        </div>
+        <!-- Desktop: fluxo horizontal com setas -->
+        <div class="hidden sm:flex items-center gap-1.5 lg:gap-2.5">
+          <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#3B82F6]/6 border border-[#3B82F6]/15" style="transition-delay:0ms">
+            <i data-lucide="handshake" class="w-5 h-5 mx-auto mb-1.5 text-[#3B82F6]"></i>
+            <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Comercial</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#8B5CF6]/6 border border-[#8B5CF6]/15" style="transition-delay:80ms">
+            <i data-lucide="clipboard-list" class="w-5 h-5 mx-auto mb-1.5 text-[#8B5CF6]"></i>
+            <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Pré-projeto</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#EC4899]/6 border border-[#EC4899]/15" style="transition-delay:160ms">
+            <i data-lucide="layout-dashboard" class="w-5 h-5 mx-auto mb-1.5 text-[#EC4899]"></i>
+            <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Layout</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#F59E0B]/6 border border-[#F59E0B]/15" style="transition-delay:240ms">
+            <i data-lucide="palette" class="w-5 h-5 mx-auto mb-1.5 text-[#F59E0B]"></i>
+            <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Criação</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#10B981]/6 border border-[#10B981]/15" style="transition-delay:320ms">
+            <i data-lucide="ruler" class="w-5 h-5 mx-auto mb-1.5 text-[#10B981]"></i>
+            <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Executivo</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-cta/6 border border-cta/15" style="transition-delay:400ms">
+            <i data-lucide="gift" class="w-5 h-5 mx-auto mb-1.5 text-cta"></i>
+            <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Entrega</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#EF4444]/6 border border-[#EF4444]/15" style="transition-delay:480ms">
+            <i data-lucide="hard-hat" class="w-5 h-5 mx-auto mb-1.5 text-[#EF4444]"></i>
+            <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Obra</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PILAR 3 — IA ===== -->
+    <div data-r class="mb-16 sm:mb-20">
+      <div class="text-center mb-10 sm:mb-14">
+        <span class="inline-block text-[11px] font-medium tracking-[0.15em] uppercase text-m-5 mb-4 px-3 py-1 rounded-full border border-m-3/40">IA</span>
+        <h3 class="text-m-black text-[24px] sm:text-[32px] font-semibold tracking-tight mb-4">Você vai ganhar 2 a 3 meses do seu ano de volta</h3>
+        <p class="text-m-7 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:620px">No Dia 2, a gente liga a IA no processo que você acabou de montar. Não é mais uma ferramenta pra aprender. É o que vai acelerar o que toma seu dia inteiro hoje: briefing, layout, apresentação, memorial descritivo, lista de compras. O que custa horas passa a custar minutos, e o sábado deixa de ser extensão da segunda.</p>
+      </div>
+      <!-- Barras de automação -->
+      <div class="bg-white rounded-2xl border border-m-1/60 p-5 sm:p-8 mx-auto" style="max-width:680px" id="ia-bars">
+        <div class="text-[11px] font-medium tracking-[0.12em] uppercase text-m-5 mb-5">O quanto a IA acelera cada etapa do seu projeto</div>
+        <div class="space-y-3.5">
+          <div class="ia-bar-item">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[13px] font-medium text-m-gr">Pré-projeto</span>
+              <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-cta ia-bar-pct">Alto</span>
+            </div>
+            <div class="h-2.5 bg-m-off rounded-full overflow-hidden"><div class="ia-bar-fill h-full bg-cta/75 rounded-full" data-w="75"></div></div>
+          </div>
+          <div class="ia-bar-item">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[13px] font-medium text-m-gr">Layout</span>
+              <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-m-black ia-bar-pct">Médio</span>
+            </div>
+            <div class="h-2.5 bg-m-off rounded-full overflow-hidden"><div class="ia-bar-fill h-full bg-cta/55 rounded-full" data-w="55"></div></div>
+          </div>
+          <div class="ia-bar-item">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[13px] font-medium text-m-gr">Criação</span>
+              <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-m-black ia-bar-pct">Médio</span>
+            </div>
+            <div class="h-2.5 bg-m-off rounded-full overflow-hidden"><div class="ia-bar-fill h-full bg-cta/55 rounded-full" data-w="55"></div></div>
+          </div>
+          <div class="ia-bar-item">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[13px] font-medium text-m-gr">Apresentação</span>
+              <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-cta ia-bar-pct">Alto</span>
+            </div>
+            <div class="h-2.5 bg-m-off rounded-full overflow-hidden"><div class="ia-bar-fill h-full bg-cta/75 rounded-full" data-w="75"></div></div>
+          </div>
+          <div class="ia-bar-item">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[13px] font-medium text-m-gr">Executivo</span>
+              <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-m-black ia-bar-pct">Médio</span>
+            </div>
+            <div class="h-2.5 bg-m-off rounded-full overflow-hidden"><div class="ia-bar-fill h-full bg-cta/55 rounded-full" data-w="50"></div></div>
+          </div>
+          <div class="ia-bar-item">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[13px] font-medium text-m-gr">Entrega</span>
+              <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-cta ia-bar-pct">Total</span>
+            </div>
+            <div class="h-2.5 bg-m-off rounded-full overflow-hidden"><div class="ia-bar-fill h-full bg-cta rounded-full" data-w="95"></div></div>
+          </div>
+        </div>
+        <!-- Bottom summary -->
+        <div class="flex items-center justify-center mt-6 pt-5 border-t border-m-1/40">
+          <div class="text-center">
+            <div class="text-[28px] sm:text-[34px] font-semibold text-cta leading-none">35%</div>
+            <div class="text-[11px] sm:text-[12px] text-m-5 mt-1.5">menos tempo por projeto</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Separador visual entre pilares e demonstrações -->
+    <div data-r class="text-center mb-10 sm:mb-14">
+      <div class="inline-flex items-center gap-3 text-m-3">
+        <div class="w-12 h-px bg-m-3/40"></div>
+        <span class="text-[11px] font-medium tracking-[0.15em] uppercase">Veja o que isso entrega</span>
+        <div class="w-12 h-px bg-m-3/40"></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 1 — Render (comparison slider) -->
+    <div data-r class="mb-14 sm:mb-20">
+      <div class="text-center mb-10 sm:mb-12">
+        <h3 class="text-m-black text-[22px] sm:text-[28px] font-semibold tracking-tight mb-4">Renders de projeto em segundos, com 1 clique</h3>
+        <p class="text-m-5 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:560px">Você vai aprender a montar fluxos de render que transformam qualquer cena 3D em renders de alta qualidade na hora. Variações de iluminação, ambientação com pessoas, vídeos com câmera suave pelo projeto inteiro. Sem esperar dias pelo renderista, sem computador potente e sem depender de ninguém.</p>
+      </div>
+      <div class="img-compare mx-auto" id="render-compare" data-r="scale" style="max-width:720px">
+        <img src="../images/3D_Perpetual_Rooftop_021.jpg" alt="Render fotorrealista" draggable="false" loading="lazy" decoding="async">
+        <div class="img-compare-overlay">
+          <img src="../images/3D_Perpetual_Rooftop_02.jpg" alt="Sketch SketchUp" draggable="false" loading="lazy" decoding="async">
+        </div>
+        <div class="img-compare-handle" role="slider" tabindex="0" aria-label="Arraste para comparar sketch e render" aria-valuenow="50" aria-valuemin="5" aria-valuemax="95">
+          <div class="img-compare-grip"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCO 2 — Processo (mockup de fluxograma gerado) -->
+    <div data-r class="mb-14 sm:mb-20">
+      <div class="text-center mb-10 sm:mb-12">
+        <h3 class="text-m-black text-[22px] sm:text-[28px] font-semibold tracking-tight mb-4">Seu processo de projeto, documentado em minutos</h3>
+        <p class="text-m-5 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:580px">Você vai transformar o processo que hoje só existe na sua cabeça em um fluxograma visual, interativo e delegável. A IA mapeia suas etapas, identifica os gaps e entrega tudo numa versão navegável pronta pra compartilhar com a equipe. O que levaria meses pra documentar, você monta durante o workshop.</p>
+      </div>
+      <!-- Visual: áudio WhatsApp → fluxograma gerado -->
+      <div class="flowchart-mockup mx-auto" id="flowchart-anim" style="max-width:800px">
+        <div class="flowchart-header">
+          <div class="flowchart-dots"><span></span><span></span><span></span></div>
+          <span class="flowchart-title">Meu Processo de Projeto</span>
+        </div>
+        <div class="flowchart-body">
+          <!-- Áudio WhatsApp como input -->
+          <div class="wpp-audio" data-fc="audio">
+            <div class="wpp-audio-avatar">
+              <i data-lucide="user" style="width:16px;height:16px;color:#fff"></i>
+            </div>
+            <button class="wpp-audio-play"><i data-lucide="play" style="width:12px;height:12px;color:#fff"></i></button>
+            <div class="wpp-audio-wave">
+              <div class="wpp-wave-bar" style="height:8px"></div>
+              <div class="wpp-wave-bar" style="height:14px"></div>
+              <div class="wpp-wave-bar" style="height:6px"></div>
+              <div class="wpp-wave-bar" style="height:18px"></div>
+              <div class="wpp-wave-bar" style="height:10px"></div>
+              <div class="wpp-wave-bar" style="height:22px"></div>
+              <div class="wpp-wave-bar" style="height:16px"></div>
+              <div class="wpp-wave-bar" style="height:8px"></div>
+              <div class="wpp-wave-bar" style="height:20px"></div>
+              <div class="wpp-wave-bar" style="height:12px"></div>
+              <div class="wpp-wave-bar" style="height:6px"></div>
+              <div class="wpp-wave-bar" style="height:16px"></div>
+              <div class="wpp-wave-bar" style="height:10px"></div>
+              <div class="wpp-wave-bar" style="height:24px"></div>
+              <div class="wpp-wave-bar" style="height:14px"></div>
+              <div class="wpp-wave-bar" style="height:8px"></div>
+              <div class="wpp-wave-bar" style="height:18px"></div>
+              <div class="wpp-wave-bar" style="height:6px"></div>
+              <div class="wpp-wave-bar" style="height:12px"></div>
+              <div class="wpp-wave-bar" style="height:20px"></div>
+            </div>
+            <span class="wpp-audio-time">10:24</span>
+          </div>
+
+          <!-- Conector áudio → processamento IA -->
+          <div class="fc-connector" data-fc-line="a0"></div>
+          <div class="fc-ia-badge" data-fc="ia"><i data-lucide="sparkles" style="width:12px;height:12px"></i> IA processando</div>
+          <div class="fc-connector" data-fc-line="a1"></div>
+
+          <!-- Workflow grid compacto -->
+          <div class="fc-grid" data-fc="flow">
+            <!-- Fase 1: Vendas -->
+            <div class="fc-phase-card" data-fc="ph0">
+              <div class="fc-phase-label fc-phase-label--teal">Vendas</div>
+              <div class="fc-steps">
+                <span class="fc-step">Primeiro contato</span>
+                <span class="fc-step-dot"></span>
+                <span class="fc-step">Qualificação</span>
+                <span class="fc-step-dot"></span>
+                <span class="fc-step">Proposta</span>
+              </div>
+            </div>
+            <!-- Fase 2: Projeto -->
+            <div class="fc-phase-card" data-fc="ph1">
+              <div class="fc-phase-label fc-phase-label--rose">Projeto</div>
+              <div class="fc-steps">
+                <span class="fc-step">Briefing</span>
+                <span class="fc-step-dot"></span>
+                <span class="fc-step">Conceito</span>
+                <span class="fc-step-dot"></span>
+                <span class="fc-step">Detalhamento</span>
+                <span class="fc-step-dot"></span>
+                <span class="fc-step">Apresentação</span>
+              </div>
+            </div>
+            <!-- Fase 3: Execução -->
+            <div class="fc-phase-card" data-fc="ph2">
+              <div class="fc-phase-label fc-phase-label--amber">Execução</div>
+              <div class="fc-steps">
+                <span class="fc-step">Compras</span>
+                <span class="fc-step-dot"></span>
+                <span class="fc-step">Obra</span>
+                <span class="fc-step-dot"></span>
+                <span class="fc-step">Vistoria</span>
+              </div>
+            </div>
+            <!-- Fase 4: Entrega -->
+            <div class="fc-phase-card" data-fc="ph3">
+              <div class="fc-phase-label fc-phase-label--teal">Entrega</div>
+              <div class="fc-steps">
+                <span class="fc-step">Entrega final</span>
+                <span class="fc-step-dot"></span>
+                <span class="fc-step">Pós-obra</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCO 3 — Ferramenta financeira -->
+    <div data-r>
+      <div class="text-center mb-10 sm:mb-14">
+        <h3 class="text-m-black text-[22px] sm:text-[28px] font-semibold tracking-tight mb-4">Saiba exatamente quanto sobra em cada projeto</h3>
+        <p class="text-m-5 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:560px">Você vai criar sua própria calculadora de orçamento com IA: visual, interativa e feita pra realidade do seu escritório. Receita, custo e margem de cada projeto na sua frente, atualizados automaticamente. Chega de planilha bagunçada e achismo no financeiro.</p>
+      </div>
+      <!-- Dashboard cards (mobile-first) -->
+      <div class="mx-auto" style="max-width:720px">
+        <!-- Metric cards row -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+          <div class="bg-white rounded-xl border border-m-1/60 p-4 text-center">
+            <div class="text-[10px] text-m-5 uppercase tracking-wider mb-2">Projetos ativos</div>
+            <div class="text-[24px] sm:text-[28px] font-semibold text-m-black leading-none">7</div>
+            <div class="mt-2 h-1.5 bg-m-off rounded-full overflow-hidden"><div class="h-full bg-cta/60 rounded-full" style="width:65%"></div></div>
+          </div>
+          <div class="bg-white rounded-xl border-2 border-cta/20 p-4 text-center">
+            <div class="text-[10px] text-cta uppercase tracking-wider mb-2 font-medium">Margem média</div>
+            <div class="text-[24px] sm:text-[28px] font-semibold text-cta leading-none">34%</div>
+            <div class="mt-2 h-1.5 bg-cta/10 rounded-full overflow-hidden"><div class="h-full bg-cta rounded-full" style="width:34%"></div></div>
+          </div>
+          <div class="bg-white rounded-xl border border-m-1/60 p-4 text-center">
+            <div class="text-[10px] text-m-5 uppercase tracking-wider mb-2">Meta mensal</div>
+            <div class="flex items-center justify-center gap-2 mt-1">
+              <svg viewBox="0 0 36 36" class="w-10 h-10" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="14" fill="none" stroke="var(--g1)" stroke-width="3"/><circle cx="18" cy="18" r="14" fill="none" stroke="#F59E0B" stroke-width="3" stroke-dasharray="66 88" stroke-linecap="round"/></svg>
+              <span class="text-[14px] font-semibold text-m-black">75%</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-m-1/60 p-4 text-center">
+            <div class="text-[10px] text-m-5 uppercase tracking-wider mb-2">Fluxo de caixa</div>
+            <svg viewBox="0 0 80 30" class="w-full h-8 mt-1"><defs><linearGradient id="sparkG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--cta)" stop-opacity=".12"/><stop offset="100%" stop-color="var(--cta)" stop-opacity="0"/></linearGradient></defs><polyline points="0,26 12,20 24,24 36,10 48,16 60,6 72,8 80,4" fill="url(#sparkG)" stroke="none"/><polyline points="0,26 12,20 24,24 36,10 48,16 60,6 72,8 80,4" fill="none" stroke="var(--cta)" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <!-- Chart area -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <!-- Bar chart -->
+          <div class="sm:col-span-2 bg-white rounded-xl border border-m-1/60 p-4">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[12px] font-semibold text-m-black">Receita vs Custo</span>
+              <div class="flex gap-3">
+                <span class="flex items-center gap-1.5 text-[10px] text-m-5"><span class="w-2 h-2 rounded-sm bg-cta"></span>Receita</span>
+                <span class="flex items-center gap-1.5 text-[10px] text-m-5"><span class="w-2 h-2 rounded-sm bg-m-3"></span>Custo</span>
+              </div>
+            </div>
+            <div class="flex items-end gap-3 h-[120px]">
+              <div class="flex-1 flex items-end gap-1 h-full"><div class="flex-1 bg-cta/70 rounded-t" style="height:70%"></div><div class="flex-1 bg-m-3/50 rounded-t" style="height:45%"></div></div>
+              <div class="flex-1 flex items-end gap-1 h-full"><div class="flex-1 bg-cta/70 rounded-t" style="height:85%"></div><div class="flex-1 bg-m-3/50 rounded-t" style="height:50%"></div></div>
+              <div class="flex-1 flex items-end gap-1 h-full"><div class="flex-1 bg-cta/70 rounded-t" style="height:60%"></div><div class="flex-1 bg-m-3/50 rounded-t" style="height:55%"></div></div>
+              <div class="flex-1 flex items-end gap-1 h-full"><div class="flex-1 bg-cta/70 rounded-t" style="height:90%"></div><div class="flex-1 bg-m-3/50 rounded-t" style="height:48%"></div></div>
+              <div class="flex-1 flex items-end gap-1 h-full"><div class="flex-1 bg-cta rounded-t" style="height:95%"></div><div class="flex-1 bg-m-3/50 rounded-t" style="height:52%"></div></div>
+            </div>
+            <div class="flex gap-3 mt-2">
+              <span class="flex-1 text-center text-[9px] text-m-5">Jan</span>
+              <span class="flex-1 text-center text-[9px] text-m-5">Fev</span>
+              <span class="flex-1 text-center text-[9px] text-m-5">Mar</span>
+              <span class="flex-1 text-center text-[9px] text-m-5">Abr</span>
+              <span class="flex-1 text-center text-[9px] text-m-5">Mai</span>
+            </div>
+          </div>
+          <!-- Donut -->
+          <div class="bg-white rounded-xl border border-m-1/60 p-4 flex flex-col items-center justify-center">
+            <span class="text-[12px] font-semibold text-m-black mb-3">Composição</span>
+            <svg viewBox="0 0 100 100" class="w-20 h-20">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="var(--g1)" stroke-width="10"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="var(--cta)" stroke-width="10" stroke-dasharray="86 239" stroke-dashoffset="0" stroke-linecap="round"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#F59E0B" stroke-width="10" stroke-dasharray="55 239" stroke-dashoffset="-86" stroke-linecap="round"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="var(--g3)" stroke-width="10" stroke-dasharray="40 239" stroke-dashoffset="-141" stroke-linecap="round"/>
+            </svg>
+            <div class="flex flex-col gap-1.5 mt-3 w-full">
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cta"></span><span class="text-[10px] text-m-5">Mão de obra</span></div>
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#F59E0B]"></span><span class="text-[10px] text-m-5">Materiais</span></div>
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-m-3"></span><span class="text-[10px] text-m-5">Outros</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- Bottom indicators -->
+        <div class="grid grid-cols-3 gap-3 mt-3">
+          <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
+            <i data-lucide="trending-up" class="w-4 h-4 text-cta flex-shrink-0"></i>
+            <div><div class="text-[9px] text-m-5">Rentabilidade</div><div class="text-[12px] font-semibold text-cta">Positiva</div></div>
+          </div>
+          <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
+            <i data-lucide="shield-check" class="w-4 h-4 text-cta flex-shrink-0"></i>
+            <div><div class="text-[9px] text-m-5">Previsibilidade</div><div class="text-[12px] font-semibold text-m-black">Controlada</div></div>
+          </div>
+          <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
+            <i data-lucide="target" class="w-4 h-4 text-[#F59E0B] flex-shrink-0"></i>
+            <div><div class="text-[9px] text-m-5">Meta</div><div class="text-[12px] font-semibold text-m-black">No caminho</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== BLOCO 3 — ENTREGÁVEIS (accordion IA Lab style) ===== -->
+<section class="sec bg-m-off">
+  <div class="max-w-6xl mx-auto px-6 mb-10">
+    <div data-r class="mb-10 sm:mb-14">
+      <span class="sl-light">Materiais inclusos</span>
+      <h2 class="text-m-black font-medium tracking-tight mt-3" style="font-size:clamp(24px,4vw,44px)">Você sai com tudo pronto</h2>
+      <p class="text-m-5 text-[15px] sm:text-[16px] mt-2">Pra usar já na segunda-feira.</p>
+    </div>
+  </div>
+
+  <div data-r class="max-w-6xl mx-auto px-6">
+    <div id="mat-accordion" class="mat-acc flex gap-3 h-[420px] sm:h-[480px] lg:h-[520px]">
+      <div class="mat-acc-item active" data-mat-item data-mat-title="Assistente de IA">
+        <img src="../images/Assistentedeia.jpg" alt="Assistente de IA" class="mat-acc-img" loading="lazy" decoding="async">
+        <div class="mat-acc-overlay"></div>
+        <div class="mat-acc-label">
+          <span class="mat-acc-number">01</span>
+          <span class="mat-acc-title">Assistente de IA</span>
+          <p class="mat-acc-desc">Seu assistente personalizado para organizar processos e gerar documentos.</p>
+        </div>
+      </div>
+      <div class="mat-acc-item" data-mat-item data-mat-title="Diagnóstico">
+        <img src="../images/diagnostico.jpg" alt="Planilha de Diagnóstico" class="mat-acc-img" loading="lazy" decoding="async">
+        <div class="mat-acc-overlay"></div>
+        <div class="mat-acc-label">
+          <span class="mat-acc-number">02</span>
+          <span class="mat-acc-title">Planilha de Diagnóstico</span>
+          <p class="mat-acc-desc">Avalie seus processos atuais e descubra onde estão os gargalos.</p>
+        </div>
+      </div>
+      <div class="mat-acc-item" data-mat-item data-mat-title="Prompts">
+        <img src="../images/prompt.jpg" alt="Prompts Prontos" class="mat-acc-img" loading="lazy" decoding="async">
+        <div class="mat-acc-overlay"></div>
+        <div class="mat-acc-label">
+          <span class="mat-acc-number">03</span>
+          <span class="mat-acc-title">Prompts Prontos</span>
+          <p class="mat-acc-desc">Para imagens, vídeos e assistentes. Testados em projetos reais.</p>
+        </div>
+      </div>
+      <div class="mat-acc-item" data-mat-item data-mat-title="Processos">
+        <img src="../images/planilhadiagnostico.jpg" alt="Mapeamento de Processos" class="mat-acc-img" loading="lazy" decoding="async">
+        <div class="mat-acc-overlay"></div>
+        <div class="mat-acc-label">
+          <span class="mat-acc-number">04</span>
+          <span class="mat-acc-title">Mapeamento de Processos</span>
+          <p class="mat-acc-desc">Modelo editável pronto. Copie, cole e adapte ao seu escritório.</p>
+        </div>
+      </div>
+      <div class="mat-acc-item" data-mat-item data-mat-title="Workflow IA">
+        <img src="../images/bonusextras.jpg" alt="Workflow de IA" class="mat-acc-img" loading="lazy" decoding="async">
+        <div class="mat-acc-overlay"></div>
+        <div class="mat-acc-label">
+          <span class="mat-acc-number">05</span>
+          <span class="mat-acc-title">Workflow de IA</span>
+          <p class="mat-acc-desc">Plugado direto no seu processo. Não é decoração, é margem.</p>
+        </div>
+      </div>
+      <div class="mat-acc-item" data-mat-item data-mat-title="Financeiro">
+        <img src="../images/planejamentofinanceiro.jpg" alt="Planejamento Financeiro" class="mat-acc-img" loading="lazy" decoding="async">
+        <div class="mat-acc-overlay"></div>
+        <div class="mat-acc-label">
+          <span class="mat-acc-number">06</span>
+          <span class="mat-acc-title">Planejamento Financeiro</span>
+          <p class="mat-acc-desc">Planilha automática. Saiba sua margem real por projeto.</p>
+        </div>
+      </div>
+      <div class="mat-acc-item" data-mat-item data-mat-title="Bônus">
+        <img src="../images/bonus.jpg" alt="Bônus Extras" class="mat-acc-img" loading="lazy" decoding="async">
+        <div class="mat-acc-overlay"></div>
+        <div class="mat-acc-label">
+          <span class="mat-acc-number">07</span>
+          <span class="mat-acc-title">Bônus Extras</span>
+          <p class="mat-acc-desc">Sites, IAs mais usadas e referências para acelerar.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BLOCO 5C — CRONOGRAMA (movido para logo após Materiais Inclusos) ===== -->
+<section class="sec bg-m-off">
+  <div class="max-w-3xl mx-auto px-6">
+    <div data-r class="text-center mb-3"><span class="sl-light">16 e 17 de maio via Zoom</span></div>
+    <h2 data-r class="text-m-black text-center font-medium tracking-tight mb-3 sm:mb-4" style="font-size:clamp(28px,5vw,48px)">Cronograma</h2>
+    <p data-r class="text-m-5 text-[15px] sm:text-[16px] text-center leading-[1.7] mb-10 sm:mb-14 mx-auto" style="max-width:520px">Ambos os dias seguirão este cronograma.</p>
+
+    <div data-r class="bg-white rounded-3xl border border-m-1 overflow-hidden">
+      <div class="p-6 sm:p-10">
+        <div class="divide-y divide-m-1/70">
+          <div class="flex items-center justify-between py-4 sm:py-5">
+            <span class="text-m-black font-semibold text-[20px] sm:text-[24px] tracking-tight" style="min-width:80px">09h</span>
+            <span class="flex-1 mx-5 sm:mx-8 h-px bg-m-1"></span>
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="play-circle" class="w-[18px] h-[18px] text-[#2DD4BF]"></i>
+              <span class="text-m-black text-[15px] sm:text-[17px] font-medium">Início</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-4 sm:py-5">
+            <span class="text-m-black font-semibold text-[20px] sm:text-[24px] tracking-tight" style="min-width:80px">12h</span>
+            <span class="flex-1 mx-5 sm:mx-8 h-px bg-m-1"></span>
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="utensils" class="w-[18px] h-[18px] text-m-5"></i>
+              <span class="text-m-black text-[15px] sm:text-[17px] font-medium">Almoço</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-4 sm:py-5">
+            <span class="text-m-black font-semibold text-[20px] sm:text-[24px] tracking-tight" style="min-width:80px">13h30</span>
+            <span class="flex-1 mx-5 sm:mx-8 h-px bg-m-1"></span>
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="rotate-cw" class="w-[18px] h-[18px] text-m-5"></i>
+              <span class="text-m-black text-[15px] sm:text-[17px] font-medium">Retorno</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-4 sm:py-5">
+            <span class="text-m-black font-semibold text-[20px] sm:text-[24px] tracking-tight" style="min-width:80px">17h00</span>
+            <span class="flex-1 mx-5 sm:mx-8 h-px bg-m-1"></span>
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="check-circle-2" class="w-[18px] h-[18px] text-[#2DD4BF]"></i>
+              <span class="text-m-black text-[15px] sm:text-[17px] font-medium">Encerramento*</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-m-1 bg-m-off/60 px-6 sm:px-10 py-4">
+        <p class="text-m-5 text-[12px] sm:text-[13px] leading-[1.7]">*Considere encerrar mais tarde, caso os participantes peçam para nos aprofundarmos em algum ponto. Porém, o conteúdo combinado será entregue dentro do horário programado.</p>
+      </div>
+    </div>
+
+    <!-- Card: Não pode ao vivo -->
+    <div data-r class="mt-6 bg-m-black rounded-3xl p-7 sm:p-9 flex flex-col sm:flex-row items-start sm:items-center gap-5">
+      <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+        <i data-lucide="play" class="w-5 h-5 text-[#2DD4BF]"></i>
+      </div>
+      <div class="flex-1">
+        <h3 class="text-white text-[17px] sm:text-[18px] font-semibold mb-1.5">Não pode participar ao vivo? Sem problema..</h3>
+        <p class="text-white/55 text-[13px] sm:text-[14px] leading-[1.7]">No checkout, você pode adicionar ao seu ingresso o conteúdo editado em formato de aulas por 1 ano e assistir depois no seu tempo quantas vezes quiser, com todo material de apoio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== BLOCO 4 — RESULTADO REAL (prints de alunos) ===== -->
+<section class="sec bg-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <div data-r class="text-center mb-3"><span class="sl-light">Resultado real</span></div>
+    <h2 data-r class="text-m-black text-center font-medium tracking-tight mb-4 sm:mb-6" style="font-size:clamp(24px,4vw,44px)">Veja o que os alunos conseguiram fazer no Workshop</h2>
+    <p data-r class="text-m-5 text-[15px] sm:text-[16px] text-center mb-10 sm:mb-14 mx-auto" style="max-width:620px">Entregas reais de profissionais que passaram pelo workshop. Processos documentados, IA rodando, escritório respirando.</p>
+
+    <!-- Carrossel horizontal com snap + setas -->
+    <div class="relative" data-r>
+      <div id="resultado-slider" data-drag-scroll class="flex gap-4 sm:gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-4 select-none" style="-webkit-overflow-scrolling:touch;cursor:grab">
+        <div class="snap-center shrink-0 w-[72%] sm:w-[44%] lg:w-[31.5%]">
+          <div class="rounded-2xl overflow-hidden border border-m-1 bg-m-off shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div style="aspect-ratio:3/4">
+              <img src="../images/print05.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="snap-center shrink-0 w-[72%] sm:w-[44%] lg:w-[31.5%]">
+          <div class="rounded-2xl overflow-hidden border border-m-1 bg-m-off shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div style="aspect-ratio:3/4">
+              <img src="../images/print06.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="snap-center shrink-0 w-[72%] sm:w-[44%] lg:w-[31.5%]">
+          <div class="rounded-2xl overflow-hidden border border-m-1 bg-m-off shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div style="aspect-ratio:3/4">
+              <img src="../images/print07.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="shrink-0 w-2"></div>
+      </div>
+
+      <!-- Nav arrows (mobile/tablet apenas — desktop mostra os 3 de uma vez) -->
+      <div class="flex lg:hidden items-center justify-center gap-3 mt-4">
+        <button data-slider-prev="resultado-slider" aria-label="Entrega anterior" class="w-10 h-10 rounded-full border border-m-1 flex items-center justify-center hover:bg-m-black hover:text-white hover:border-m-black transition-all cursor-pointer text-m-5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <span class="text-m-3 text-[12px]">Deslize para ver todos</span>
+        <button data-slider-next="resultado-slider" aria-label="Próxima entrega" class="w-10 h-10 rounded-full border border-m-1 flex items-center justify-center hover:bg-m-black hover:text-white hover:border-m-black transition-all cursor-pointer text-m-5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BLOCO 5 — PARA QUEM É (carousel with nav) ===== -->
+<section class="sec bg-m-off overflow-hidden">
+  <div class="max-w-6xl mx-auto px-6">
+    <div data-r class="text-center mb-3"><span class="sl-light">Para quem é</span></div>
+    <h2 data-r class="text-m-black text-center font-medium tracking-tight mb-3 sm:mb-4" style="font-size:clamp(24px,4vw,44px)">Esse workshop foi feito para você?</h2>
+    <p data-r class="text-m-5 text-[15px] sm:text-[16px] text-center mb-8 sm:mb-12 mx-auto" style="max-width:500px">Se você marcou pelo menos 3 dos itens abaixo, a resposta é sim.</p>
+  </div>
+
+  <!-- Carousel -->
+  <div class="relative max-w-6xl mx-auto px-6">
+    <div id="quem-slider" data-drag-scroll class="flex gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-6 select-none" style="-webkit-overflow-scrolling:touch;cursor:grab">
+      <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
+        <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="clock" class="w-6 h-6 text-cta/60"></i></div>
+          <h3 class="text-m-black text-[17px] font-semibold mb-2">+10h por dia trabalhando</h3>
+          <p class="text-m-5 text-[14px] leading-[1.6] flex-1">E ainda assim não dá conta de tudo. Sente que o dia nunca é suficiente para o que precisa fazer.</p>
+          <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
+        </div>
+      </div>
+      <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
+        <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="calendar-x" class="w-6 h-6 text-cta/60"></i></div>
+          <h3 class="text-m-black text-[17px] font-semibold mb-2">Finais de semana no escritório</h3>
+          <p class="text-m-5 text-[14px] leading-[1.6] flex-1">Sábado virou extensão da segunda. Família e hobbies ficam sempre para depois.</p>
+          <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
+        </div>
+      </div>
+      <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
+        <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="flame" class="w-6 h-6 text-cta/60"></i></div>
+          <h3 class="text-m-black text-[17px] font-semibold mb-2">Modo bombeira 24/7</h3>
+          <p class="text-m-5 text-[14px] leading-[1.6] flex-1">Fatura razoavelmente bem, mas vive apagando incêndio. Sem nenhuma previsibilidade.</p>
+          <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
+        </div>
+      </div>
+      <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
+        <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="users" class="w-6 h-6 text-cta/60"></i></div>
+          <h3 class="text-m-black text-[17px] font-semibold mb-2">Medo de contratar</h3>
+          <p class="text-m-5 text-[14px] leading-[1.6] flex-1">Não sabe como delegar sem perder o controle. Se você para, tudo para.</p>
+          <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
+        </div>
+      </div>
+      <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
+        <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="eye-off" class="w-6 h-6 text-cta/60"></i></div>
+          <h3 class="text-m-black text-[17px] font-semibold mb-2">Gestão que dá vergonha</h3>
+          <p class="text-m-5 text-[14px] leading-[1.6] flex-1">Se um cliente visse os bastidores, perderia toda a autoridade.</p>
+          <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
+        </div>
+      </div>
+      <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
+        <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="heart" class="w-6 h-6 text-cta/60"></i></div>
+          <h3 class="text-m-black text-[17px] font-semibold mb-2">Quer ter vida de volta</h3>
+          <p class="text-m-5 text-[14px] leading-[1.6] flex-1">Sonha com tempo para a família, mas o escritório te consome por completo.</p>
+          <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
+        </div>
+      </div>
+      <div class="shrink-0 w-6"></div>
+    </div>
+
+    <!-- Nav arrows -->
+    <div class="flex items-center justify-center gap-3 mt-4">
+      <button data-slider-prev="quem-slider" class="w-10 h-10 rounded-full border border-m-1 flex items-center justify-center hover:bg-m-black hover:text-white hover:border-m-black transition-all cursor-pointer text-m-5">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="text-m-3 text-[12px]">Deslize para ver todos</span>
+      <button data-slider-next="quem-slider" class="w-10 h-10 rounded-full border border-m-1 flex items-center justify-center hover:bg-m-black hover:text-white hover:border-m-black transition-all cursor-pointer text-m-5">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <!-- Counter + CTA -->
+    <div id="check-result" data-r class="mt-8 text-center transition-all duration-500" style="opacity:0;transform:translateY(10px)">
+      <p class="text-m-7 text-[15px] mb-4">Você marcou <span id="check-count" class="text-cta font-semibold text-[18px]">0</span> de 6</p>
+      <a href="https://pay.hotmart.com/K98392503A?checkoutMode=10" target="_blank" rel="noopener noreferrer" class="inline-flex bg-cta hover:bg-cta-h text-white px-8 py-3.5 rounded-full text-[15px] font-medium transition-all" style="display:none" id="check-cta">
+        Esse workshop foi feito pra você →
+      </a>
+    </div>
+  </div>
+
+  <!-- Strip: espectro de experiência — recém-formada até 40+ anos -->
+  <div class="max-w-6xl mx-auto px-6 mt-10 sm:mt-14">
+    <div data-r class="text-center mb-6 sm:mb-8">
+      <h3 class="text-m-black font-medium tracking-tight" style="font-size:clamp(24px,4vw,44px)">Funciona pra quem está começando agora e pra quem já tem escritório consolidado</h3>
+      <p class="text-m-5 text-[14px] sm:text-[15px] leading-[1.7] mt-3 mx-auto" style="max-width:600px">Experiência técnica não resolve caos operacional. Por isso o workshop foi desenhado para profissionais maduros que já dominam o ofício e querem instalar o sistema que faltava para o escritório crescer sem consumir quem está no comando.</p>
+    </div>
+
+    <!-- Eixo de carreira -->
+    <div data-r class="flex items-center gap-2 sm:gap-3 mb-5 px-1 sm:px-2">
+      <span class="text-[9px] sm:text-[11px] tracking-[.12em] sm:tracking-[.15em] uppercase text-m-3 font-medium whitespace-nowrap">Começando agora</span>
+      <span class="flex-1 h-px bg-m-1"></span>
+      <span class="text-[9px] sm:text-[11px] tracking-[.12em] sm:tracking-[.15em] uppercase text-m-3 font-medium whitespace-nowrap">40+ anos de carreira</span>
+    </div>
+
+    <!-- Carrossel horizontal com snap + setas (mobile e desktop) -->
+    <div class="relative" data-r>
+      <div id="prints-slider" data-drag-scroll class="flex gap-4 sm:gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-4 select-none" style="-webkit-overflow-scrolling:touch;cursor:grab">
+        <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
+          <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
+              <img src="../images/print04.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
+          <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
+              <img src="../images/print02.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
+          <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
+              <img src="../images/print03.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
+          <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
+              <img src="../images/print01.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="shrink-0 w-2"></div>
+      </div>
+
+      <!-- Nav arrows -->
+      <div class="flex items-center justify-center gap-3 mt-4">
+        <button data-slider-prev="prints-slider" aria-label="Depoimento anterior" class="w-10 h-10 rounded-full border border-m-1 flex items-center justify-center hover:bg-m-black hover:text-white hover:border-m-black transition-all cursor-pointer text-m-5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <span class="text-m-3 text-[12px]">Deslize para ver todos</span>
+        <button data-slider-next="prints-slider" aria-label="Próximo depoimento" class="w-10 h-10 rounded-full border border-m-1 flex items-center justify-center hover:bg-m-black hover:text-white hover:border-m-black transition-all cursor-pointer text-m-5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote -->
+  <div class="max-w-6xl mx-auto px-6 mt-14">
+    <div data-r class="bg-white rounded-3xl border border-m-1 p-8 lg:p-12 flex flex-col lg:flex-row gap-8 items-center">
+      <div class="w-20 h-20 rounded-full bg-m-black border-4 border-m-off overflow-hidden shrink-0">
+        <img src="../images/rodrigo-bio-color.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover object-top">
+      </div>
+      <div>
+        <p class="font-ed text-[20px] lg:text-[24px] text-m-black italic leading-[1.4] mb-3">"Esse sistema me permitiu ter um escritório que não depende de mim. Trabalhar apenas de manhã. Tardes livres pra família e pros hobbies."</p>
+        <p class="text-m-5 text-[13px]">Rodrigo Rosar · 16 anos de escritório · Metrik Design</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== BLOCO 6 — PROVA SOCIAL (iPhone mockup + video) — movido pra cima ===== -->
+<section class="sec bg-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <!-- Left: copy + numbers -->
+      <div data-r="left">
+        <span class="sl-light mb-3 inline-block">O que dizem do Workshop</span>
+        <div class="num mb-3 sm:mb-4" style="font-size:clamp(60px,12vw,140px);color:var(--black);line-height:.85">+<span data-count-to="2034">0</span></div>
+        <h2 class="text-m-black font-medium tracking-tight mb-4" style="font-size:clamp(20px,3vw,32px)">depoimentos sobre o Workshop</h2>
+        <p class="text-m-7 text-[14px] sm:text-[15px] leading-[1.7] mb-6 sm:mb-8" style="max-width:420px">Profissionais maduros, com 10, 15, 20 anos de experiência e de todas as regiões do Brasil, com escritórios de todos os tamanhos, de quem trabalha sozinho a quem gerencia equipes. O que todos tinham em comum: estavam cansados de improvisar.</p>
+
+        <!-- NPS block — destaque separado dos depoimentos Instagram -->
+        <div class="inline-flex items-center gap-3 bg-m-off border border-m-1/60 rounded-2xl px-5 py-3.5 mb-2">
+          <span class="text-cta text-[18px] leading-none" aria-label="Nota 4.9 de 5">★★★★★</span>
+          <div class="flex flex-col">
+            <span class="text-m-black text-[15px] font-semibold">4.9 · <span data-count-to="1389">0</span> avaliações</span>
+            <span class="text-m-5 text-[12px]">Pesquisa de satisfação pós-evento · Média das 5 edições</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: iPhone mockup with video -->
+      <div data-r="right" class="flex justify-center mt-8 lg:mt-0">
+        <div class="relative w-[260px] sm:w-[300px] lg:w-[320px]">
+          <div class="relative bg-m-black rounded-[40px] p-3 shadow-2xl">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[28px] bg-m-black rounded-b-3xl z-10 flex items-end justify-center pb-1"><div class="w-16 h-1 bg-white/20 rounded-full"></div></div>
+            <div class="rounded-[28px] overflow-hidden bg-m-black aspect-[9/16]">
+              <video autoplay muted loop playsinline preload="metadata" class="w-full h-full object-contain">
+                <source src="../images/depoimentos.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+          <div class="absolute -inset-8 bg-cta/5 rounded-full blur-3xl -z-10"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== BLOCO 5B — UMA DECISÃO MUDA TUDO (emocional) ===== -->
+<section class="sec bg-m-black text-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <div data-r class="text-center mb-3"><span class="sl-light">Antes e depois</span></div>
+    <h2 data-r class="text-white text-center font-medium tracking-tight mb-3 sm:mb-4" style="font-size:clamp(26px,4.5vw,48px)">Uma decisão muda tudo</h2>
+    <p data-r class="text-white/45 text-[15px] sm:text-[16px] text-center leading-[1.7] mb-12 sm:mb-16 mx-auto" style="max-width:560px">Não é sobre projetar melhor. É sobre viver melhor. E a gente sabe o que está em jogo.</p>
+
+    <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+      <!-- Imagem backstage do Workshop -->
+      <div data-r="clip" class="relative img-card aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+        <img src="../images/backstage.jpg" alt="Bastidores do Workshop Projeto de Primeira + IA" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1200" height="653">
+      </div>
+
+      <!-- Tópicos emocionais -->
+      <div data-r="right" class="space-y-5">
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="home" class="w-5 h-5 text-[#2DD4BF]"></i></div>
+          <div>
+            <h3 class="text-white text-[17px] font-semibold mb-1.5">Voltar a jantar com quem você ama</h3>
+            <p class="text-white/50 text-[14px] leading-[1.65]">Sem pensar em prazo, sem o celular na mesa, sem aquele projeto rodando na cabeça enquanto o filho fala com você.</p>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="moon" class="w-5 h-5 text-[#2DD4BF]"></i></div>
+          <div>
+            <h3 class="text-white text-[17px] font-semibold mb-1.5">Dormir sem pensar em prazo</h3>
+            <p class="text-white/50 text-[14px] leading-[1.65]">A cabeça desliga quando o processo toma conta. Acabou a ansiedade de domingo à noite.</p>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="sun" class="w-5 h-5 text-[#2DD4BF]"></i></div>
+          <div>
+            <h3 class="text-white text-[17px] font-semibold mb-1.5">Ter o final de semana de volta</h3>
+            <p class="text-white/50 text-[14px] leading-[1.65]">Sábado não é mais extensão da segunda. É sábado. É família, descanso, a vida que você trocou pelo escritório.</p>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="heart" class="w-5 h-5 text-[#2DD4BF]"></i></div>
+          <div>
+            <h3 class="text-white text-[17px] font-semibold mb-1.5">Se olhar no espelho com orgulho de novo</h3>
+            <p class="text-white/50 text-[14px] leading-[1.65]">Sem a culpa do que deixou de lado. Sem a exaustão que virou sua cara. Você de volta ao leme da sua vida.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== BLOCO 7 — PREÇO (CTA 1) ===== -->
+<section id="investimento" class="sec bg-m-black">
+  <div class="max-w-xl mx-auto px-6 text-center">
+    <div data-r class="mb-4"><span class="sl-light">Investimento</span></div>
+    <h2 data-r class="text-white font-light tracking-tight mb-8 sm:mb-12" style="font-size:clamp(24px,4vw,44px)">Tudo isso por apenas...</h2>
+
+    <div data-r="scale" class="bg-white/5 border border-white/10 rounded-3xl p-8 lg:p-12">
+      <div class="mb-2"><span class="text-white/30 text-[16px] line-through">R$ 197</span></div>
+      <div class="text-[#2DD4BF] font-bold leading-none mb-2" style="font-size:clamp(64px,14vw,112px)">R$ 47</div>
+      <p class="text-white/40 text-sm mb-10">14h ao vivo · Certificado · Todos os materiais</p>
+      <a href="https://pay.hotmart.com/K98392503A?checkoutMode=10" target="_blank" rel="noopener noreferrer" class="block w-full bg-cta hover:bg-cta-h active:scale-[0.98] text-white py-4 rounded-full text-[15px] font-medium transition-all mb-4 text-center">Garantir ingresso · Lote promo</a>
+    </div>
+
+    <div data-r class="mt-16 text-left max-w-md mx-auto">
+      <h3 class="text-white text-[20px] font-medium mb-6">Por que tão barato?</h3>
+      <div class="space-y-4 text-[15px] text-white/50 leading-[1.7]">
+        <p>O preço é acessível de propósito. Não quero curiosos. Quero profissionais que vão implementar.</p>
+        <p>Em 14 horas, você vai receber o que eu levei <strong class="text-white/80">16 anos</strong> para construir. Passo <strong class="text-white/80">95% do tempo</strong> entregando conteúdo de alto nível. Nos outros 5%, apresento a <strong class="text-white/80">Implementação Projeto de Primeira</strong>.</p>
+        <p class="font-ed text-[20px] text-white/70 italic mt-6">A conta fecha, para todos nós.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== BLOCO 8 — BIO RODRIGO ===== -->
+<section class="sec bg-m-w">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="grid lg:grid-cols-5 gap-12 lg:gap-20 items-center">
+      <div data-r="clip" class="lg:col-span-2">
+        <div class="img-card aspect-[3/4]">
+          <img src="../images/bio_2-2.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover" loading="lazy" decoding="async">
+        </div>
+      </div>
+      <div data-r="right" class="lg:col-span-3">
+        <span class="sl-light mb-3 inline-block">Quem ensina</span>
+        <h2 class="text-m-black font-light tracking-tight mb-6" style="font-size:clamp(24px,3.5vw,40px)">Prazer, Rodrigo Rosar.</h2>
+        <div class="space-y-4 text-[15px] text-m-7 leading-[1.7] mb-8">
+          <p>Levanta a bandeira contra o ego na arquitetura. Ensina tudo que aprendeu errando, sem medo de compartilhar.</p>
+          <p>Designer por formação, professor da PUC-RS, MBA em Gestão. 16 anos liderando a Metrik Design em Blumenau. Projetos de alto padrão de ponta a ponta, usando o exato método que você vai aprender.</p>
+          <p>Em 2019 abriu o jogo e mostrou seus erros. 457 catalogados. A solução deu vida ao <strong class="text-m-black">Projeto de Primeira</strong>.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-m-off border border-m-1 rounded-full px-4 py-2 text-[11px] font-medium tracking-[.08em] uppercase text-m-gr">Professor · PUC-RS</span>
+          <span class="bg-m-off border border-m-1 rounded-full px-4 py-2 text-[11px] font-medium tracking-[.08em] uppercase text-m-gr">16 anos · Metrik</span>
+          <span class="bg-m-off border border-m-1 rounded-full px-4 py-2 text-[11px] font-medium tracking-[.08em] uppercase text-m-gr">+7.000 alunos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BLOCO 9 — FAQ ===== -->
+<section class="sec bg-m-off">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="grid lg:grid-cols-3 gap-12">
+      <div data-r>
+        <span class="sl-light mb-3 inline-block">Dúvidas</span>
+        <h2 class="text-m-black font-light tracking-tight" style="font-size:clamp(24px,3vw,36px)">Perguntas frequentes</h2>
+      </div>
+      <div class="lg:col-span-2" data-r>
+        <div class="bg-m-w rounded-2xl border border-m-1 overflow-hidden">
+          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Preciso ter experiência com IA para participar?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Não. O workshop parte do zero quando o assunto é IA. Primeiro organizamos sua rotina e processo, depois mostramos onde a IA entra para acelerar. Se você nunca usou nada além do ChatGPT (ou nem isso), vai acompanhar perfeitamente.</p></div></div>
+          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Já tenho anos de experiência, não vou ver conteúdo básico?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Esse workshop foi desenhado para profissionais experientes. 70% das nossas alunas têm mais de 5 anos de mercado. O foco não é ensinar a projetar, é instalar o sistema que tira o escritório das suas costas e te dá liberdade.</p></div></div>
+          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">É ao vivo ou gravado?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Ao vivo, via Zoom, nos dias 16 e 17 de maio. No checkout, você pode adicionar ao seu ingresso o conteúdo editado em formato de aulas por 1 ano.</p></div></div>
+          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Qual a diferença entre o Workshop e a Implementação Projeto de Primeira?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">O Workshop é o mapa. Em dois dias você entende o caminho completo e já começa a aplicar. A Implementação Projeto de Primeira é a jornada: acompanhamento completo para instalar cada etapa no seu escritório, com suporte, sprints semanais e IA configurada para a sua realidade.</p></div></div>
+          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Posso desistir do meu ingresso?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Sim. Se no primeiro dia você sentir que não é para você, devolvemos 100% do valor do ingresso, sem burocracia.</p></div></div>
+          <div><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Vai ficar gravado?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Você pode adquirir o conteúdo dos 2 dias em formato de aulas durante a compra do ingresso ou até um dia antes do evento. Acesso por 1 ano.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BLOCO 10 — FECHAMENTO ===== -->
+<section class="relative overflow-hidden">
+  <div class="absolute inset-0">
+    <img src="https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=1600&q=80" alt="" class="w-full h-full object-cover" loading="lazy" style="filter:blur(2px)">
+    <div class="absolute inset-0 bg-m-black/85"></div>
+  </div>
+  <div class="relative z-10 text-center px-6 py-20 sm:py-28 lg:py-36">
+    <div data-r class="max-w-xl mx-auto">
+      <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-5 py-2 mb-6 sm:mb-8"><span class="text-white/80 text-[13px] sm:text-[14px] font-medium">16 e 17 de maio · Ao vivo · Zoom</span></div>
+      <h2 class="text-white font-light leading-[1.1] tracking-tight mb-4 sm:mb-6" style="font-size:clamp(24px,5vw,48px)">Esse será o último final de semana que você vai precisar trabalhar.</h2>
+      <p class="text-white/50 text-[15px] sm:text-[17px] leading-[1.6] mb-8" style="max-width:400px;margin:0 auto">É hora de agir. Não deixe pra depois.</p>
+      <div class="mb-6">
+        <span class="text-white/25 text-[14px] line-through">R$ 197</span>
+        <div class="text-white font-bold leading-none mt-2" style="font-size:clamp(40px,9vw,64px)">R$ 47</div>
+      </div>
+      <a href="https://pay.hotmart.com/K98392503A?checkoutMode=10" target="_blank" rel="noopener noreferrer" class="inline-flex bg-cta hover:bg-cta-h active:scale-95 text-white w-full sm:w-auto px-10 py-4 rounded-full text-[15px] font-medium transition-all justify-center">Garantir ingresso · Lote promo</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="bg-m-black border-t border-white/5 py-14">
+  <div class="max-w-6xl mx-auto px-6">
+
+    <!-- Suporte -->
+    <div class="text-center mb-10">
+      <p class="text-white/35 text-[12px] uppercase tracking-[0.15em] mb-4">Precisa de ajuda?</p>
+      <a href="https://www.rodrigorosar.com.br/suporte" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/85 hover:text-white text-[13px] font-medium px-5 py-2.5 rounded-full transition-all">
+        <i data-lucide="message-circle" class="w-4 h-4"></i>
+        Falar com o suporte
+      </a>
+    </div>
+
+    <!-- Divider -->
+    <div class="w-12 h-px bg-white/10 mx-auto mb-8"></div>
+
+    <!-- Empresa -->
+    <div class="text-center text-white/35 text-[12px] leading-[1.8]">
+      <p class="font-medium text-white/55">Metrik Projetos de Interiores e Produtos LTDA</p>
+      <p>CNPJ 22.555.309/0001-80</p>
+      <p class="text-white/25 mt-3">&copy; 2026 · Todos os direitos reservados</p>
+    </div>
+
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+</body>
+</html>

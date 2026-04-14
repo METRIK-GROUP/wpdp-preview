@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hero Lab · Workshop PDP+IA</title>
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{background:#0A0A0B;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+    body{padding:40px 20px 80px;max-width:720px;margin:0 auto}
+    header{text-align:center;padding:40px 0 50px}
+    .pill{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#0F766E;background:rgba(15,118,110,0.1);border:1px solid rgba(15,118,110,0.3);padding:6px 14px;border-radius:999px;margin-bottom:24px;font-weight:600}
+    h1{font-size:clamp(28px,6vw,42px);font-weight:700;letter-spacing:-0.02em;line-height:1.1;margin-bottom:14px}
+    .sub{color:rgba(255,255,255,0.5);font-size:15px;line-height:1.6;max-width:480px;margin:0 auto}
+    .versions{display:flex;flex-direction:column;gap:16px;margin-top:20px}
+    .group-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.35);font-weight:600;margin:22px 4px 4px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06)}
+    .group-label:first-child{margin-top:0}
+    .card{display:block;text-decoration:none;color:inherit;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:28px 26px;transition:all 0.25s ease}
+    .card:hover,.card:focus-visible{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.18);transform:translateY(-2px)}
+    .card:focus-visible{outline:2px solid #2DD4BF;outline-offset:4px}
+    .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px}
+    .card-label{font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+    .card-title{font-size:22px;font-weight:700;letter-spacing:-0.01em;margin-top:6px}
+    .card-desc{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.6;margin-top:10px}
+    .arrow{font-size:22px;color:rgba(255,255,255,0.4);flex-shrink:0;transition:transform 0.25s ease,color 0.25s ease}
+    .card:hover .arrow{color:#2DD4BF;transform:translateX(4px)}
+    .badge-current{display:inline-block;font-size:10px;font-weight:700;color:#2DD4BF;background:rgba(45,212,191,0.1);border:1px solid rgba(45,212,191,0.3);padding:3px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:0.8px;margin-left:8px;vertical-align:middle}
+    footer{text-align:center;margin-top:50px;color:rgba(255,255,255,0.3);font-size:12px;line-height:1.8}
+    footer a{color:rgba(255,255,255,0.5);text-decoration:none;border-bottom:1px dashed rgba(255,255,255,0.2)}
+    footer a:hover{color:#2DD4BF}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+
+  <header>
+    <span class="pill">Hero Lab</span>
+    <h1>Testando versões de Hero</h1>
+    <p class="sub">5 variações ativas para teste A/B com tráfego pago. O corpo da página é idêntico em todas — só o Hero muda.</p>
+  </header>
+
+  <main class="versions">
+
+    <span class="group-label">Com botão de checkout no hero</span>
+
+    <a class="card" href="/v1/">
+      <div class="card-head">
+        <div>
+          <div class="card-label">Versão 1</div>
+          <div class="card-title">Light clean · rings animados</div>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+      </div>
+      <p class="card-desc">Fundo branco, rings e orbs teal sutis, conteúdo centralizado. É o Hero que está no site oficial hoje.</p>
+    </a>
+
+    <a class="card" href="/v2/">
+      <div class="card-head">
+        <div>
+          <div class="card-label">Versão 2</div>
+          <div class="card-title">Glass effect · dark mode</div>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+      </div>
+      <p class="card-desc">Fundo preto com orbs teal/cyan difusas atrás de um card glassmórfico central. H1 ajustado, CTA branco sólido pra contraste.</p>
+    </a>
+
+    <a class="card" href="/v3/">
+      <div class="card-head">
+        <div>
+          <div class="card-label">Versão 3</div>
+          <div class="card-title">Video BG · cinematográfico</div>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+      </div>
+      <p class="card-desc">Vídeo em loop mudo no fundo (depoimentos), overlay escuro pra legibilidade, card glass pesado por cima. Mood cinematográfico.</p>
+    </a>
+
+    <span class="group-label">Sem botão de checkout no hero</span>
+
+    <a class="card" href="/v4/">
+      <div class="card-head">
+        <div>
+          <div class="card-label">Versão 4</div>
+          <div class="card-title">Light clean · sem CTA no hero</div>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+      </div>
+      <p class="card-desc">Mesma base visual da v1 (fundo branco), porém sem o bloco de preço e botão de checkout no hero. CTAs aparecem apenas mais abaixo, no bloco de Investimento e no Fechamento.</p>
+    </a>
+
+    <a class="card" href="/v5/">
+      <div class="card-head">
+        <div>
+          <div class="card-label">Versão 5</div>
+          <div class="card-title">Video BG · sem CTA no hero</div>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+      </div>
+      <p class="card-desc">Mesma base visual da v3 (vídeo no fundo, card glass), porém sem o bloco de preço e botão de checkout no hero. CTAs aparecem apenas mais abaixo, no bloco de Investimento e no Fechamento.</p>
+    </a>
+
+  </main>
+
+  <footer>
+    Workshop PDP + IA · <a href="/">voltar pro site oficial</a>
+  </footer>
+
+</body>
+</html>
