@@ -8,15 +8,15 @@
   <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="no-referrer-when-downgrade">
-  <link rel="preload" href="../fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="../fonts/dmserif-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="https://metrik-group.github.io/wpdp-preview/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="https://metrik-group.github.io/wpdp-preview/fonts/dmserif-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>tailwind.config={theme:{extend:{colors:{m:{black:'#1E1E1E',gr:'#3D3D3A','7':'#5F5E5A','5':'#888780','3':'#B4B2A9','1':'#D3D1C7',off:'#F5F4F0',w:'#FFFFFF'},cta:'#0F766E','cta-h':'#0D6B63'},fontFamily:{sans:['Inter','sans-serif'],ed:['DM Serif Display','Georgia','serif']}}}}</script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="https://metrik-group.github.io/wpdp-preview/css/animations.css">
   <style>
-    @font-face{font-family:'Inter';font-style:normal;font-weight:300 600;font-display:swap;src:url('../fonts/inter-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-    @font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/dmserif-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+    @font-face{font-family:'Inter';font-style:normal;font-weight:300 600;font-display:swap;src:url('https://metrik-group.github.io/wpdp-preview/fonts/inter-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+    @font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url('https://metrik-group.github.io/wpdp-preview/fonts/dmserif-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
     html,body{overflow-x:hidden;max-width:100vw;position:relative}
     body{font-family:'Inter',sans-serif;color:#1E1E1E;-webkit-font-smoothing:antialiased}
     [data-panel]{transition:opacity .3s ease,transform .3s ease}
@@ -35,58 +35,77 @@
 <!-- ===== BLOCO 1 — HERO (v2: Glassmorphism dark) ===== -->
 <header id="hero" class="relative flex flex-col overflow-hidden" style="min-height:100svh;background:#0A0A0B">
 
-  <!-- Video background: luminous sphere transition -->
-  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none" autoplay muted loop playsinline preload="auto" poster="../images/hero-sphere-poster.jpg" style="z-index:0;opacity:0.6">
-    <source src="../images/hero-sphere.mp4" type="video/mp4">
-  </video>
-  <!-- Soft darken overlay for legibility over the sphere -->
-  <div class="absolute inset-0 pointer-events-none" style="z-index:1;background:radial-gradient(ellipse at center,rgba(10,10,11,0.3) 0%,rgba(10,10,11,0.7) 70%,rgba(10,10,11,0.92) 100%)"></div>
+  <!-- BG ambient orbs (source of glow behind the glass card) -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <!-- Large teal orb center-left -->
+    <div style="position:absolute;width:720px;height:720px;top:20%;left:-10%;background:radial-gradient(circle,rgba(15,118,110,0.45) 0%,rgba(15,118,110,0) 60%);filter:blur(40px);animation:orb-float 18s ease-in-out infinite"></div>
+    <!-- Cyan orb center-right -->
+    <div style="position:absolute;width:640px;height:640px;bottom:5%;right:-8%;background:radial-gradient(circle,rgba(45,212,191,0.30) 0%,rgba(45,212,191,0) 60%);filter:blur(40px);animation:orb-float 22s ease-in-out infinite reverse"></div>
+    <!-- Small accent orb top -->
+    <div style="position:absolute;width:420px;height:420px;top:-5%;left:40%;background:radial-gradient(circle,rgba(15,118,110,0.25) 0%,rgba(15,118,110,0) 55%);filter:blur(50px);animation:orb-float 26s ease-in-out 2s infinite"></div>
+    <!-- Soft bottom accent -->
+    <div style="position:absolute;width:500px;height:500px;bottom:-15%;left:30%;background:radial-gradient(circle,rgba(45,212,191,0.20) 0%,rgba(45,212,191,0) 60%);filter:blur(60px);animation:orb-float 30s ease-in-out 4s infinite"></div>
+    <!-- Subtle grid pattern overlay -->
+    <div style="position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.04) 1px,transparent 0);background-size:32px 32px;opacity:0.5"></div>
+  </div>
 
   <!-- Top bar: Logo left, Rodrigo right -->
   <div class="relative z-10 flex items-center justify-between px-4 sm:px-6 lg:px-12 pt-5 lg:pt-8">
     <!-- Logo -->
     <div class="flex items-center shrink-0">
-      <img src="../images/Logotipo_Interiores_com_IA_final_white.png" alt="Interiores com IA — Workshop" class="h-7 lg:h-10" loading="eager" fetchpriority="high" decoding="async">
+      <img src="https://metrik-group.github.io/wpdp-preview/images/Logotipo_Interiores_com_IA_final_white.png" alt="Interiores com IA — Workshop" class="h-7 lg:h-10" loading="eager" fetchpriority="high" decoding="async">
     </div>
 
     <!-- Rodrigo -->
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
       <p class="text-white/70 text-[12px] sm:text-[13px] font-medium">Rodrigo Rosar</p>
       <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/5 border-2 border-white/15 overflow-hidden shrink-0 backdrop-blur-sm">
-        <img src="../images/rodrigo-bio-color.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover object-top" fetchpriority="high" decoding="async" width="44" height="44">
+        <img src="https://metrik-group.github.io/wpdp-preview/images/rodrigo-bio-color.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover object-top" fetchpriority="high" decoding="async" width="44" height="44">
       </div>
     </div>
   </div>
 
-  <!-- Hero content: glass card — mobile sobe levemente, desktop centralizado -->
-  <div class="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-10 -translate-y-6 sm:translate-y-0">
-
-    <!-- Date pill: FORA do glass, diretamente sobre o vídeo (glass effect reforçado) -->
-    <div class="h-in mb-5 sm:mb-6">
-      <div class="relative inline-flex items-center gap-2 rounded-full px-5 py-2.5" style="background:rgba(10,10,11,0.55);border:1px solid rgba(255,255,255,0.22);backdrop-filter:blur(60px) saturate(180%);-webkit-backdrop-filter:blur(60px) saturate(180%);box-shadow:0 18px 50px -14px rgba(0,0,0,0.75),inset 0 1px 0 rgba(255,255,255,0.18),inset 0 -1px 0 rgba(0,0,0,0.2)">
-        <div class="absolute inset-x-0 top-0 h-px rounded-t-full" style="background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent)"></div>
-        <span class="inline-block w-1.5 h-1.5 rounded-full bg-cta" style="box-shadow:0 0 10px rgba(45,212,191,0.8)"></span>
-        <span class="text-white/90 text-[12px] sm:text-[13px] font-medium tracking-wide">16 e 17 de maio · Ao vivo · Zoom</span>
-      </div>
-    </div>
-
+  <!-- Hero content: glass card -->
+  <div class="relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6 py-10">
     <div class="max-w-4xl w-full mx-auto">
 
-      <!-- Glassmorphic card (heavier blur to abstract the video behind) -->
-      <div class="relative rounded-[24px] px-6 py-8 sm:px-10 sm:py-10 lg:px-14 lg:py-12 text-center" style="background:rgba(10,10,11,0.35);backdrop-filter:blur(40px) saturate(140%);-webkit-backdrop-filter:blur(40px) saturate(140%);border:1px solid rgba(255,255,255,0.14);box-shadow:0 30px 90px -20px rgba(0,0,0,0.75),inset 0 1px 0 rgba(255,255,255,0.1)">
+      <!-- Glassmorphic card -->
+      <div class="relative rounded-[28px] px-6 py-10 sm:px-10 sm:py-14 lg:px-16 lg:py-16 text-center" style="background:rgba(255,255,255,0.05);backdrop-filter:blur(30px) saturate(140%);-webkit-backdrop-filter:blur(30px) saturate(140%);border:1px solid rgba(255,255,255,0.12);box-shadow:0 25px 80px -20px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08)">
 
         <!-- Subtle top gradient on card edge -->
-        <div class="absolute inset-x-0 top-0 h-px rounded-t-[24px]" style="background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)"></div>
+        <div class="absolute inset-x-0 top-0 h-px rounded-t-[28px]" style="background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)"></div>
 
-        <h1 class="h-in text-white font-bold leading-[1.25] tracking-tight mb-4 sm:mb-5 mx-auto" style="font-size:clamp(24px,3.5vw,38px);max-width:800px;">
+        <div class="h-in">
+          <div class="inline-flex items-center gap-2 rounded-full px-5 py-2 mb-8" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px)">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-cta" style="box-shadow:0 0 10px rgba(45,212,191,0.8)"></span>
+            <span class="text-white/80 text-[13px] font-medium">16 e 17 de maio · Ao vivo · Zoom</span>
+          </div>
+        </div>
+
+        <h1 class="h-in text-white font-bold leading-[1.08] tracking-tight mb-5 sm:mb-6 mx-auto" style="font-size:clamp(28px,4.2vw,46px);max-width:880px;">
           Dois dias para transformar seu processo de projeto em uma máquina de aprovações de primeira, acelerada com IA
         </h1>
 
-        <p class="h-in text-white/65 text-[13px] sm:text-[14px] leading-[1.65] mb-6 sm:mb-8 mx-auto" style="max-width:500px;">
+        <p class="h-in text-white/65 text-[15px] sm:text-[16px] leading-[1.7] mb-8 sm:mb-10 mx-auto" style="max-width:520px;">
           Um passo a passo prático para aprovar projetos de interiores em apenas duas reuniões. Com IA do briefing aos executivos.
         </p>
 
-        <div class="h-in flex flex-wrap items-center justify-center gap-3 sm:gap-5 px-2">
+        <!-- CTA + scarcity bar -->
+        <div class="h-in inline-flex flex-col items-center gap-3 mb-6 w-full sm:w-auto">
+          <span class="text-white/50 text-[14px]">De <span class="line-through">R$ 197</span> por apenas</span>
+          <a href="https://pay.hotmart.com/K98392503A?checkoutMode=10" target="_blank" rel="noopener noreferrer" class="cp bg-white hover:bg-white/95 active:scale-95 text-[#0A0A0B] w-full sm:w-auto px-10 py-4 rounded-full text-[15px] sm:text-[15px] font-semibold transition-all text-center" style="box-shadow:0 20px 50px -10px rgba(255,255,255,0.35),0 0 0 1px rgba(255,255,255,0.25),0 0 60px -10px rgba(45,212,191,0.4)">
+            Garantir ingresso · Lote promo
+          </a>
+          <!-- Scarcity bar -->
+          <div class="w-64 relative">
+            <div class="w-full h-[3px] rounded-full overflow-hidden" style="background:rgba(255,255,255,0.1)">
+              <div class="h-full" style="width:95%;background:#DC2626;border-radius:3px 0 0 3px;box-shadow:0 0 10px rgba(239,68,68,0.5)"></div>
+            </div>
+            <p class="text-[11px] mt-1.5 tracking-wide" style="color:#F87171">Últimas vagas do lote atual</p>
+          </div>
+        </div>
+
+        <div class="h-in flex flex-wrap items-center justify-center gap-3 sm:gap-5 mt-2 px-2">
           <div class="flex items-center gap-2">
             <div class="flex -space-x-2">
               <div class="w-7 h-7 rounded-full border-2 overflow-hidden" style="border-color:rgba(255,255,255,0.2);background:#1E1E1E"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy" style="filter:blur(2px)"></div>
@@ -127,7 +146,7 @@
       <span class="inline-block text-[13px] font-semibold tracking-[.12em] uppercase text-white/60 bg-white/6 border border-white/10 rounded-full px-4 py-1.5 mb-8">Dia 1</span>
       <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         <div data-r="clip" class="img-card aspect-[4/3] lg:sticky-panel">
-          <img src="../images/imagefx-dia1.jpg" alt="Processo de projeto" class="w-full h-full object-cover" loading="lazy" decoding="async">
+          <img src="https://metrik-group.github.io/wpdp-preview/images/imagefx-dia1.jpg" alt="Processo de projeto" class="w-full h-full object-cover" loading="lazy" decoding="async">
         </div>
         <div>
           <span class="text-[#2DD4BF] text-[12px] font-medium tracking-[.1em] uppercase mb-3 inline-block">Sábado · 9h às 17h</span>
@@ -149,7 +168,7 @@
       <span class="inline-block text-[13px] font-semibold tracking-[.12em] uppercase text-white/60 bg-white/6 border border-white/10 rounded-full px-4 py-1.5 mb-8">Dia 2</span>
       <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         <div data-r="clip" class="img-card aspect-[4/3] lg:sticky-panel">
-          <img src="../images/imagefx-dia2.jpg" alt="IA aplicada ao design" class="w-full h-full object-cover" loading="lazy" decoding="async">
+          <img src="https://metrik-group.github.io/wpdp-preview/images/imagefx-dia2.jpg" alt="IA aplicada ao design" class="w-full h-full object-cover" loading="lazy" decoding="async">
         </div>
         <div>
           <span class="text-[#2DD4BF] text-[12px] font-medium tracking-[.1em] uppercase mb-3 inline-block">Domingo · 9h às 17h</span>
@@ -370,9 +389,9 @@
         <p class="text-m-5 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:560px">Você vai aprender a montar fluxos de render que transformam qualquer cena 3D em renders de alta qualidade na hora. Variações de iluminação, ambientação com pessoas, vídeos com câmera suave pelo projeto inteiro. Sem esperar dias pelo renderista, sem computador potente e sem depender de ninguém.</p>
       </div>
       <div class="img-compare mx-auto" id="render-compare" data-r="scale" style="max-width:720px">
-        <img src="../images/3D_Perpetual_Rooftop_021.jpg" alt="Render fotorrealista" draggable="false" loading="lazy" decoding="async">
+        <img src="https://metrik-group.github.io/wpdp-preview/images/3D_Perpetual_Rooftop_021.jpg" alt="Render fotorrealista" draggable="false" loading="lazy" decoding="async">
         <div class="img-compare-overlay">
-          <img src="../images/3D_Perpetual_Rooftop_02.jpg" alt="Sketch SketchUp" draggable="false" loading="lazy" decoding="async">
+          <img src="https://metrik-group.github.io/wpdp-preview/images/3D_Perpetual_Rooftop_02.jpg" alt="Sketch SketchUp" draggable="false" loading="lazy" decoding="async">
         </div>
         <div class="img-compare-handle" role="slider" tabindex="0" aria-label="Arraste para comparar sketch e render" aria-valuenow="50" aria-valuemin="5" aria-valuemax="95">
           <div class="img-compare-grip"></div>
@@ -588,7 +607,7 @@
   <div data-r class="max-w-6xl mx-auto px-6">
     <div id="mat-accordion" class="mat-acc flex gap-3 h-[420px] sm:h-[480px] lg:h-[520px]">
       <div class="mat-acc-item active" data-mat-item data-mat-title="Assistente de IA">
-        <img src="../images/Assistentedeia.jpg" alt="Assistente de IA" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="https://metrik-group.github.io/wpdp-preview/images/Assistentedeia.jpg" alt="Assistente de IA" class="mat-acc-img" loading="lazy" decoding="async">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">01</span>
@@ -597,7 +616,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Diagnóstico">
-        <img src="../images/diagnostico.jpg" alt="Planilha de Diagnóstico" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="https://metrik-group.github.io/wpdp-preview/images/diagnostico.jpg" alt="Planilha de Diagnóstico" class="mat-acc-img" loading="lazy" decoding="async">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">02</span>
@@ -606,7 +625,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Prompts">
-        <img src="../images/prompt.jpg" alt="Prompts Prontos" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="https://metrik-group.github.io/wpdp-preview/images/prompt.jpg" alt="Prompts Prontos" class="mat-acc-img" loading="lazy" decoding="async">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">03</span>
@@ -615,7 +634,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Processos">
-        <img src="../images/planilhadiagnostico.jpg" alt="Mapeamento de Processos" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="https://metrik-group.github.io/wpdp-preview/images/planilhadiagnostico.jpg" alt="Mapeamento de Processos" class="mat-acc-img" loading="lazy" decoding="async">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">04</span>
@@ -624,7 +643,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Workflow IA">
-        <img src="../images/bonusextras.jpg" alt="Workflow de IA" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="https://metrik-group.github.io/wpdp-preview/images/bonusextras.jpg" alt="Workflow de IA" class="mat-acc-img" loading="lazy" decoding="async">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">05</span>
@@ -633,7 +652,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Financeiro">
-        <img src="../images/planejamentofinanceiro.jpg" alt="Planejamento Financeiro" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="https://metrik-group.github.io/wpdp-preview/images/planejamentofinanceiro.jpg" alt="Planejamento Financeiro" class="mat-acc-img" loading="lazy" decoding="async">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">06</span>
@@ -642,7 +661,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Bônus">
-        <img src="../images/bonus.jpg" alt="Bônus Extras" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="https://metrik-group.github.io/wpdp-preview/images/bonus.jpg" alt="Bônus Extras" class="mat-acc-img" loading="lazy" decoding="async">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">07</span>
@@ -730,21 +749,21 @@
         <div class="snap-center shrink-0 w-[72%] sm:w-[44%] lg:w-[31.5%]">
           <div class="rounded-2xl overflow-hidden border border-m-1 bg-m-off shadow-sm hover:shadow-md transition-shadow duration-300">
             <div style="aspect-ratio:3/4">
-              <img src="../images/print05.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
+              <img src="https://metrik-group.github.io/wpdp-preview/images/print05.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
             </div>
           </div>
         </div>
         <div class="snap-center shrink-0 w-[72%] sm:w-[44%] lg:w-[31.5%]">
           <div class="rounded-2xl overflow-hidden border border-m-1 bg-m-off shadow-sm hover:shadow-md transition-shadow duration-300">
             <div style="aspect-ratio:3/4">
-              <img src="../images/print06.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
+              <img src="https://metrik-group.github.io/wpdp-preview/images/print06.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
             </div>
           </div>
         </div>
         <div class="snap-center shrink-0 w-[72%] sm:w-[44%] lg:w-[31.5%]">
           <div class="rounded-2xl overflow-hidden border border-m-1 bg-m-off shadow-sm hover:shadow-md transition-shadow duration-300">
             <div style="aspect-ratio:3/4">
-              <img src="../images/print07.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
+              <img src="https://metrik-group.github.io/wpdp-preview/images/print07.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
             </div>
           </div>
         </div>
@@ -867,28 +886,28 @@
         <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
           <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
-              <img src="../images/print04.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+              <img src="https://metrik-group.github.io/wpdp-preview/images/print04.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
             </div>
           </div>
         </div>
         <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
           <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
-              <img src="../images/print02.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+              <img src="https://metrik-group.github.io/wpdp-preview/images/print02.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
             </div>
           </div>
         </div>
         <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
           <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
-              <img src="../images/print03.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+              <img src="https://metrik-group.github.io/wpdp-preview/images/print03.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
             </div>
           </div>
         </div>
         <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
           <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
-              <img src="../images/print01.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+              <img src="https://metrik-group.github.io/wpdp-preview/images/print01.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
             </div>
           </div>
         </div>
@@ -912,7 +931,7 @@
   <div class="max-w-6xl mx-auto px-6 mt-14">
     <div data-r class="bg-white rounded-3xl border border-m-1 p-8 lg:p-12 flex flex-col lg:flex-row gap-8 items-center">
       <div class="w-20 h-20 rounded-full bg-m-black border-4 border-m-off overflow-hidden shrink-0">
-        <img src="../images/rodrigo-bio-color.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover object-top">
+        <img src="https://metrik-group.github.io/wpdp-preview/images/rodrigo-bio-color.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover object-top">
       </div>
       <div>
         <p class="font-ed text-[20px] lg:text-[24px] text-m-black italic leading-[1.4] mb-3">"Esse sistema me permitiu ter um escritório que não depende de mim. Trabalhar apenas de manhã. Tardes livres pra família e pros hobbies."</p>
@@ -951,7 +970,7 @@
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[28px] bg-m-black rounded-b-3xl z-10 flex items-end justify-center pb-1"><div class="w-16 h-1 bg-white/20 rounded-full"></div></div>
             <div class="rounded-[28px] overflow-hidden bg-m-black aspect-[9/16]">
               <video autoplay muted loop playsinline preload="metadata" class="w-full h-full object-contain">
-                <source src="../images/depoimentos.mp4" type="video/mp4">
+                <source src="https://metrik-group.github.io/wpdp-preview/images/depoimentos.mp4" type="video/mp4">
               </video>
             </div>
           </div>
@@ -973,7 +992,7 @@
     <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
       <!-- Imagem backstage do Workshop -->
       <div data-r="clip" class="relative img-card aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/10">
-        <img src="../images/backstage.jpg" alt="Bastidores do Workshop Projeto de Primeira + IA" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1200" height="653">
+        <img src="https://metrik-group.github.io/wpdp-preview/images/backstage.jpg" alt="Bastidores do Workshop Projeto de Primeira + IA" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1200" height="653">
       </div>
 
       <!-- Tópicos emocionais -->
@@ -1043,7 +1062,7 @@
     <div class="grid lg:grid-cols-5 gap-12 lg:gap-20 items-center">
       <div data-r="clip" class="lg:col-span-2">
         <div class="img-card aspect-[3/4]">
-          <img src="../images/bio_2-2.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover" loading="lazy" decoding="async">
+          <img src="https://metrik-group.github.io/wpdp-preview/images/bio_2-2.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover" loading="lazy" decoding="async">
         </div>
       </div>
       <div data-r="right" class="lg:col-span-3">
@@ -1132,6 +1151,6 @@
   </div>
 </footer>
 
-<script src="../js/main.js"></script>
+<script src="https://metrik-group.github.io/wpdp-preview/js/main.js"></script>
 </body>
 </html>
