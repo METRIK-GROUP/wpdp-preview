@@ -35,70 +35,71 @@
   </div>
 </nav>
 
-<!-- ===== BLOCO 1 — HERO (light version) ===== -->
-<header id="hero" class="relative flex flex-col bg-white overflow-hidden" style="min-height:100svh">
-  <!-- BG animated gradient rings -->
-  <div class="absolute inset-0 overflow-hidden">
-    <div class="hero-ring" style="width:700px;height:700px;top:50%;left:50%;transform:translate(-50%,-50%);border:2px solid rgba(15,118,110,0.15);border-radius:50%;animation:ring-pulse 7s ease-in-out infinite"></div>
-    <div class="hero-ring" style="width:1000px;height:1000px;top:50%;left:50%;transform:translate(-50%,-50%);border:1.5px solid rgba(15,118,110,0.10);border-radius:50%;animation:ring-pulse 7s ease-in-out 1.5s infinite"></div>
-    <div class="hero-ring" style="width:1300px;height:1300px;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid rgba(15,118,110,0.07);border-radius:50%;animation:ring-pulse 7s ease-in-out 3s infinite"></div>
-    <div class="hero-ring" style="width:1600px;height:1600px;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid rgba(15,118,110,0.04);border-radius:50%;animation:ring-pulse 7s ease-in-out 4.5s infinite"></div>
-    <div class="hero-orb" style="width:500px;height:500px;top:15%;left:-5%;background:radial-gradient(circle,rgba(15,118,110,0.10) 0%,transparent 55%);animation:orb-float 18s ease-in-out infinite"></div>
-    <div class="hero-orb" style="width:400px;height:400px;bottom:10%;right:-3%;background:radial-gradient(circle,rgba(15,118,110,0.08) 0%,transparent 55%);animation:orb-float 22s ease-in-out infinite reverse"></div>
-  </div>
+<!-- ===== BLOCO 1 — HERO (v2: Glassmorphism dark) ===== -->
+<header id="hero" class="relative flex flex-col overflow-hidden" style="min-height:100svh;background:#0A0A0B">
+
+  <!-- Video background: luminous sphere transition -->
+  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none" autoplay muted loop playsinline preload="auto" style="z-index:0;opacity:0.6">
+    <source src="../images/hero-sphere.mp4" type="video/mp4">
+  </video>
+  <!-- Soft darken overlay for legibility over the sphere -->
+  <div class="absolute inset-0 pointer-events-none" style="z-index:1;background:radial-gradient(ellipse at center,rgba(10,10,11,0.3) 0%,rgba(10,10,11,0.7) 70%,rgba(10,10,11,0.92) 100%)"></div>
 
   <!-- Top bar: Logo left, Rodrigo right -->
   <div class="relative z-10 flex items-center justify-between px-4 sm:px-6 lg:px-12 pt-5 lg:pt-8">
     <!-- Logo -->
     <div class="flex items-center shrink-0">
-      <img src="../images/Logotipo_Interiores_com_IA_final.png" alt="Interiores com IA — Workshop" class="h-7 lg:h-10" loading="eager" fetchpriority="high" decoding="async">
+      <img src="../images/Logotipo_Interiores_com_IA_final_white.png" alt="Interiores com IA — Workshop" class="h-7 lg:h-10" loading="eager" fetchpriority="high" decoding="async">
     </div>
 
     <!-- Rodrigo -->
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-      <p class="text-m-black/70 text-[12px] sm:text-[13px] font-medium">Rodrigo Rosar</p>
-      <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-m-black border-2 border-m-black/10 overflow-hidden shrink-0">
+      <p class="text-white/70 text-[12px] sm:text-[13px] font-medium">Rodrigo Rosar</p>
+      <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/5 border-2 border-white/15 overflow-hidden shrink-0 backdrop-blur-sm">
         <img src="../images/rodrigo-bio-color.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover object-top" fetchpriority="high" decoding="async" width="44" height="44">
       </div>
     </div>
   </div>
 
-  <!-- Hero content (centered) -->
-  <div class="relative z-10 flex-1 flex items-center justify-center">
-    <div class="max-w-4xl mx-auto px-6 text-center">
-      <div class="h-in">
-        <div class="inline-flex items-center gap-2 bg-m-black/5 border border-m-black/8 backdrop-blur-sm rounded-full px-5 py-2 mb-8">
-          <span class="text-m-black/60 text-[13px] font-medium">16 e 17 de maio · Ao vivo · Zoom</span>
-        </div>
-      </div>
+  <!-- Hero content: glass card -->
+  <div class="relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6 py-10">
+    <div class="max-w-4xl w-full mx-auto">
 
-      <h1 class="h-in text-m-black font-bold leading-[1.08] tracking-tight mb-5 sm:mb-6" style="font-size:clamp(28px,5.5vw,60px);">
-        Dois dias para transformar seu processo de projeto em uma máquina de aprovações de primeira, acelerada com IA
-      </h1>
+      <!-- Glassmorphic card (heavier blur to abstract the video behind) -->
+      <div class="relative rounded-[28px] px-6 py-10 sm:px-10 sm:py-14 lg:px-16 lg:py-16 text-center" style="background:rgba(10,10,11,0.35);backdrop-filter:blur(40px) saturate(140%);-webkit-backdrop-filter:blur(40px) saturate(140%);border:1px solid rgba(255,255,255,0.14);box-shadow:0 30px 90px -20px rgba(0,0,0,0.75),inset 0 1px 0 rgba(255,255,255,0.1)">
 
-      <p class="h-in text-m-7 text-[15px] sm:text-[16px] leading-[1.7] mb-8 sm:mb-10 mx-auto" style="max-width:520px;">
-        Em um final de semana, vamos acabar com a desorganização e construir juntos um processo de projeto profissional, com IA do briefing aos executivos.
-      </p>
+        <!-- Subtle top gradient on card edge -->
+        <div class="absolute inset-x-0 top-0 h-px rounded-t-[28px]" style="background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)"></div>
 
-      <!-- CTA + scarcity bar -->
-      <div class="h-in inline-flex flex-col items-center gap-3 mb-6 w-full sm:w-auto">
-        <span class="text-m-5 text-[14px]">De <span class="line-through">R$ 197</span> por apenas</span>
-        <a href="https://pay.hotmart.com/K98392503A?checkoutMode=10" target="_blank" rel="noopener noreferrer" class="cp bg-cta hover:bg-cta-h active:scale-95 text-white w-full sm:w-auto px-10 py-4 rounded-full text-[15px] sm:text-[15px] font-medium transition-all shadow-lg shadow-cta/20 text-center">
-          Garantir ingresso · Lote promo
-        </a>
-        <!-- Scarcity bar -->
-        <div class="w-64 relative">
-          <div class="w-full h-[3px] rounded-full overflow-hidden" style="background:#D3D1C7">
-            <div class="h-full" style="width:95%;background:#DC2626;border-radius:3px 0 0 3px"></div>
+        <div class="h-in">
+          <div class="inline-flex items-center gap-2 rounded-full px-5 py-2 mb-8" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px)">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-cta" style="box-shadow:0 0 10px rgba(45,212,191,0.8)"></span>
+            <span class="text-white/80 text-[13px] font-medium">16 e 17 de maio · Ao vivo · Zoom</span>
           </div>
-          <p class="text-[11px] mt-1.5 tracking-wide" style="color:#EF4444">Últimas vagas do lote atual</p>
         </div>
-      </div>
 
-      <div class="h-in flex flex-wrap items-center justify-center gap-3 sm:gap-5 mt-2 px-2">
-        <div class="flex items-center gap-2"><div class="flex -space-x-2"><div class="w-7 h-7 rounded-full bg-m-off border-2 border-white overflow-hidden"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy"></div><div class="w-7 h-7 rounded-full bg-m-off border-2 border-white overflow-hidden"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy"></div><div class="w-7 h-7 rounded-full bg-m-off border-2 border-white overflow-hidden"><img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy"></div><div class="w-7 h-7 rounded-full bg-m-black border-2 border-white flex items-center justify-center text-white text-[9px] font-bold">+3k</div></div><span class="text-m-5 text-[12px]">+3.100 participantes</span></div>
-        <div class="flex items-center gap-1.5"><span class="text-cta text-[13px]" aria-label="Nota 4.9 de 5">★★★★★</span><span class="text-m-5 text-[12px]">4.9 · 1389 avaliações</span></div>
-        <span class="text-m-3 text-[12px]">5 edições realizadas</span>
+        <h1 class="h-in text-white font-bold leading-[1.08] tracking-tight mb-5 sm:mb-6 mx-auto" style="font-size:clamp(28px,4.2vw,46px);max-width:880px;">
+          Dois dias para transformar seu processo de projeto em uma máquina de aprovações de primeira, acelerada com IA
+        </h1>
+
+        <p class="h-in text-white/65 text-[15px] sm:text-[16px] leading-[1.7] mb-8 sm:mb-10 mx-auto" style="max-width:520px;">
+          Um passo a passo prático para aprovar projetos de interiores em apenas duas reuniões. Com IA do briefing aos executivos.
+        </p>
+
+        <div class="h-in flex flex-wrap items-center justify-center gap-3 sm:gap-5 mt-6 sm:mt-8 px-2">
+          <div class="flex items-center gap-2">
+            <div class="flex -space-x-2">
+              <div class="w-7 h-7 rounded-full border-2 overflow-hidden" style="border-color:rgba(255,255,255,0.2);background:#1E1E1E"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy"></div>
+              <div class="w-7 h-7 rounded-full border-2 overflow-hidden" style="border-color:rgba(255,255,255,0.2);background:#1E1E1E"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy"></div>
+              <div class="w-7 h-7 rounded-full border-2 overflow-hidden" style="border-color:rgba(255,255,255,0.2);background:#1E1E1E"><img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy"></div>
+              <div class="w-7 h-7 rounded-full border-2 flex items-center justify-center text-white text-[9px] font-bold" style="border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.1)">+3k</div>
+            </div>
+            <span class="text-white/50 text-[12px]">+3.100 participantes</span>
+          </div>
+          <div class="flex items-center gap-1.5"><span class="text-[13px]" style="color:#2DD4BF" aria-label="Nota 4.9 de 5">★★★★★</span><span class="text-white/50 text-[12px]">4.9 · 1389 avaliações</span></div>
+          <span class="text-white/35 text-[12px]">5 edições realizadas</span>
+        </div>
+
       </div>
     </div>
   </div>
