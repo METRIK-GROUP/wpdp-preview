@@ -45,7 +45,7 @@
 <header id="hero" class="relative flex flex-col overflow-hidden" style="min-height:100svh;background:#0A0A0B">
 
   <!-- Video background MOBILE: videobg.mp4 em destaque (quase intacto) — loop eterno, autoplay blindado -->
-  <video id="bg-mobile" class="absolute inset-0 w-full h-full object-cover pointer-events-none sm:hidden" autoplay muted loop playsinline webkit-playsinline="true" x5-playsinline="true" x5-video-player-type="h5-page" preload="auto" fetchpriority="low" disablepictureinpicture disableremoteplayback controlslist="nodownload nofullscreen noplaybackrate noremoteplayback" style="z-index:0;opacity:1;background:#0A0A0B" aria-hidden="true">
+  <video id="bg-mobile" class="absolute inset-0 w-full h-full object-cover pointer-events-none sm:hidden" autoplay muted loop playsinline webkit-playsinline="true" x5-playsinline="true" x5-video-player-type="h5-page" preload="auto" fetchpriority="low" poster="../images/videobg-poster.jpg" disablepictureinpicture disableremoteplayback controlslist="nodownload nofullscreen noplaybackrate noremoteplayback" style="z-index:0;opacity:1;background:#0A0A0B;object-position:center" aria-hidden="true">
     <source src="../images/videobg.mp4" type="video/mp4">
   </video>
   <!-- Video background DESKTOP: luminous sphere (original) — loop eterno, autoplay blindado -->
@@ -1149,33 +1149,50 @@
 
 <script src="../js/main.js"></script>
 <script>
-  // Autoplay blindado: retry ate conseguir tocar, loop eterno garantido
+  // Autoplay blindado v2: retry agressivo + detection de stall + poster fallback se falhar
   (function(){
     var vids = document.querySelectorAll('header video');
     if (!vids.length) return;
     var force = function(v){
-      try { v.muted = true; v.playsInline = true; } catch(e){}
-      var p = v.play();
+      try { v.muted = true; v.defaultMuted = true; v.playsInline = true; v.autoplay = true; } catch(e){}
+      var p;
+      try { p = v.play(); } catch(e){ return; }
       if (p && typeof p.catch === 'function') p.catch(function(){});
     };
     vids.forEach(function(v){
       force(v);
       v.addEventListener('loadedmetadata', function(){ force(v); });
       v.addEventListener('canplay', function(){ force(v); });
+      v.addEventListener('canplaythrough', function(){ force(v); });
       v.addEventListener('pause', function(){ if (!v.ended) force(v); });
-      v.addEventListener('ended', function(){ v.currentTime = 0; force(v); });
+      v.addEventListener('ended', function(){ try { v.currentTime = 0; } catch(e){} force(v); });
+      v.addEventListener('stalled', function(){ force(v); });
+      v.addEventListener('suspend', function(){ force(v); });
     });
+    // Poll: se video nao avanca por >2s, tenta de novo
+    var lastT = {}, stuck = 0;
+    setInterval(function(){
+      vids.forEach(function(v, i){
+        if (v.paused || v.readyState < 2) { force(v); return; }
+        var t = v.currentTime;
+        if (lastT[i] !== undefined && t === lastT[i]) {
+          stuck++;
+          if (stuck >= 2) { force(v); stuck = 0; }
+        } else { stuck = 0; }
+        lastT[i] = t;
+      });
+    }, 1500);
     // Retry em qualquer interacao (iOS Low Power Mode / Data Saver)
-    ['touchstart','click','scroll','keydown'].forEach(function(ev){
-      document.addEventListener(ev, function once(){
-        vids.forEach(force);
-        document.removeEventListener(ev, once);
-      }, { passive: true });
+    var onInteract = function(){ vids.forEach(force); };
+    ['touchstart','touchend','click','pointerdown','scroll','keydown'].forEach(function(ev){
+      document.addEventListener(ev, onInteract, { passive: true, capture: true });
     });
-    // Retry ao voltar de background (tab switch)
+    // Retry ao voltar de background (tab switch / unlock)
     document.addEventListener('visibilitychange', function(){
       if (!document.hidden) vids.forEach(force);
     });
+    window.addEventListener('pageshow', function(){ vids.forEach(force); });
+    window.addEventListener('focus', function(){ vids.forEach(force); });
   })();
 </script>
 </body>
