@@ -38,12 +38,12 @@
 <!-- ===== BLOCO 1 — HERO (v2: Glassmorphism dark) ===== -->
 <header id="hero" class="relative flex flex-col overflow-hidden" style="min-height:100svh;background:#0A0A0B">
 
-  <!-- Video background MOBILE: videobg.mp4 em destaque (quase intacto) -->
-  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none sm:hidden" autoplay muted loop playsinline preload="auto" style="z-index:0;opacity:1">
+  <!-- Video background MOBILE: videobg.mp4 em destaque (quase intacto) — loop eterno, preload metadata (LCP friendly) -->
+  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none sm:hidden" autoplay muted loop playsinline preload="metadata" fetchpriority="low" style="z-index:0;opacity:1;background:#0A0A0B">
     <source src="../images/videobg.mp4" type="video/mp4">
   </video>
-  <!-- Video background DESKTOP: luminous sphere (original) -->
-  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none hidden sm:block" autoplay muted loop playsinline preload="auto" poster="../images/hero-sphere-poster.jpg" style="z-index:0;opacity:0.6">
+  <!-- Video background DESKTOP: luminous sphere (original) — loop eterno, preload metadata -->
+  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none hidden sm:block" autoplay muted loop playsinline preload="metadata" fetchpriority="low" poster="../images/hero-sphere-poster.jpg" style="z-index:0;opacity:0.6">
     <source src="../images/hero-sphere.mp4" type="video/mp4">
   </video>
   <!-- Overlay MOBILE: bem leve, so um vignette sutil pra nao competir com UI -->
