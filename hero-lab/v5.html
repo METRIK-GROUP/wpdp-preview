@@ -38,14 +38,25 @@
 <!-- ===== BLOCO 1 — HERO (v2: Glassmorphism dark) ===== -->
 <header id="hero" class="relative flex flex-col overflow-hidden" style="min-height:100svh;background:#0A0A0B">
 
-  <!-- Video background: luminous sphere transition -->
-  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none" autoplay muted loop playsinline preload="auto" poster="../images/hero-sphere-poster.jpg" style="z-index:0;opacity:0.6">
+  <!-- Video background MOBILE: videobg.mp4 em destaque (quase intacto) -->
+  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none sm:hidden" autoplay muted loop playsinline preload="auto" style="z-index:0;opacity:1">
+    <source src="../images/videobg.mp4" type="video/mp4">
+  </video>
+  <!-- Video background DESKTOP: luminous sphere (original) -->
+  <video class="absolute inset-0 w-full h-full object-cover pointer-events-none hidden sm:block" autoplay muted loop playsinline preload="auto" poster="../images/hero-sphere-poster.jpg" style="z-index:0;opacity:0.6">
     <source src="../images/hero-sphere.mp4" type="video/mp4">
   </video>
-  <!-- Soft darken overlay for legibility over the sphere -->
-  <div class="absolute inset-0 pointer-events-none" style="z-index:1;background:radial-gradient(ellipse at center,rgba(10,10,11,0.3) 0%,rgba(10,10,11,0.7) 70%,rgba(10,10,11,0.92) 100%)"></div>
+  <!-- Overlay MOBILE: bem leve, so um vignette sutil pra nao competir com UI -->
+  <div class="absolute inset-0 pointer-events-none sm:hidden" style="z-index:1;background:linear-gradient(180deg,rgba(10,10,11,0.15) 0%,rgba(10,10,11,0) 30%,rgba(10,10,11,0) 60%,rgba(10,10,11,0.35) 100%)"></div>
+  <!-- Overlay DESKTOP: original radial gradient -->
+  <div class="absolute inset-0 pointer-events-none hidden sm:block" style="z-index:1;background:radial-gradient(ellipse at center,rgba(10,10,11,0.3) 0%,rgba(10,10,11,0.7) 70%,rgba(10,10,11,0.92) 100%)"></div>
 
-  <!-- Top bar: Logo left, Rodrigo right -->
+  <!-- Logo workshop: centralizado, abaixo do top bar pra nao colidir com Rodrigo -->
+  <div class="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-20 opacity-80">
+    <img src="../images/Logotipo_Interiores_com_IA_final_white.png" alt="Interiores com IA - Workshop" class="h-8 sm:h-9" loading="eager" fetchpriority="high" decoding="async">
+  </div>
+
+  <!-- Top bar: Rodrigo right -->
   <div class="relative z-10 flex items-center justify-end px-4 sm:px-6 lg:px-12 pt-5 lg:pt-8">
     <!-- Rodrigo -->
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -57,33 +68,30 @@
   </div>
 
   <!-- Hero content: glass card — mobile sobe levemente, desktop centralizado -->
-  <div class="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pt-72 sm:pt-10 pb-10">
+  <div class="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pt-[304px] sm:pt-12 pb-10">
 
-    <div class="h-in mb-5 flex justify-center">
-      <img src="../images/Logotipo_Interiores_com_IA_final_white.png" alt="Interiores com IA - Workshop" class="h-10 sm:h-11" loading="eager" fetchpriority="high" decoding="async">
-    </div>
     <!-- Date pill: FORA do glass, diretamente sobre o vídeo (glass effect reforçado) -->
     <div class="h-in mb-5 sm:mb-6">
-      <div class="relative inline-flex items-center gap-2 rounded-full px-5 py-2.5" style="background:rgba(10,10,11,0.55);border:1px solid rgba(255,255,255,0.22);backdrop-filter:blur(60px) saturate(180%);-webkit-backdrop-filter:blur(60px) saturate(180%);box-shadow:0 18px 50px -14px rgba(0,0,0,0.75),inset 0 1px 0 rgba(255,255,255,0.18),inset 0 -1px 0 rgba(0,0,0,0.2)">
+      <div class="relative inline-flex items-center gap-2 rounded-full px-4 py-2" style="background:rgba(10,10,11,0.55);border:1px solid rgba(255,255,255,0.22);backdrop-filter:blur(60px) saturate(180%);-webkit-backdrop-filter:blur(60px) saturate(180%);box-shadow:0 18px 50px -14px rgba(0,0,0,0.75),inset 0 1px 0 rgba(255,255,255,0.18),inset 0 -1px 0 rgba(0,0,0,0.2)">
         <div class="absolute inset-x-0 top-0 h-px rounded-t-full" style="background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent)"></div>
         <span class="inline-block w-1.5 h-1.5 rounded-full bg-cta" style="box-shadow:0 0 10px rgba(45,212,191,0.8)"></span>
-        <span class="text-white/90 text-[12px] sm:text-[13px] font-medium tracking-wide">16 e 17 de maio · Ao vivo · Zoom</span>
+        <span class="text-white/90 text-[11px] sm:text-[12px] font-medium tracking-wide">16 e 17 de maio · Ao vivo · Zoom</span>
       </div>
     </div>
 
     <div class="max-w-4xl w-full mx-auto">
 
-      <!-- Glassmorphic card (heavier blur to abstract the video behind) -->
-      <div class="relative rounded-[24px] px-6 py-8 sm:px-10 sm:py-10 lg:px-14 lg:py-12 text-center" style="background:rgba(10,10,11,0.35);backdrop-filter:blur(40px) saturate(140%);-webkit-backdrop-filter:blur(40px) saturate(140%);border:1px solid rgba(255,255,255,0.14);box-shadow:0 30px 90px -20px rgba(0,0,0,0.75),inset 0 1px 0 rgba(255,255,255,0.1)">
+      <!-- Glassmorphic card: blur medio + bg moderado (deixa video respirar, text-shadow garante leitura) -->
+      <div class="relative rounded-[20px] px-5 py-7 sm:px-8 sm:py-8 lg:px-12 lg:py-10 text-center" style="background:rgba(10,10,11,0.38);backdrop-filter:blur(45px) saturate(145%);-webkit-backdrop-filter:blur(45px) saturate(145%);border:1px solid rgba(255,255,255,0.15);box-shadow:0 20px 60px -18px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1)">
 
         <!-- Subtle top gradient on card edge -->
         <div class="absolute inset-x-0 top-0 h-px rounded-t-[24px]" style="background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)"></div>
 
-        <h1 class="h-in text-white font-bold leading-[1.25] tracking-tight mb-4 sm:mb-5 mx-auto" style="font-size:clamp(24px,3.5vw,38px);max-width:800px;">
+        <h1 class="h-in text-white font-bold leading-[1.25] tracking-tight mb-3 sm:mb-4 mx-auto" style="font-size:clamp(22px,3.2vw,34px);max-width:760px;text-shadow:0 2px 24px rgba(0,0,0,0.6);">
           Dois dias para transformar seu processo de projeto em uma máquina de aprovações de primeira acelerada com IA
         </h1>
 
-        <p class="h-in text-white/65 text-[13px] sm:text-[14px] leading-[1.65] mb-6 sm:mb-8 mx-auto" style="max-width:500px;">
+        <p class="h-in text-white/75 text-[12.5px] sm:text-[13.5px] leading-[1.6] mb-5 sm:mb-7 mx-auto" style="max-width:480px;text-shadow:0 1px 16px rgba(0,0,0,0.5);">
           Em um final de semana, vamos acabar com a desorganização e construir juntos um processo de projeto profissional, com IA do briefing aos executivos.
         </p>
 
