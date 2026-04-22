@@ -13,9 +13,7 @@
   <meta name="referrer" content="no-referrer-when-downgrade">
   <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/dmserif-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config={theme:{extend:{colors:{m:{black:'#1E1E1E',gr:'#3D3D3A','7':'#5F5E5A','5':'#888780','3':'#B4B2A9','1':'#D3D1C7',off:'#F5F4F0',w:'#FFFFFF'},cta:'#0F766E','cta-h':'#0D6B63'},fontFamily:{sans:['Inter','sans-serif'],ed:['DM Serif Display','Georgia','serif']}}}}</script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/css/tailwind.min.css">
   <link rel="stylesheet" href="/css/animations.css">
   <style>
     @font-face{font-family:'Inter';font-style:normal;font-weight:300 600;font-display:swap;src:url('/fonts/inter-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
@@ -62,7 +60,7 @@
 
   <!-- Logo workshop: centralizado, abaixo do top bar pra nao colidir com Rodrigo -->
   <div class="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-20 opacity-80">
-    <img src="/images/Logotipo_Interiores_com_IA_final_white.png" alt="Interiores com IA - Workshop" class="h-8 sm:h-9" loading="eager" fetchpriority="high" decoding="async">
+    <img src="/images/Logotipo_Interiores_com_IA_final_white.png" alt="Interiores com IA - Workshop" class="h-8 sm:h-9" loading="eager" fetchpriority="high" decoding="async" width="1050" height="195">
   </div>
 
   <!-- Top bar: Rodrigo right -->
@@ -107,9 +105,9 @@
         <div class="h-in flex flex-wrap items-center justify-center gap-x-2 gap-y-2 sm:gap-5 px-1 sm:px-2">
           <div class="flex items-center gap-2">
             <div class="flex -space-x-2">
-              <div class="w-7 h-7 rounded-full border-2 overflow-hidden" style="border-color:rgba(255,255,255,0.2);background:#1E1E1E"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy"></div>
-              <div class="w-7 h-7 rounded-full border-2 overflow-hidden" style="border-color:rgba(255,255,255,0.2);background:#1E1E1E"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy"></div>
-              <div class="w-7 h-7 rounded-full border-2 overflow-hidden" style="border-color:rgba(255,255,255,0.2);background:#1E1E1E"><img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy"></div>
+              <div class="w-7 h-7 rounded-full border-2 overflow-hidden" style="border-color:rgba(255,255,255,0.2);background:#1E1E1E"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy" width="60" height="60"></div>
+              <div class="w-7 h-7 rounded-full border-2 overflow-hidden" style="border-color:rgba(255,255,255,0.2);background:#1E1E1E"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy" width="60" height="60"></div>
+              <div class="w-7 h-7 rounded-full border-2 overflow-hidden" style="border-color:rgba(255,255,255,0.2);background:#1E1E1E"><img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=60&q=80" alt="" class="w-full h-full object-cover" loading="lazy" width="60" height="60"></div>
               <div class="w-7 h-7 rounded-full border-2 flex items-center justify-center text-white text-[9px] font-bold" style="border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.1)">+3k</div>
             </div>
             <span class="text-white/50 text-[12px]">+3.100 participantes</span>
@@ -145,17 +143,37 @@
       <span class="inline-block text-[13px] font-semibold tracking-[.12em] uppercase text-white/60 bg-white/6 border border-white/10 rounded-full px-4 py-1.5 mb-8">Dia 1</span>
       <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         <div data-r="clip" class="img-card aspect-[4/3] lg:sticky-panel">
-          <img src="/images/imagefx-dia1.jpg" alt="Processo de projeto" class="w-full h-full object-cover" loading="lazy" decoding="async">
+          <img src="/images/imagefx-dia1.jpg" alt="Processo de projeto" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1024" height="716">
         </div>
         <div>
           <span class="text-[#2DD4BF] text-[12px] font-medium tracking-[.1em] uppercase mb-3 inline-block">Sábado · 9h às 17h</span>
           <h3 class="text-white text-[28px] font-semibold tracking-tight mb-4">Processo de Projeto</h3>
           <p class="text-white/50 text-[15px] leading-[1.7] mb-8">Vamos organizar sua cabeça, sua rotina e todo o processo do seu escritório. Juntos, a gente documenta cada etapa de forma profissional e monta a estrutura certa pra crescer.</p>
           <div class="space-y-5">
-            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="brain-circuit" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Organização pessoal e de rotina</span><p class="text-white/40 text-[13px] mt-0.5">Vamos tirar peso da sua cabeça e blindar sua agenda</p></div></div>
-            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="layers" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Processo de projeto documentado</span><p class="text-white/40 text-[13px] mt-0.5">A gente leva você do caos à previsibilidade em cada etapa</p></div></div>
-            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="clipboard-list" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Estrutura profissional de documentos</span><p class="text-white/40 text-[13px] mt-0.5">Vamos montar fluxogramas, playbooks e checklists que guiam cada etapa</p></div></div>
-            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="check-circle" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Projeto aprovado de primeira</span><p class="text-white/40 text-[13px] mt-0.5">A gente te entrega a metodologia que elimina retrabalho e alterações</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white/50"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" />
+  <path d="M9 13a4.5 4.5 0 0 0 3-4" />
+  <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5" />
+  <path d="M3.477 10.896a4 4 0 0 1 .585-.396" />
+  <path d="M6 18a4 4 0 0 1-1.967-.516" />
+  <path d="M12 13h4" />
+  <path d="M12 18h6a2 2 0 0 1 2 2v1" />
+  <path d="M12 8h8" />
+  <path d="M16 8V5a2 2 0 0 1 2-2" />
+  <circle cx="16" cy="13" r=".5" />
+  <circle cx="18" cy="3" r=".5" />
+  <circle cx="20" cy="21" r=".5" />
+  <circle cx="20" cy="8" r=".5" /></svg></div><div><span class="text-white text-[15px] font-medium">Organização pessoal e de rotina</span><p class="text-white/40 text-[13px] mt-0.5">Vamos tirar peso da sua cabeça e blindar sua agenda</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white/50"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" /></svg></div><div><span class="text-white text-[15px] font-medium">Processo de projeto documentado</span><p class="text-white/40 text-[13px] mt-0.5">A gente leva você do caos à previsibilidade em cada etapa</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white/50"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+  <path d="M12 11h4" />
+  <path d="M12 16h4" />
+  <path d="M8 11h.01" />
+  <path d="M8 16h.01" /></svg></div><div><span class="text-white text-[15px] font-medium">Estrutura profissional de documentos</span><p class="text-white/40 text-[13px] mt-0.5">Vamos montar fluxogramas, playbooks e checklists que guiam cada etapa</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white/50"><path d="M21.801 10A10 10 0 1 1 17 3.335" />
+  <path d="m9 11 3 3L22 4" /></svg></div><div><span class="text-white text-[15px] font-medium">Projeto aprovado de primeira</span><p class="text-white/40 text-[13px] mt-0.5">A gente te entrega a metodologia que elimina retrabalho e alterações</p></div></div>
           </div>
         </div>
       </div>
@@ -167,17 +185,26 @@
       <span class="inline-block text-[13px] font-semibold tracking-[.12em] uppercase text-white/60 bg-white/6 border border-white/10 rounded-full px-4 py-1.5 mb-8">Dia 2</span>
       <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         <div data-r="clip" class="img-card aspect-[4/3] lg:sticky-panel">
-          <img src="/images/imagefx-dia2.jpg" alt="IA aplicada ao design" class="w-full h-full object-cover" loading="lazy" decoding="async">
+          <img src="/images/imagefx-dia2.jpg" alt="IA aplicada ao design" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1024" height="716">
         </div>
         <div>
           <span class="text-[#2DD4BF] text-[12px] font-medium tracking-[.1em] uppercase mb-3 inline-block">Domingo · 9h às 17h</span>
           <h3 class="text-white text-[28px] font-semibold tracking-tight mb-4">Processo com IA</h3>
           <p class="text-white/50 text-[15px] leading-[1.7] mb-8">A gente vai ligar a IA dentro do processo que você montou no sábado. Do briefing ao executivo, das imagens ao orçamento, dos documentos ao acompanhamento.</p>
           <div class="space-y-5">
-            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="workflow" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">IA no seu processo inteiro</span><p class="text-white/40 text-[13px] mt-0.5">Vamos plugar a IA em cada fase, do briefing à entrega</p></div></div>
-            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="bot" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Seus próprios assistentes</span><p class="text-white/40 text-[13px] mt-0.5">Você vai criar agentes de IA feitos pra realidade do seu escritório</p></div></div>
-            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="image" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Renders e vídeos em minutos</span><p class="text-white/40 text-[13px] mt-0.5">Você vai gerar imagens fotorrealistas e vídeos do projeto em movimento</p></div></div>
-            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="wrench" class="w-5 h-5 text-white/50"></i></div><div><span class="text-white text-[15px] font-medium">Ferramentas sob medida</span><p class="text-white/40 text-[13px] mt-0.5">A gente te mostra como a IA monta planilhas, calculadoras e painéis pra você</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white/50"><rect width="8" height="8" x="3" y="3" rx="2" />
+  <path d="M7 11v4a2 2 0 0 0 2 2h4" />
+  <rect width="8" height="8" x="13" y="13" rx="2" /></svg></div><div><span class="text-white text-[15px] font-medium">IA no seu processo inteiro</span><p class="text-white/40 text-[13px] mt-0.5">Vamos plugar a IA em cada fase, do briefing à entrega</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white/50"><path d="M12 8V4H8" />
+  <rect width="16" height="12" x="4" y="8" rx="2" />
+  <path d="M2 14h2" />
+  <path d="M20 14h2" />
+  <path d="M15 13v2" />
+  <path d="M9 13v2" /></svg></div><div><span class="text-white text-[15px] font-medium">Seus próprios assistentes</span><p class="text-white/40 text-[13px] mt-0.5">Você vai criar agentes de IA feitos pra realidade do seu escritório</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white/50"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+  <circle cx="9" cy="9" r="2" />
+  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></svg></div><div><span class="text-white text-[15px] font-medium">Renders e vídeos em minutos</span><p class="text-white/40 text-[13px] mt-0.5">Você vai gerar imagens fotorrealistas e vídeos do projeto em movimento</p></div></div>
+            <div class="flex gap-4 items-start"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white/50"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" /></svg></div><div><span class="text-white text-[15px] font-medium">Ferramentas sob medida</span><p class="text-white/40 text-[13px] mt-0.5">A gente te mostra como a IA monta planilhas, calculadoras e painéis pra você</p></div></div>
           </div>
         </div>
       </div>
@@ -240,68 +267,120 @@
         <!-- Mobile: grid 2 colunas -->
         <div class="grid grid-cols-2 gap-2.5 sm:hidden" id="process-phases">
           <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#3B82F6]/6 border border-[#3B82F6]/15" style="transition-delay:0ms">
-            <i data-lucide="handshake" class="w-5 h-5 mx-auto mb-1 text-[#3B82F6]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1 text-[#3B82F6]"><path d="m11 17 2 2a1 1 0 1 0 3-3" />
+  <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
+  <path d="m21 3 1 11h-2" />
+  <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
+  <path d="M3 4h8" /></svg>
             <div class="text-[11px] font-semibold text-m-black">Comercial</div>
           </div>
           <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#8B5CF6]/6 border border-[#8B5CF6]/15" style="transition-delay:60ms">
-            <i data-lucide="clipboard-list" class="w-5 h-5 mx-auto mb-1 text-[#8B5CF6]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1 text-[#8B5CF6]"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+  <path d="M12 11h4" />
+  <path d="M12 16h4" />
+  <path d="M8 11h.01" />
+  <path d="M8 16h.01" /></svg>
             <div class="text-[11px] font-semibold text-m-black">Pré-projeto</div>
           </div>
           <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#EC4899]/6 border border-[#EC4899]/15" style="transition-delay:120ms">
-            <i data-lucide="layout-dashboard" class="w-5 h-5 mx-auto mb-1 text-[#EC4899]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1 text-[#EC4899]"><rect width="7" height="9" x="3" y="3" rx="1" />
+  <rect width="7" height="5" x="14" y="3" rx="1" />
+  <rect width="7" height="9" x="14" y="12" rx="1" />
+  <rect width="7" height="5" x="3" y="16" rx="1" /></svg>
             <div class="text-[11px] font-semibold text-m-black">Layout</div>
           </div>
           <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#F59E0B]/6 border border-[#F59E0B]/15" style="transition-delay:180ms">
-            <i data-lucide="palette" class="w-5 h-5 mx-auto mb-1 text-[#F59E0B]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1 text-[#F59E0B]"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z" />
+  <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+  <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+  <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+  <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" /></svg>
             <div class="text-[11px] font-semibold text-m-black">Criação</div>
           </div>
           <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#10B981]/6 border border-[#10B981]/15" style="transition-delay:240ms">
-            <i data-lucide="ruler" class="w-5 h-5 mx-auto mb-1 text-[#10B981]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1 text-[#10B981]"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" /></svg>
             <div class="text-[11px] font-semibold text-m-black">Executivo</div>
           </div>
           <div class="process-phase rounded-xl py-3 px-2 text-center bg-cta/6 border border-cta/15" style="transition-delay:300ms">
-            <i data-lucide="gift" class="w-5 h-5 mx-auto mb-1 text-cta"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1 text-cta"><path d="M12 7v14" />
+  <path d="M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
+  <path d="M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5" />
+  <rect x="3" y="7" width="18" height="4" rx="1" /></svg>
             <div class="text-[11px] font-semibold text-m-black">Entrega</div>
           </div>
           <div class="process-phase rounded-xl py-3 px-2 text-center bg-[#EF4444]/6 border border-[#EF4444]/15 col-span-2" style="transition-delay:360ms">
-            <i data-lucide="hard-hat" class="w-5 h-5 mx-auto mb-1 text-[#EF4444]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1 text-[#EF4444]"><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5" />
+  <path d="M14 6a6 6 0 0 1 6 6v3" />
+  <path d="M4 15v-3a6 6 0 0 1 6-6" />
+  <rect x="2" y="15" width="20" height="4" rx="1" /></svg>
             <div class="text-[11px] font-semibold text-m-black">Obra</div>
           </div>
         </div>
         <!-- Desktop: fluxo horizontal com setas -->
         <div class="hidden sm:flex items-center gap-1.5 lg:gap-2.5">
           <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#3B82F6]/6 border border-[#3B82F6]/15" style="transition-delay:0ms">
-            <i data-lucide="handshake" class="w-5 h-5 mx-auto mb-1.5 text-[#3B82F6]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1.5 text-[#3B82F6]"><path d="m11 17 2 2a1 1 0 1 0 3-3" />
+  <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
+  <path d="m21 3 1 11h-2" />
+  <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
+  <path d="M3 4h8" /></svg>
             <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Comercial</div>
           </div>
-          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"><path d="m9 18 6-6-6-6" /></svg>
           <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#8B5CF6]/6 border border-[#8B5CF6]/15" style="transition-delay:80ms">
-            <i data-lucide="clipboard-list" class="w-5 h-5 mx-auto mb-1.5 text-[#8B5CF6]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1.5 text-[#8B5CF6]"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+  <path d="M12 11h4" />
+  <path d="M12 16h4" />
+  <path d="M8 11h.01" />
+  <path d="M8 16h.01" /></svg>
             <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Pré-projeto</div>
           </div>
-          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"><path d="m9 18 6-6-6-6" /></svg>
           <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#EC4899]/6 border border-[#EC4899]/15" style="transition-delay:160ms">
-            <i data-lucide="layout-dashboard" class="w-5 h-5 mx-auto mb-1.5 text-[#EC4899]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1.5 text-[#EC4899]"><rect width="7" height="9" x="3" y="3" rx="1" />
+  <rect width="7" height="5" x="14" y="3" rx="1" />
+  <rect width="7" height="9" x="14" y="12" rx="1" />
+  <rect width="7" height="5" x="3" y="16" rx="1" /></svg>
             <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Layout</div>
           </div>
-          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"><path d="m9 18 6-6-6-6" /></svg>
           <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#F59E0B]/6 border border-[#F59E0B]/15" style="transition-delay:240ms">
-            <i data-lucide="palette" class="w-5 h-5 mx-auto mb-1.5 text-[#F59E0B]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1.5 text-[#F59E0B]"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z" />
+  <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+  <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+  <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+  <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" /></svg>
             <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Criação</div>
           </div>
-          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"><path d="m9 18 6-6-6-6" /></svg>
           <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#10B981]/6 border border-[#10B981]/15" style="transition-delay:320ms">
-            <i data-lucide="ruler" class="w-5 h-5 mx-auto mb-1.5 text-[#10B981]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1.5 text-[#10B981]"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" /></svg>
             <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Executivo</div>
           </div>
-          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"><path d="m9 18 6-6-6-6" /></svg>
           <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-cta/6 border border-cta/15" style="transition-delay:400ms">
-            <i data-lucide="gift" class="w-5 h-5 mx-auto mb-1.5 text-cta"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1.5 text-cta"><path d="M12 7v14" />
+  <path d="M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
+  <path d="M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5" />
+  <rect x="3" y="7" width="18" height="4" rx="1" /></svg>
             <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Entrega</div>
           </div>
-          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-m-3 flex-shrink-0"><path d="m9 18 6-6-6-6" /></svg>
           <div class="process-phase flex-1 rounded-xl py-4 px-1 text-center bg-[#EF4444]/6 border border-[#EF4444]/15" style="transition-delay:480ms">
-            <i data-lucide="hard-hat" class="w-5 h-5 mx-auto mb-1.5 text-[#EF4444]"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mx-auto mb-1.5 text-[#EF4444]"><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5" />
+  <path d="M14 6a6 6 0 0 1 6 6v3" />
+  <path d="M4 15v-3a6 6 0 0 1 6-6" />
+  <rect x="2" y="15" width="20" height="4" rx="1" /></svg>
             <div class="text-[11px] lg:text-[12px] font-semibold text-m-black">Obra</div>
           </div>
         </div>
@@ -388,9 +467,9 @@
         <p class="text-m-5 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:560px">Você vai aprender a montar fluxos de render que transformam qualquer cena 3D em renders de alta qualidade na hora. Variações de iluminação, ambientação com pessoas, vídeos com câmera suave pelo projeto inteiro. Sem esperar dias pelo renderista, sem computador potente e sem depender de ninguém.</p>
       </div>
       <div class="img-compare mx-auto" id="render-compare" data-r="scale" style="max-width:720px">
-        <img src="/images/3D_Perpetual_Rooftop_021.jpg" alt="Render fotorrealista" draggable="false" loading="lazy" decoding="async">
+        <img src="/images/3D_Perpetual_Rooftop_021.jpg" alt="Render fotorrealista" draggable="false" loading="lazy" decoding="async" width="1264" height="848">
         <div class="img-compare-overlay">
-          <img src="/images/3D_Perpetual_Rooftop_02.jpg" alt="Sketch SketchUp" draggable="false" loading="lazy" decoding="async">
+          <img src="/images/3D_Perpetual_Rooftop_02.jpg" alt="Sketch SketchUp" draggable="false" loading="lazy" decoding="async" width="3840" height="2367">
         </div>
         <div class="img-compare-handle" role="slider" tabindex="0" aria-label="Arraste para comparar sketch e render" aria-valuenow="50" aria-valuemin="5" aria-valuemax="95">
           <div class="img-compare-grip"></div>
@@ -414,9 +493,10 @@
           <!-- Áudio WhatsApp como input -->
           <div class="wpp-audio" data-fc="audio">
             <div class="wpp-audio-avatar">
-              <i data-lucide="user" style="width:16px;height:16px;color:#fff"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:#fff"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+  <circle cx="12" cy="7" r="4" /></svg>
             </div>
-            <button class="wpp-audio-play"><i data-lucide="play" style="width:12px;height:12px;color:#fff"></i></button>
+            <button class="wpp-audio-play"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;color:#fff"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" /></svg></button>
             <div class="wpp-audio-wave">
               <div class="wpp-wave-bar" style="height:8px"></div>
               <div class="wpp-wave-bar" style="height:14px"></div>
@@ -444,7 +524,10 @@
 
           <!-- Conector áudio → processamento IA -->
           <div class="fc-connector" data-fc-line="a0"></div>
-          <div class="fc-ia-badge" data-fc="ia"><i data-lucide="sparkles" style="width:12px;height:12px"></i> IA processando</div>
+          <div class="fc-ia-badge" data-fc="ia"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />
+  <path d="M20 2v4" />
+  <path d="M22 4h-4" />
+  <circle cx="4" cy="20" r="2" /></svg> IA processando</div>
           <div class="fc-connector" data-fc-line="a1"></div>
 
           <!-- Workflow grid compacto -->
@@ -575,15 +658,19 @@
         <!-- Bottom indicators -->
         <div class="grid grid-cols-3 gap-3 mt-3">
           <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
-            <i data-lucide="trending-up" class="w-4 h-4 text-cta flex-shrink-0"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-cta flex-shrink-0"><path d="M16 7h6v6" />
+  <path d="m22 7-8.5 8.5-5-5L2 17" /></svg>
             <div><div class="text-[9px] text-m-5">Rentabilidade</div><div class="text-[12px] font-semibold text-cta">Positiva</div></div>
           </div>
           <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
-            <i data-lucide="shield-check" class="w-4 h-4 text-cta flex-shrink-0"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-cta flex-shrink-0"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" /></svg>
             <div><div class="text-[9px] text-m-5">Previsibilidade</div><div class="text-[12px] font-semibold text-m-black">Controlada</div></div>
           </div>
           <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
-            <i data-lucide="target" class="w-4 h-4 text-[#F59E0B] flex-shrink-0"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#F59E0B] flex-shrink-0"><circle cx="12" cy="12" r="10" />
+  <circle cx="12" cy="12" r="6" />
+  <circle cx="12" cy="12" r="2" /></svg>
             <div><div class="text-[9px] text-m-5">Meta</div><div class="text-[12px] font-semibold text-m-black">No caminho</div></div>
           </div>
         </div>
@@ -606,7 +693,7 @@
   <div data-r class="max-w-6xl mx-auto px-6">
     <div id="mat-accordion" class="mat-acc flex gap-3 h-[420px] sm:h-[480px] lg:h-[520px]">
       <div class="mat-acc-item active" data-mat-item data-mat-title="Assistente de IA">
-        <img src="/images/Assistentedeia.jpg" alt="Assistente de IA" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="/images/Assistentedeia.jpg" alt="Assistente de IA" class="mat-acc-img" loading="lazy" decoding="async" width="1280" height="896">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">01</span>
@@ -615,7 +702,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Diagnóstico">
-        <img src="/images/diagnostico.jpg" alt="Planilha de Diagnóstico" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="/images/diagnostico.jpg" alt="Planilha de Diagnóstico" class="mat-acc-img" loading="lazy" decoding="async" width="1280" height="896">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">02</span>
@@ -624,7 +711,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Prompts">
-        <img src="/images/prompt.jpg" alt="Prompts Prontos" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="/images/prompt.jpg" alt="Prompts Prontos" class="mat-acc-img" loading="lazy" decoding="async" width="1280" height="896">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">03</span>
@@ -633,7 +720,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Processos">
-        <img src="/images/planilhadiagnostico.jpg" alt="Mapeamento de Processos" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="/images/planilhadiagnostico.jpg" alt="Mapeamento de Processos" class="mat-acc-img" loading="lazy" decoding="async" width="1280" height="896">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">04</span>
@@ -642,7 +729,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Workflow IA">
-        <img src="/images/bonusextras.jpg" alt="Workflow de IA" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="/images/bonusextras.jpg" alt="Workflow de IA" class="mat-acc-img" loading="lazy" decoding="async" width="1280" height="896">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">05</span>
@@ -651,7 +738,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Financeiro">
-        <img src="/images/planejamentofinanceiro.jpg" alt="Planejamento Financeiro" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="/images/planejamentofinanceiro.jpg" alt="Planejamento Financeiro" class="mat-acc-img" loading="lazy" decoding="async" width="1280" height="896">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">06</span>
@@ -660,7 +747,7 @@
         </div>
       </div>
       <div class="mat-acc-item" data-mat-item data-mat-title="Bônus">
-        <img src="/images/bonus.jpg" alt="Bônus Extras" class="mat-acc-img" loading="lazy" decoding="async">
+        <img src="/images/bonus.jpg" alt="Bônus Extras" class="mat-acc-img" loading="lazy" decoding="async" width="1280" height="896">
         <div class="mat-acc-overlay"></div>
         <div class="mat-acc-label">
           <span class="mat-acc-number">07</span>
@@ -686,7 +773,8 @@
             <span class="text-m-black font-semibold text-[20px] sm:text-[24px] tracking-tight" style="min-width:80px">09h</span>
             <span class="flex-1 mx-5 sm:mx-8 h-px bg-m-1"></span>
             <div class="flex items-center gap-2.5">
-              <i data-lucide="play-circle" class="w-[18px] h-[18px] text-[#2DD4BF]"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-[18px] h-[18px] text-[#2DD4BF]"><path d="M9 9.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997A1 1 0 0 1 9 14.996z" />
+  <circle cx="12" cy="12" r="10" /></svg>
               <span class="text-m-black text-[15px] sm:text-[17px] font-medium">Início</span>
             </div>
           </div>
@@ -694,7 +782,9 @@
             <span class="text-m-black font-semibold text-[20px] sm:text-[24px] tracking-tight" style="min-width:80px">12h</span>
             <span class="flex-1 mx-5 sm:mx-8 h-px bg-m-1"></span>
             <div class="flex items-center gap-2.5">
-              <i data-lucide="utensils" class="w-[18px] h-[18px] text-m-5"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-[18px] h-[18px] text-m-5"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+  <path d="M7 2v20" />
+  <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" /></svg>
               <span class="text-m-black text-[15px] sm:text-[17px] font-medium">Almoço</span>
             </div>
           </div>
@@ -702,7 +792,8 @@
             <span class="text-m-black font-semibold text-[20px] sm:text-[24px] tracking-tight" style="min-width:80px">13h30</span>
             <span class="flex-1 mx-5 sm:mx-8 h-px bg-m-1"></span>
             <div class="flex items-center gap-2.5">
-              <i data-lucide="rotate-cw" class="w-[18px] h-[18px] text-m-5"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-[18px] h-[18px] text-m-5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+  <path d="M21 3v5h-5" /></svg>
               <span class="text-m-black text-[15px] sm:text-[17px] font-medium">Retorno</span>
             </div>
           </div>
@@ -710,7 +801,8 @@
             <span class="text-m-black font-semibold text-[20px] sm:text-[24px] tracking-tight" style="min-width:80px">17h00</span>
             <span class="flex-1 mx-5 sm:mx-8 h-px bg-m-1"></span>
             <div class="flex items-center gap-2.5">
-              <i data-lucide="check-circle-2" class="w-[18px] h-[18px] text-[#2DD4BF]"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-[18px] h-[18px] text-[#2DD4BF]"><circle cx="12" cy="12" r="10" />
+  <path d="m9 12 2 2 4-4" /></svg>
               <span class="text-m-black text-[15px] sm:text-[17px] font-medium">Encerramento*</span>
             </div>
           </div>
@@ -724,7 +816,7 @@
     <!-- Card: Não pode ao vivo -->
     <div data-r class="mt-6 bg-m-black rounded-3xl p-7 sm:p-9 flex flex-col sm:flex-row items-start sm:items-center gap-5">
       <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-        <i data-lucide="play" class="w-5 h-5 text-[#2DD4BF]"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#2DD4BF]"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" /></svg>
       </div>
       <div class="flex-1">
         <h3 class="text-white text-[17px] sm:text-[18px] font-semibold mb-1.5">Não pode participar ao vivo? Sem problema..</h3>
@@ -748,21 +840,21 @@
         <div class="snap-center shrink-0 w-[72%] sm:w-[44%] lg:w-[31.5%]">
           <div class="rounded-2xl overflow-hidden border border-m-1 bg-m-off shadow-sm hover:shadow-md transition-shadow duration-300">
             <div style="aspect-ratio:3/4">
-              <img src="/images/print05.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
+              <img src="/images/print05.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async" width="658" height="900">
             </div>
           </div>
         </div>
         <div class="snap-center shrink-0 w-[72%] sm:w-[44%] lg:w-[31.5%]">
           <div class="rounded-2xl overflow-hidden border border-m-1 bg-m-off shadow-sm hover:shadow-md transition-shadow duration-300">
             <div style="aspect-ratio:3/4">
-              <img src="/images/print06.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
+              <img src="/images/print06.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async" width="658" height="900">
             </div>
           </div>
         </div>
         <div class="snap-center shrink-0 w-[72%] sm:w-[44%] lg:w-[31.5%]">
           <div class="rounded-2xl overflow-hidden border border-m-1 bg-m-off shadow-sm hover:shadow-md transition-shadow duration-300">
             <div style="aspect-ratio:3/4">
-              <img src="/images/print07.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async">
+              <img src="/images/print07.jpg" alt="Entrega real de aluno do Workshop" class="w-full h-full object-cover" loading="lazy" decoding="async" width="658" height="900">
             </div>
           </div>
         </div>
@@ -796,7 +888,8 @@
     <div id="quem-slider" data-drag-scroll class="flex gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-6 select-none" style="-webkit-overflow-scrolling:touch;cursor:grab">
       <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
         <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
-          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="clock" class="w-6 h-6 text-cta/60"></i></div>
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-cta/60"><circle cx="12" cy="12" r="10" />
+  <path d="M12 6v6l4 2" /></svg></div>
           <h3 class="text-m-black text-[17px] font-semibold mb-2">+10h por dia trabalhando</h3>
           <p class="text-m-5 text-[14px] leading-[1.6] flex-1">E ainda assim não dá conta de tudo. Sente que o dia nunca é suficiente para o que precisa fazer.</p>
           <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
@@ -804,7 +897,12 @@
       </div>
       <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
         <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
-          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="calendar-x" class="w-6 h-6 text-cta/60"></i></div>
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-cta/60"><path d="M8 2v4" />
+  <path d="M16 2v4" />
+  <rect width="18" height="18" x="3" y="4" rx="2" />
+  <path d="M3 10h18" />
+  <path d="m14 14-4 4" />
+  <path d="m10 14 4 4" /></svg></div>
           <h3 class="text-m-black text-[17px] font-semibold mb-2">Finais de semana no escritório</h3>
           <p class="text-m-5 text-[14px] leading-[1.6] flex-1">Sábado virou extensão da segunda. Família e hobbies ficam sempre para depois.</p>
           <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
@@ -812,7 +910,7 @@
       </div>
       <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
         <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
-          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="flame" class="w-6 h-6 text-cta/60"></i></div>
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-cta/60"><path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4" /></svg></div>
           <h3 class="text-m-black text-[17px] font-semibold mb-2">Modo bombeira 24/7</h3>
           <p class="text-m-5 text-[14px] leading-[1.6] flex-1">Fatura razoavelmente bem, mas vive apagando incêndio. Sem nenhuma previsibilidade.</p>
           <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
@@ -820,7 +918,10 @@
       </div>
       <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
         <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
-          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="users" class="w-6 h-6 text-cta/60"></i></div>
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-cta/60"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+  <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+  <circle cx="9" cy="7" r="4" /></svg></div>
           <h3 class="text-m-black text-[17px] font-semibold mb-2">Medo de contratar</h3>
           <p class="text-m-5 text-[14px] leading-[1.6] flex-1">Não sabe como delegar sem perder o controle. Se você para, tudo para.</p>
           <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
@@ -828,7 +929,10 @@
       </div>
       <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
         <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
-          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="eye-off" class="w-6 h-6 text-cta/60"></i></div>
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-cta/60"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+  <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+  <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+  <path d="m2 2 20 20" /></svg></div>
           <h3 class="text-m-black text-[17px] font-semibold mb-2">Gestão que dá vergonha</h3>
           <p class="text-m-5 text-[14px] leading-[1.6] flex-1">Se um cliente visse os bastidores, perderia toda a autoridade.</p>
           <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
@@ -836,7 +940,7 @@
       </div>
       <div class="snap-center shrink-0 w-[300px] sm:w-[340px]">
         <div data-check class="bg-white rounded-3xl border-2 border-m-1 p-6 cursor-pointer hover:border-cta/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
-          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><i data-lucide="heart" class="w-6 h-6 text-cta/60"></i></div>
+          <div class="w-12 h-12 rounded-2xl bg-cta/8 flex items-center justify-center mb-4 check-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-cta/60"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" /></svg></div>
           <h3 class="text-m-black text-[17px] font-semibold mb-2">Quer ter vida de volta</h3>
           <p class="text-m-5 text-[14px] leading-[1.6] flex-1">Sonha com tempo para a família, mas o escritório te consome por completo.</p>
           <div class="mt-4 flex items-center gap-2 text-m-3 text-[12px]"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path class="check-path" d="M9 12l2 2 4-4" stroke-dasharray="12" stroke-dashoffset="12" style="transition:stroke-dashoffset .3s ease"/></svg><span>Clique se você se identifica</span></div>
@@ -885,28 +989,28 @@
         <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
           <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
-              <img src="/images/print04.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+              <img src="/images/print04.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async" width="900" height="328">
             </div>
           </div>
         </div>
         <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
           <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
-              <img src="/images/print02.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+              <img src="/images/print02.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async" width="900" height="328">
             </div>
           </div>
         </div>
         <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
           <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
-              <img src="/images/print03.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+              <img src="/images/print03.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async" width="900" height="328">
             </div>
           </div>
         </div>
         <div class="snap-center shrink-0 w-[82%] sm:w-[48%] lg:w-[32%]">
           <div class="rounded-2xl border border-m-1 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="bg-m-off flex items-center justify-center p-2 sm:p-3" style="aspect-ratio:5/4">
-              <img src="/images/print01.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async">
+              <img src="/images/print01.jpg" alt="Depoimento de aluno do Workshop" class="max-w-full max-h-full object-contain rounded-md" loading="lazy" decoding="async" width="900" height="656">
             </div>
           </div>
         </div>
@@ -930,7 +1034,7 @@
   <div class="max-w-6xl mx-auto px-6 mt-14">
     <div data-r class="bg-white rounded-3xl border border-m-1 p-8 lg:p-12 flex flex-col lg:flex-row gap-8 items-center">
       <div class="w-20 h-20 rounded-full bg-m-black border-4 border-m-off overflow-hidden shrink-0">
-        <img src="/images/rodrigo-bio-color.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover object-top">
+        <img src="/images/rodrigo-bio-color.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover object-top" width="128" height="128">
       </div>
       <div>
         <p class="font-ed text-[20px] lg:text-[24px] text-m-black italic leading-[1.4] mb-3">"Esse sistema me permitiu ter um escritório que não depende de mim. Trabalhar apenas de manhã. Tardes livres pra família e pros hobbies."</p>
@@ -997,28 +1101,37 @@
       <!-- Tópicos emocionais -->
       <div data-r="right" class="space-y-5">
         <div class="flex gap-4 items-start">
-          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="home" class="w-5 h-5 text-[#2DD4BF]"></i></div>
+          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#2DD4BF]"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></div>
           <div>
             <h3 class="text-white text-[17px] font-semibold mb-1.5">Voltar a jantar com quem você ama</h3>
             <p class="text-white/50 text-[14px] leading-[1.65]">Sem pensar em prazo, sem o celular na mesa, sem aquele projeto rodando na cabeça enquanto o filho fala com você.</p>
           </div>
         </div>
         <div class="flex gap-4 items-start">
-          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="moon" class="w-5 h-5 text-[#2DD4BF]"></i></div>
+          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#2DD4BF]"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" /></svg></div>
           <div>
             <h3 class="text-white text-[17px] font-semibold mb-1.5">Dormir sem pensar em prazo</h3>
             <p class="text-white/50 text-[14px] leading-[1.65]">A cabeça desliga quando o processo toma conta. Acabou a ansiedade de domingo à noite.</p>
           </div>
         </div>
         <div class="flex gap-4 items-start">
-          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="sun" class="w-5 h-5 text-[#2DD4BF]"></i></div>
+          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#2DD4BF]"><circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" /></svg></div>
           <div>
             <h3 class="text-white text-[17px] font-semibold mb-1.5">Ter o final de semana de volta</h3>
             <p class="text-white/50 text-[14px] leading-[1.65]">Sábado não é mais extensão da segunda. É sábado. É família, descanso, a vida que você trocou pelo escritório.</p>
           </div>
         </div>
         <div class="flex gap-4 items-start">
-          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="heart" class="w-5 h-5 text-[#2DD4BF]"></i></div>
+          <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#2DD4BF]"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" /></svg></div>
           <div>
             <h3 class="text-white text-[17px] font-semibold mb-1.5">Se olhar no espelho com orgulho de novo</h3>
             <p class="text-white/50 text-[14px] leading-[1.65]">Sem a culpa do que deixou de lado. Sem a exaustão que virou sua cara. Você de volta ao leme da sua vida.</p>
@@ -1061,7 +1174,7 @@
     <div class="grid lg:grid-cols-5 gap-12 lg:gap-20 items-center">
       <div data-r="clip" class="lg:col-span-2">
         <div class="img-card aspect-[3/4]">
-          <img src="/images/bio_2-2.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover" loading="lazy" decoding="async">
+          <img src="/images/bio_2-2.jpg" alt="Rodrigo Rosar" class="w-full h-full object-cover" loading="lazy" decoding="async" width="376" height="513">
         </div>
       </div>
       <div data-r="right" class="lg:col-span-3">
@@ -1092,12 +1205,12 @@
       </div>
       <div class="lg:col-span-2" data-r>
         <div class="bg-m-w rounded-2xl border border-m-1 overflow-hidden">
-          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Preciso ter experiência com IA para participar?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Não. O workshop parte do zero quando o assunto é IA. Primeiro organizamos sua rotina e processo, depois mostramos onde a IA entra para acelerar. Se você nunca usou nada além do ChatGPT (ou nem isso), vai acompanhar perfeitamente.</p></div></div>
-          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Já tenho anos de experiência, não vou ver conteúdo básico?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Esse workshop foi desenhado para profissionais experientes. 70% das nossas alunas têm mais de 5 anos de mercado. O foco não é ensinar a projetar, é instalar o sistema que tira o escritório das suas costas e te dá liberdade.</p></div></div>
-          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">É ao vivo ou gravado?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Ao vivo, via Zoom, nos dias 16 e 17 de maio. No checkout, você pode adicionar ao seu ingresso o conteúdo editado em formato de aulas por 1 ano.</p></div></div>
-          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Qual a diferença entre o Workshop e a Implementação Projeto de Primeira?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">O Workshop é o mapa. Em dois dias você entende o caminho completo e já começa a aplicar. A Implementação Projeto de Primeira é a jornada: acompanhamento completo para instalar cada etapa no seu escritório, com suporte, sprints semanais e IA configurada para a sua realidade.</p></div></div>
-          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Posso desistir do meu ingresso?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Sim. Se no primeiro dia você sentir que não é para você, devolvemos 100% do valor do ingresso, sem burocracia.</p></div></div>
-          <div><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Vai ficar gravado?</span><i data-lucide="chevron-down" class="chv w-5 h-5 text-m-5 shrink-0"></i></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Você pode adquirir o conteúdo dos 2 dias em formato de aulas durante a compra do ingresso ou até um dia antes do evento. Acesso por 1 ano.</p></div></div>
+          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Preciso ter experiência com IA para participar?</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chv w-5 h-5 text-m-5 shrink-0"><path d="m6 9 6 6 6-6" /></svg></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Não. O workshop parte do zero quando o assunto é IA. Primeiro organizamos sua rotina e processo, depois mostramos onde a IA entra para acelerar. Se você nunca usou nada além do ChatGPT (ou nem isso), vai acompanhar perfeitamente.</p></div></div>
+          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Já tenho anos de experiência, não vou ver conteúdo básico?</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chv w-5 h-5 text-m-5 shrink-0"><path d="m6 9 6 6 6-6" /></svg></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Esse workshop foi desenhado para profissionais experientes. 70% das nossas alunas têm mais de 5 anos de mercado. O foco não é ensinar a projetar, é instalar o sistema que tira o escritório das suas costas e te dá liberdade.</p></div></div>
+          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">É ao vivo ou gravado?</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chv w-5 h-5 text-m-5 shrink-0"><path d="m6 9 6 6 6-6" /></svg></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Ao vivo, via Zoom, nos dias 16 e 17 de maio. No checkout, você pode adicionar ao seu ingresso o conteúdo editado em formato de aulas por 1 ano.</p></div></div>
+          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Qual a diferença entre o Workshop e a Implementação Projeto de Primeira?</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chv w-5 h-5 text-m-5 shrink-0"><path d="m6 9 6 6 6-6" /></svg></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">O Workshop é o mapa. Em dois dias você entende o caminho completo e já começa a aplicar. A Implementação Projeto de Primeira é a jornada: acompanhamento completo para instalar cada etapa no seu escritório, com suporte, sprints semanais e IA configurada para a sua realidade.</p></div></div>
+          <div class="border-b border-m-1"><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Posso desistir do meu ingresso?</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chv w-5 h-5 text-m-5 shrink-0"><path d="m6 9 6 6 6-6" /></svg></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Sim. Se no primeiro dia você sentir que não é para você, devolvemos 100% do valor do ingresso, sem burocracia.</p></div></div>
+          <div><button data-acc class="w-full flex items-center justify-between p-5 text-left cursor-pointer"><span class="text-[15px] font-medium text-m-black pr-4">Vai ficar gravado?</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chv w-5 h-5 text-m-5 shrink-0"><path d="m6 9 6 6 6-6" /></svg></button><div class="ac"><p class="text-[14px] text-m-7 leading-[1.7] px-5 pb-5">Você pode adquirir o conteúdo dos 2 dias em formato de aulas durante a compra do ingresso ou até um dia antes do evento. Acesso por 1 ano.</p></div></div>
         </div>
       </div>
     </div>
@@ -1107,7 +1220,7 @@
 <!-- ===== BLOCO 10 — FECHAMENTO ===== -->
 <section class="relative overflow-hidden">
   <div class="absolute inset-0">
-    <img src="https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=1600&q=80" alt="" class="w-full h-full object-cover" loading="lazy">
+    <img src="https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=1600&q=80" alt="" class="w-full h-full object-cover" loading="lazy" width="1600" height="1067">
     <div class="absolute inset-0 bg-m-black/85"></div>
   </div>
   <div class="relative z-10 text-center px-6 py-20 sm:py-28 lg:py-36">
@@ -1132,7 +1245,7 @@
     <div class="text-center mb-10">
       <p class="text-white/35 text-[12px] uppercase tracking-[0.15em] mb-4">Precisa de ajuda?</p>
       <a href="https://www.rodrigorosar.com.br/suporte" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/85 hover:text-white text-[13px] font-medium px-5 py-2.5 rounded-full transition-all">
-        <i data-lucide="message-circle" class="w-4 h-4"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /></svg>
         Falar com o suporte
       </a>
     </div>
