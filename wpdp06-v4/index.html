@@ -476,93 +476,149 @@
       </div>
     </div>
 
-    <!-- BLOCO 3 — Ferramenta financeira -->
+    <!-- BLOCO 3 — Calculadora de orçamento de obra -->
     <div data-r>
       <div class="text-center mb-10 sm:mb-14">
-        <h3 class="text-m-black text-[22px] sm:text-[28px] font-semibold tracking-tight mb-4">Saiba exatamente quanto sobra em cada projeto</h3>
-        <p class="text-m-5 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:560px">Você vai criar sua própria calculadora de orçamento com IA: visual, interativa e feita pra realidade do seu escritório. Receita, custo e margem de cada projeto na sua frente, atualizados automaticamente. Chega de planilha bagunçada e achismo no financeiro.</p>
+        <h3 class="text-m-black text-[22px] sm:text-[28px] font-semibold tracking-tight mb-4">Monte seu planejador de obra. Sem planilha.</h3>
+        <p class="text-m-5 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:620px">Você vai aprender a montar sua própria calculadora de orçamento de obra, feita pra realidade do seu escritório. O planejador sugere percentuais de custo por região, separa serviço, fase 1 e fase 2 e te avisa na hora sobre possíveis pontos de atenção. Em minutos você ajusta, refaz e sai usando. Sem planilha, sem programador e sem achismo.</p>
       </div>
-      <!-- Dashboard cards (mobile-first) -->
-      <div class="mx-auto" style="max-width:720px">
-        <!-- Metric cards row -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-          <div class="bg-white rounded-xl border border-m-1/60 p-4 text-center">
-            <div class="text-[10px] text-m-5 uppercase tracking-wider mb-2">Projetos ativos</div>
-            <div class="text-[24px] sm:text-[28px] font-semibold text-m-black leading-none">7</div>
-            <div class="mt-2 h-1.5 bg-m-off rounded-full overflow-hidden"><div class="h-full bg-cta/60 rounded-full" style="width:65%"></div></div>
-          </div>
-          <div class="bg-white rounded-xl border-2 border-cta/20 p-4 text-center">
-            <div class="text-[10px] text-cta uppercase tracking-wider mb-2 font-medium">Margem média</div>
-            <div class="text-[24px] sm:text-[28px] font-semibold text-cta leading-none">34%</div>
-            <div class="mt-2 h-1.5 bg-cta/10 rounded-full overflow-hidden"><div class="h-full bg-cta rounded-full" style="width:34%"></div></div>
-          </div>
-          <div class="bg-white rounded-xl border border-m-1/60 p-4 text-center">
-            <div class="text-[10px] text-m-5 uppercase tracking-wider mb-2">Meta mensal</div>
-            <div class="flex items-center justify-center gap-2 mt-1">
-              <svg viewBox="0 0 36 36" class="w-10 h-10" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="14" fill="none" stroke="var(--g1)" stroke-width="3"/><circle cx="18" cy="18" r="14" fill="none" stroke="#F59E0B" stroke-width="3" stroke-dasharray="66 88" stroke-linecap="round"/></svg>
-              <span class="text-[14px] font-semibold text-m-black">75%</span>
-            </div>
-          </div>
-          <div class="bg-white rounded-xl border border-m-1/60 p-4 text-center">
-            <div class="text-[10px] text-m-5 uppercase tracking-wider mb-2">Fluxo de caixa</div>
-            <svg viewBox="0 0 80 30" class="w-full h-8 mt-1"><defs><linearGradient id="sparkG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--cta)" stop-opacity=".12"/><stop offset="100%" stop-color="var(--cta)" stop-opacity="0"/></linearGradient></defs><polyline points="0,26 12,20 24,24 36,10 48,16 60,6 72,8 80,4" fill="url(#sparkG)" stroke="none"/><polyline points="0,26 12,20 24,24 36,10 48,16 60,6 72,8 80,4" fill="none" stroke="var(--cta)" stroke-width="2" stroke-linecap="round"/></svg>
-          </div>
+      <!-- Calculadora de obra (mobile-first) -->
+      <div class="mx-auto" style="max-width:840px">
+        <!-- Resumo topo: porcentagens por fase + local + total -->
+        <div class="bg-white rounded-xl border border-m-1/60 px-4 py-3 mb-3 flex flex-wrap items-center text-[11px] sm:text-[12px] text-m-5" style="gap:.5rem 1.25rem">
+          <span>Serviço: <strong class="text-m-black font-semibold">10,0%</strong></span>
+          <span>Fase 1: <strong class="text-m-black font-semibold">20,5%</strong></span>
+          <span>Fase 2: <strong class="text-m-black font-semibold">69,5%</strong></span>
+          <span class="ml-auto">Total: <strong class="text-cta font-semibold">100,0%</strong></span>
         </div>
-        <!-- Chart area -->
+
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <!-- Bar chart -->
-          <div class="sm:col-span-2 bg-white rounded-xl border border-m-1/60 p-4">
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-[12px] font-semibold text-m-black">Receita vs Custo</span>
-              <div class="flex gap-3">
-                <span class="flex items-center gap-1.5 text-[10px] text-m-5"><span class="w-2 h-2 rounded-sm bg-cta"></span>Receita</span>
-                <span class="flex items-center gap-1.5 text-[10px] text-m-5"><span class="w-2 h-2 rounded-sm bg-m-3"></span>Custo</span>
+          <!-- Esquerda: blocos Serviço + Fase 1 (2 colunas) -->
+          <div class="sm:col-span-2 flex flex-col gap-3">
+            <!-- Bloco Serviço -->
+            <div class="bg-white rounded-xl border border-m-1/60 overflow-hidden">
+              <div class="bg-m-off px-4 py-2 text-[10px] uppercase tracking-wider text-m-5 font-medium">Serviço — Acompanhamento / gestão</div>
+              <div class="px-4 py-3 flex items-center gap-3 text-[12px]">
+                <span class="w-2 h-2 rounded-sm bg-cta flex-shrink-0"></span>
+                <span class="flex-1 text-m-black">Acompanhamento / gestão</span>
+                <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">10,0%</span>
+                <span class="text-m-5 whitespace-nowrap">R$ 80.000</span>
               </div>
             </div>
-            <div class="flex items-end gap-3 h-[120px]">
-              <div class="flex-1 flex items-end gap-1 h-full"><div class="flex-1 bg-cta/70 rounded-t" style="height:70%"></div><div class="flex-1 bg-m-3/50 rounded-t" style="height:45%"></div></div>
-              <div class="flex-1 flex items-end gap-1 h-full"><div class="flex-1 bg-cta/70 rounded-t" style="height:85%"></div><div class="flex-1 bg-m-3/50 rounded-t" style="height:50%"></div></div>
-              <div class="flex-1 flex items-end gap-1 h-full"><div class="flex-1 bg-cta/70 rounded-t" style="height:60%"></div><div class="flex-1 bg-m-3/50 rounded-t" style="height:55%"></div></div>
-              <div class="flex-1 flex items-end gap-1 h-full"><div class="flex-1 bg-cta/70 rounded-t" style="height:90%"></div><div class="flex-1 bg-m-3/50 rounded-t" style="height:48%"></div></div>
-              <div class="flex-1 flex items-end gap-1 h-full"><div class="flex-1 bg-cta rounded-t" style="height:95%"></div><div class="flex-1 bg-m-3/50 rounded-t" style="height:52%"></div></div>
+
+            <!-- Bloco Fase 1 -->
+            <div class="bg-white rounded-xl border border-m-1/60 overflow-hidden">
+              <div class="bg-m-off px-4 py-2 flex items-center justify-between text-[10px] uppercase tracking-wider">
+                <span class="text-m-5 font-medium">Fase 1 — Civil, Instalações e Acabamentos</span>
+                <span class="text-cta font-semibold">20,5% · R$ 164.000</span>
+              </div>
+              <div class="divide-y divide-m-1/70 text-[12px]">
+                <div class="px-4 py-2.5 flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-sm bg-cta flex-shrink-0"></span>
+                  <span class="flex-1 text-m-black">Civil — Pequenas modificações</span>
+                  <span class="text-[10px] text-m-5">SINAPI 5,0%</span>
+                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">5,0%</span>
+                  <span class="text-m-5 whitespace-nowrap">R$ 40.000</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#8B5CF6"></span>
+                  <span class="flex-1 text-m-black">Revestimentos e WCs</span>
+                  <span class="text-[10px] text-m-5">SINAPI 5,0%</span>
+                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">5,0%</span>
+                  <span class="text-m-5 whitespace-nowrap">R$ 40.000</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#F59E0B"></span>
+                  <span class="flex-1 text-m-black">Iluminação técnica e decorativa</span>
+                  <span class="text-[10px] text-m-5">SINAPI 1,8%</span>
+                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">2,0%</span>
+                  <span class="text-m-5 whitespace-nowrap">R$ 16.000</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#EC4899"></span>
+                  <span class="flex-1 text-m-black">Climatização (split)</span>
+                  <span class="text-[10px] text-m-5">SINAPI 3,2%</span>
+                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">3,5%</span>
+                  <span class="text-m-5 whitespace-nowrap">R$ 28.000</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#3B82F6"></span>
+                  <span class="flex-1 text-m-black">Fechamento de sacada</span>
+                  <span class="text-[10px] text-m-5">SINAPI 2,5%</span>
+                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">3,0%</span>
+                  <span class="text-m-5 whitespace-nowrap">R$ 24.000</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-sm flex-shrink-0 bg-m-3"></span>
+                  <span class="flex-1 text-m-black">Outros serviços</span>
+                  <span class="text-[10px] text-m-5">SINAPI 1,5%</span>
+                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">2,0%</span>
+                  <span class="text-m-5 whitespace-nowrap">R$ 16.000</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center gap-2 text-[11px] text-m-5 italic">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                  <span>Adicionar serviço</span>
+                </div>
+              </div>
             </div>
-            <div class="flex gap-3 mt-2">
-              <span class="flex-1 text-center text-[9px] text-m-5">Jan</span>
-              <span class="flex-1 text-center text-[9px] text-m-5">Fev</span>
-              <span class="flex-1 text-center text-[9px] text-m-5">Mar</span>
-              <span class="flex-1 text-center text-[9px] text-m-5">Abr</span>
-              <span class="flex-1 text-center text-[9px] text-m-5">Mai</span>
+
+            <!-- Bloco Fase 2 (condensado) -->
+            <div class="bg-white rounded-xl border border-m-1/60 overflow-hidden">
+              <div class="bg-m-off px-4 py-2 flex items-center justify-between text-[10px] uppercase tracking-wider">
+                <span class="text-m-5 font-medium">Fase 2 — Marcenaria, Marmoraria e Complementos</span>
+                <span class="text-cta font-semibold">69,5% · R$ 556.000</span>
+              </div>
+              <div class="px-4 py-2.5 flex items-center gap-2 flex-wrap text-[11px]">
+                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full bg-cta"></span><span class="text-m-black">Marcenaria</span><span class="text-m-5">15,6%</span></span>
+                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full" style="background:#F59E0B"></span><span class="text-m-black">Marmoraria</span><span class="text-m-5">10,0%</span></span>
+                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full" style="background:#8B5CF6"></span><span class="text-m-black">Vidraçaria</span><span class="text-m-5">9,0%</span></span>
+                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full" style="background:#EC4899"></span><span class="text-m-black">Cortinas e Persianas</span><span class="text-m-5">6,9%</span></span>
+                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full" style="background:#10B981"></span><span class="text-m-black">Acessórios de marcenaria</span><span class="text-m-5">1,5%</span></span>
+                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full bg-m-3"></span><span class="text-m-black">Outros complementos</span><span class="text-m-5">26,5%</span></span>
+              </div>
             </div>
           </div>
-          <!-- Donut -->
-          <div class="bg-white rounded-xl border border-m-1/60 p-4 flex flex-col items-center justify-center">
-            <span class="text-[12px] font-semibold text-m-black mb-3">Composição</span>
-            <svg viewBox="0 0 100 100" class="w-20 h-20">
-              <circle cx="50" cy="50" r="38" fill="none" stroke="var(--g1)" stroke-width="10"/>
-              <circle cx="50" cy="50" r="38" fill="none" stroke="var(--cta)" stroke-width="10" stroke-dasharray="86 239" stroke-dashoffset="0" stroke-linecap="round"/>
-              <circle cx="50" cy="50" r="38" fill="none" stroke="#F59E0B" stroke-width="10" stroke-dasharray="55 239" stroke-dashoffset="-86" stroke-linecap="round"/>
-              <circle cx="50" cy="50" r="38" fill="none" stroke="var(--g3)" stroke-width="10" stroke-dasharray="40 239" stroke-dashoffset="-141" stroke-linecap="round"/>
-            </svg>
-            <div class="flex flex-col gap-1.5 mt-3 w-full">
-              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cta"></span><span class="text-[10px] text-m-5">Mão de obra</span></div>
-              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#F59E0B]"></span><span class="text-[10px] text-m-5">Materiais</span></div>
-              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-m-3"></span><span class="text-[10px] text-m-5">Outros</span></div>
+
+          <!-- Direita: Visão Geral (donut) -->
+          <div class="bg-white rounded-xl border border-m-1/60 p-4 flex flex-col">
+            <span class="text-[10px] uppercase tracking-wider text-m-5 font-medium text-center mb-3">Visão Geral</span>
+            <div class="relative flex items-center justify-center">
+              <svg width="112" height="112" viewBox="0 0 100 100" style="transform:rotate(-90deg)">
+                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--g1)" stroke-width="12"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--cta)" stroke-width="12" stroke-dasharray="37 239" stroke-dashoffset="0"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#F59E0B" stroke-width="12" stroke-dasharray="24 239" stroke-dashoffset="-37"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#8B5CF6" stroke-width="12" stroke-dasharray="21 239" stroke-dashoffset="-61"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#EC4899" stroke-width="12" stroke-dasharray="17 239" stroke-dashoffset="-82"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#B4B2A9" stroke-width="12" stroke-dasharray="140 239" stroke-dashoffset="-99"/>
+              </svg>
+              <div class="absolute text-center">
+                <div class="text-[9px] uppercase tracking-wider text-m-5">Obra</div>
+                <div class="text-[13px] font-semibold text-m-black">R$ 800k</div>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5 mt-4 text-[10px]">
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm bg-cta flex-shrink-0"></span><span class="flex-1 text-m-5">Marcenaria</span><span class="text-m-black font-medium">15,6%</span></div>
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#F59E0B"></span><span class="flex-1 text-m-5">Marmoraria</span><span class="text-m-black font-medium">10,0%</span></div>
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#8B5CF6"></span><span class="flex-1 text-m-5">Vidraçaria</span><span class="text-m-black font-medium">9,0%</span></div>
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#EC4899"></span><span class="flex-1 text-m-5">Cortinas</span><span class="text-m-black font-medium">6,9%</span></div>
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm bg-m-3 flex-shrink-0"></span><span class="flex-1 text-m-5">Outros</span><span class="text-m-black font-medium">58,5%</span></div>
             </div>
           </div>
         </div>
-        <!-- Bottom indicators -->
-        <div class="grid grid-cols-3 gap-3 mt-3">
+
+        <!-- Rodapé: 3 micro-capabilities -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
           <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
-            <i data-lucide="trending-up" class="w-4 h-4 text-cta flex-shrink-0"></i>
-            <div><div class="text-[9px] text-m-5">Rentabilidade</div><div class="text-[12px] font-semibold text-cta">Positiva</div></div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-cta flex-shrink-0"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16h8"/><path d="M7 11h12"/><path d="M7 6h3"/></svg>
+            <div><div class="text-[9px] text-m-5">Customizado</div><div class="text-[12px] font-semibold text-m-black">Sua realidade</div></div>
           </div>
           <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
-            <i data-lucide="shield-check" class="w-4 h-4 text-cta flex-shrink-0"></i>
-            <div><div class="text-[9px] text-m-5">Previsibilidade</div><div class="text-[12px] font-semibold text-m-black">Controlada</div></div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#F59E0B] flex-shrink-0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            <div><div class="text-[9px] text-m-5">Alertas inteligentes</div><div class="text-[12px] font-semibold text-m-black">Pontos de atenção</div></div>
           </div>
           <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
-            <i data-lucide="target" class="w-4 h-4 text-[#F59E0B] flex-shrink-0"></i>
-            <div><div class="text-[9px] text-m-5">Meta</div><div class="text-[12px] font-semibold text-m-black">No caminho</div></div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-cta flex-shrink-0"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+            <div><div class="text-[9px] text-m-5">Reutilizável</div><div class="text-[12px] font-semibold text-m-black">Próximos projetos</div></div>
           </div>
         </div>
       </div>
