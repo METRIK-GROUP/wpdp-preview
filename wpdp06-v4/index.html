@@ -476,132 +476,91 @@
       </div>
     </div>
 
-    <!-- BLOCO 3 — Calculadora de orçamento de obra -->
+    <!-- BLOCO 3 — Planejador automático de orçamento de obra -->
     <div data-r>
       <div class="text-center mb-10 sm:mb-14">
-        <h3 class="text-m-black text-[22px] sm:text-[28px] font-semibold tracking-tight mb-4">Monte seu planejador de obra. Sem planilha.</h3>
-        <p class="text-m-5 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:620px">Você vai aprender a montar sua própria calculadora de orçamento de obra, feita pra realidade do seu escritório. O planejador sugere percentuais de custo por região, separa serviço, fase 1 e fase 2 e te avisa na hora sobre possíveis pontos de atenção. Em minutos você ajusta, refaz e sai usando. Sem planilha, sem programador e sem achismo.</p>
+        <div class="text-[10px] sm:text-[11px] font-semibold tracking-[.16em] uppercase text-cta mb-3">Planejador automático de orçamento de obra</div>
+        <h3 class="text-m-black text-[22px] sm:text-[28px] font-semibold tracking-tight mb-4">Projete dentro do orçamento. Antes da obra começar.</h3>
+        <p class="text-m-5 text-[15px] sm:text-[16px] leading-[1.7] mx-auto" style="max-width:620px">Você vai aprender a montar uma ferramenta que orça com precisão, mostra os custos em tempo real e te dá segurança pra decidir a cada passo. Tudo automatizado, pensada pra você projetar dentro do orçamento desde o primeiro traço. Uma ferramenta que trabalha por você.</p>
       </div>
-      <!-- Calculadora de obra (mobile-first) -->
-      <div class="mx-auto" style="max-width:840px">
-        <!-- Resumo topo: porcentagens por fase + local + total -->
+      <!-- Dashboard visual abstrato -->
+      <div class="mx-auto" style="max-width:780px">
+        <!-- Status bar topo: total + indicator -->
         <div class="bg-white rounded-xl border border-m-1/60 px-4 py-3 mb-3 flex flex-wrap items-center text-[11px] sm:text-[12px] text-m-5" style="gap:.5rem 1.25rem">
-          <span>Serviço: <strong class="text-m-black font-semibold">10,0%</strong></span>
-          <span>Fase 1: <strong class="text-m-black font-semibold">20,5%</strong></span>
-          <span>Fase 2: <strong class="text-m-black font-semibold">69,5%</strong></span>
-          <span class="ml-auto">Total: <strong class="text-cta font-semibold">100,0%</strong></span>
+          <span class="text-[10px] uppercase tracking-wider font-medium">Orçamento planejado</span>
+          <span class="text-[14px] sm:text-[16px] font-semibold text-m-black">R$ 500.000</span>
+          <span class="ml-auto inline-flex items-center gap-1.5 bg-cta/10 text-cta font-semibold rounded-full px-2.5 py-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Dentro do orçamento
+          </span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <!-- Esquerda: blocos Serviço + Fase 1 (2 colunas) -->
-          <div class="sm:col-span-2 flex flex-col gap-3">
-            <!-- Bloco Serviço -->
-            <div class="bg-white rounded-xl border border-m-1/60 overflow-hidden">
-              <div class="bg-m-off px-4 py-2 text-[10px] uppercase tracking-wider text-m-5 font-medium">Serviço — Acompanhamento / gestão</div>
-              <div class="px-4 py-3 flex items-center gap-3 text-[12px]">
-                <span class="w-2 h-2 rounded-sm bg-cta flex-shrink-0"></span>
-                <span class="flex-1 text-m-black">Acompanhamento / gestão</span>
-                <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">10,0%</span>
-                <span class="text-m-5 whitespace-nowrap">R$ 80.000</span>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <!-- Esquerda: Donut composição -->
+          <div class="bg-white rounded-xl border border-m-1/60 p-5 flex flex-col items-center">
+            <span class="text-[10px] uppercase tracking-wider text-m-5 font-medium mb-3">Composição da obra</span>
+            <div class="relative flex items-center justify-center">
+              <svg width="168" height="168" viewBox="0 0 100 100" style="transform:rotate(-90deg)">
+                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--g1)" stroke-width="13"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--cta)" stroke-width="13" stroke-dasharray="48 239" stroke-dashoffset="0"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#F59E0B" stroke-width="13" stroke-dasharray="72 239" stroke-dashoffset="-48"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#8B5CF6" stroke-width="13" stroke-dasharray="55 239" stroke-dashoffset="-120"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#B4B2A9" stroke-width="13" stroke-dasharray="64 239" stroke-dashoffset="-175"/>
+              </svg>
+              <div class="absolute text-center">
+                <div class="text-[9px] uppercase tracking-wider text-m-5">Total</div>
+                <div class="text-[16px] font-semibold text-m-black">R$ 500k</div>
               </div>
             </div>
-
-            <!-- Bloco Fase 1 -->
-            <div class="bg-white rounded-xl border border-m-1/60 overflow-hidden">
-              <div class="bg-m-off px-4 py-2 flex items-center justify-between text-[10px] uppercase tracking-wider">
-                <span class="text-m-5 font-medium">Fase 1 — Civil, Instalações e Acabamentos</span>
-                <span class="text-cta font-semibold">20,5% · R$ 164.000</span>
-              </div>
-              <div class="divide-y divide-m-1/70 text-[12px]">
-                <div class="px-4 py-2.5 flex items-center gap-3">
-                  <span class="w-2 h-2 rounded-sm bg-cta flex-shrink-0"></span>
-                  <span class="flex-1 text-m-black">Civil — Pequenas modificações</span>
-                  <span class="text-[10px] text-m-5">SINAPI 5,0%</span>
-                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">5,0%</span>
-                  <span class="text-m-5 whitespace-nowrap">R$ 40.000</span>
-                </div>
-                <div class="px-4 py-2.5 flex items-center gap-3">
-                  <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#8B5CF6"></span>
-                  <span class="flex-1 text-m-black">Revestimentos e WCs</span>
-                  <span class="text-[10px] text-m-5">SINAPI 5,0%</span>
-                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">5,0%</span>
-                  <span class="text-m-5 whitespace-nowrap">R$ 40.000</span>
-                </div>
-                <div class="px-4 py-2.5 flex items-center gap-3">
-                  <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#F59E0B"></span>
-                  <span class="flex-1 text-m-black">Iluminação técnica e decorativa</span>
-                  <span class="text-[10px] text-m-5">SINAPI 1,8%</span>
-                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">2,0%</span>
-                  <span class="text-m-5 whitespace-nowrap">R$ 16.000</span>
-                </div>
-                <div class="px-4 py-2.5 flex items-center gap-3">
-                  <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#EC4899"></span>
-                  <span class="flex-1 text-m-black">Climatização (split)</span>
-                  <span class="text-[10px] text-m-5">SINAPI 3,2%</span>
-                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">3,5%</span>
-                  <span class="text-m-5 whitespace-nowrap">R$ 28.000</span>
-                </div>
-                <div class="px-4 py-2.5 flex items-center gap-3">
-                  <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#3B82F6"></span>
-                  <span class="flex-1 text-m-black">Fechamento de sacada</span>
-                  <span class="text-[10px] text-m-5">SINAPI 2,5%</span>
-                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">3,0%</span>
-                  <span class="text-m-5 whitespace-nowrap">R$ 24.000</span>
-                </div>
-                <div class="px-4 py-2.5 flex items-center gap-3">
-                  <span class="w-2 h-2 rounded-sm flex-shrink-0 bg-m-3"></span>
-                  <span class="flex-1 text-m-black">Outros serviços</span>
-                  <span class="text-[10px] text-m-5">SINAPI 1,5%</span>
-                  <span class="text-[11px] text-cta font-semibold bg-cta/10 rounded-full px-2 py-0.5">2,0%</span>
-                  <span class="text-m-5 whitespace-nowrap">R$ 16.000</span>
-                </div>
-                <div class="px-4 py-2.5 flex items-center gap-2 text-[11px] text-m-5 italic">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                  <span>Adicionar serviço</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Bloco Fase 2 (condensado) -->
-            <div class="bg-white rounded-xl border border-m-1/60 overflow-hidden">
-              <div class="bg-m-off px-4 py-2 flex items-center justify-between text-[10px] uppercase tracking-wider">
-                <span class="text-m-5 font-medium">Fase 2 — Marcenaria, Marmoraria e Complementos</span>
-                <span class="text-cta font-semibold">69,5% · R$ 556.000</span>
-              </div>
-              <div class="px-4 py-2.5 flex items-center gap-2 flex-wrap text-[11px]">
-                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full bg-cta"></span><span class="text-m-black">Marcenaria</span><span class="text-m-5">15,6%</span></span>
-                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full" style="background:#F59E0B"></span><span class="text-m-black">Marmoraria</span><span class="text-m-5">10,0%</span></span>
-                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full" style="background:#8B5CF6"></span><span class="text-m-black">Vidraçaria</span><span class="text-m-5">9,0%</span></span>
-                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full" style="background:#EC4899"></span><span class="text-m-black">Cortinas e Persianas</span><span class="text-m-5">6,9%</span></span>
-                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full" style="background:#10B981"></span><span class="text-m-black">Acessórios de marcenaria</span><span class="text-m-5">1,5%</span></span>
-                <span class="inline-flex items-center gap-1.5 bg-m-off/60 rounded-full px-2 py-1"><span class="w-1.5 h-1.5 rounded-full bg-m-3"></span><span class="text-m-black">Outros complementos</span><span class="text-m-5">26,5%</span></span>
-              </div>
+            <div class="flex flex-col gap-1.5 mt-4 w-full text-[11px]">
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm bg-cta flex-shrink-0"></span><span class="flex-1 text-m-5">Acompanhamento</span></div>
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#F59E0B"></span><span class="flex-1 text-m-5">Civil e acabamentos</span></div>
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#8B5CF6"></span><span class="flex-1 text-m-5">Marcenaria e marmoraria</span></div>
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm bg-m-3 flex-shrink-0"></span><span class="flex-1 text-m-5">Complementos</span></div>
             </div>
           </div>
 
-          <!-- Direita: Visão Geral (donut) -->
-          <div class="bg-white rounded-xl border border-m-1/60 p-4 flex flex-col">
-            <span class="text-[10px] uppercase tracking-wider text-m-5 font-medium text-center mb-3">Visão Geral</span>
-            <div class="relative flex items-center justify-center">
-              <svg width="112" height="112" viewBox="0 0 100 100" style="transform:rotate(-90deg)">
-                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--g1)" stroke-width="12"/>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--cta)" stroke-width="12" stroke-dasharray="37 239" stroke-dashoffset="0"/>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#F59E0B" stroke-width="12" stroke-dasharray="24 239" stroke-dashoffset="-37"/>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#8B5CF6" stroke-width="12" stroke-dasharray="21 239" stroke-dashoffset="-61"/>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#EC4899" stroke-width="12" stroke-dasharray="17 239" stroke-dashoffset="-82"/>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#B4B2A9" stroke-width="12" stroke-dasharray="140 239" stroke-dashoffset="-99"/>
-              </svg>
-              <div class="absolute text-center">
-                <div class="text-[9px] uppercase tracking-wider text-m-5">Obra</div>
-                <div class="text-[13px] font-semibold text-m-black">R$ 800k</div>
+          <!-- Direita: barras de fase + spark custos -->
+          <div class="bg-white rounded-xl border border-m-1/60 p-5 flex flex-col gap-4">
+            <!-- Fases progress -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[11px] text-m-5">Gestão</span>
+                <span class="text-[11px] text-m-5">Acompanhamento</span>
               </div>
+              <div class="h-2 bg-m-off rounded-full overflow-hidden"><div class="h-full bg-cta rounded-full" style="width:18%"></div></div>
             </div>
-            <div class="flex flex-col gap-1.5 mt-4 text-[10px]">
-              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm bg-cta flex-shrink-0"></span><span class="flex-1 text-m-5">Marcenaria</span><span class="text-m-black font-medium">15,6%</span></div>
-              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#F59E0B"></span><span class="flex-1 text-m-5">Marmoraria</span><span class="text-m-black font-medium">10,0%</span></div>
-              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#8B5CF6"></span><span class="flex-1 text-m-5">Vidraçaria</span><span class="text-m-black font-medium">9,0%</span></div>
-              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#EC4899"></span><span class="flex-1 text-m-5">Cortinas</span><span class="text-m-black font-medium">6,9%</span></div>
-              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm bg-m-3 flex-shrink-0"></span><span class="flex-1 text-m-5">Outros</span><span class="text-m-black font-medium">58,5%</span></div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[11px] text-m-5">Construção</span>
+                <span class="text-[11px] text-m-5">Civil e acabamentos</span>
+              </div>
+              <div class="h-2 bg-m-off rounded-full overflow-hidden"><div class="h-full rounded-full" style="width:32%;background:#F59E0B"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[11px] text-m-5">Mobiliário</span>
+                <span class="text-[11px] text-m-5">Marcenaria e complementos</span>
+              </div>
+              <div class="h-2 bg-m-off rounded-full overflow-hidden"><div class="h-full rounded-full" style="width:50%;background:#8B5CF6"></div></div>
+            </div>
+
+            <!-- Mini spark: custos ao longo do projeto -->
+            <div class="mt-1">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-semibold text-m-black">Custos em tempo real</span>
+                <span class="text-[10px] text-cta font-medium">Atualizado</span>
+              </div>
+              <svg viewBox="0 0 120 40" class="w-full h-10">
+                <defs>
+                  <linearGradient id="sparkPl" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--cta)" stop-opacity=".18"/>
+                    <stop offset="100%" stop-color="var(--cta)" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <polyline points="0,34 15,28 30,30 45,20 60,22 75,14 90,16 105,10 120,8" fill="url(#sparkPl)" stroke="none"/>
+                <polyline points="0,34 15,28 30,30 45,20 60,22 75,14 90,16 105,10 120,8" fill="none" stroke="var(--cta)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </div>
           </div>
         </div>
@@ -609,21 +568,20 @@
         <!-- Rodapé: 3 micro-capabilities -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
           <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-cta flex-shrink-0"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16h8"/><path d="M7 11h12"/><path d="M7 6h3"/></svg>
-            <div><div class="text-[9px] text-m-5">Customizado</div><div class="text-[12px] font-semibold text-m-black">Sua realidade</div></div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-cta flex-shrink-0"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+            <div><div class="text-[9px] text-m-5">Automatizado</div><div class="text-[12px] font-semibold text-m-black">Trabalha por você</div></div>
           </div>
           <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#F59E0B] flex-shrink-0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-            <div><div class="text-[9px] text-m-5">Alertas inteligentes</div><div class="text-[12px] font-semibold text-m-black">Pontos de atenção</div></div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#F59E0B] flex-shrink-0"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><path d="M21 3v6h-6"/></svg>
+            <div><div class="text-[9px] text-m-5">Tempo real</div><div class="text-[12px] font-semibold text-m-black">Custos na hora</div></div>
           </div>
           <div class="bg-white rounded-xl border border-m-1/60 p-3 flex items-center gap-2.5">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-cta flex-shrink-0"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-            <div><div class="text-[9px] text-m-5">Reutilizável</div><div class="text-[12px] font-semibold text-m-black">Próximos projetos</div></div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-cta flex-shrink-0"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+            <div><div class="text-[9px] text-m-5">Segurança</div><div class="text-[12px] font-semibold text-m-black">Decisão clara</div></div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </section>
 
@@ -1073,7 +1031,18 @@
     <div data-r="scale" class="bg-white/5 border border-white/10 rounded-3xl p-8 lg:p-12">
       <div class="mb-2"><span class="text-white/30 text-[16px] line-through">R$ 197</span></div>
       <div class="text-[#2DD4BF] font-bold leading-none mb-2" style="font-size:clamp(64px,14vw,112px)">R$ 47</div>
-      <p class="text-white/40 text-sm mb-10">14h ao vivo · Certificado · Todos os materiais</p>
+      <p class="text-white/40 text-[13px] mb-6">Tudo isso está incluso:</p>
+      <ul class="text-left space-y-2.5 mb-10 text-white/70 text-[14px]">
+        <li class="flex items-start gap-2.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#2DD4BF] mt-0.5 flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg><span>14h de conteúdo ao vivo no Zoom</span></li>
+        <li class="flex items-start gap-2.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#2DD4BF] mt-0.5 flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg><span>Certificado de participação</span></li>
+        <li class="flex items-start gap-2.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#2DD4BF] mt-0.5 flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg><span>Assistente de IA personalizado</span></li>
+        <li class="flex items-start gap-2.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#2DD4BF] mt-0.5 flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg><span>Planilha de Diagnóstico</span></li>
+        <li class="flex items-start gap-2.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#2DD4BF] mt-0.5 flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg><span>Prompts prontos para imagens, vídeos e assistentes</span></li>
+        <li class="flex items-start gap-2.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#2DD4BF] mt-0.5 flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg><span>Mapeamento de Processos editável</span></li>
+        <li class="flex items-start gap-2.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#2DD4BF] mt-0.5 flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg><span>Workflow de IA plugado no seu processo</span></li>
+        <li class="flex items-start gap-2.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#2DD4BF] mt-0.5 flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg><span>Planejamento Financeiro automático</span></li>
+        <li class="flex items-start gap-2.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#2DD4BF] mt-0.5 flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg><span>Bônus extras: sites, IAs e referências</span></li>
+      </ul>
       <a href="https://pay.hotmart.com/K98392503A?checkoutMode=10" target="_blank" rel="noopener noreferrer" class="block w-full bg-cta hover:bg-cta-h active:scale-[0.98] text-white py-4 rounded-full text-[15px] font-medium transition-all mb-4 text-center">Garantir ingresso · Lote promo</a>
     </div>
 
