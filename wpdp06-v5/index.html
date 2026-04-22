@@ -43,9 +43,14 @@ h1, h2, h3, .sec p, .sec h2 + p {
   text-wrap: balance;
 }
 
-/* --- A11y contrast overrides (nos cards de check, WCAG AA) --- */
+/* --- A11y contrast overrides (WCAG AA) --- */
 [data-check] p.text-m-5, [data-check] .flex-1.text-m-5 { color: #5F5E5A !important; }
 [data-check] .text-m-3 { color: #5F5E5A !important; }
+/* Slider hints "Deslize para ver todos" sobre bg claro */
+.text-m-3.text-\[12px\] { color: #5F5E5A !important; }
+/* Footer texto fraco sobre bg preto */
+footer .text-white\/35 { color: rgba(255,255,255,0.65) !important; }
+footer .text-white\/25 { color: rgba(255,255,255,0.55) !important; }
 
 /* --- Reveal --- */
 [data-r] {
