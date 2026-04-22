@@ -333,19 +333,22 @@ function initLazyVideos() {
     if (p && typeof p.catch === 'function') p.catch(() => {});
   }
 
-  // Hero videos: load after window.load + idle callback (post-LCP)
+  // Hero videos: trigger on first user interaction OR 4s fallback (post-LCP)
   const heroVids = document.querySelectorAll('video[data-lazy="hero"]');
   if (heroVids.length) {
-    const kick = () => {
-      const runner = () => heroVids.forEach(attachSources);
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(runner, { timeout: 2000 });
-      } else {
-        setTimeout(runner, 300);
-      }
+    let fired = false;
+    const runner = () => {
+      if (fired) return;
+      fired = true;
+      heroVids.forEach(attachSources);
+      ['scroll','touchstart','mousemove','keydown','click'].forEach(ev => {
+        window.removeEventListener(ev, runner, true);
+      });
     };
-    if (document.readyState === 'complete') kick();
-    else window.addEventListener('load', kick, { once: true });
+    ['scroll','touchstart','mousemove','keydown','click'].forEach(ev => {
+      window.addEventListener(ev, runner, { passive: true, capture: true, once: true });
+    });
+    setTimeout(runner, 4000);
   }
 
   // IO videos (depoimentos): load when approaching viewport
