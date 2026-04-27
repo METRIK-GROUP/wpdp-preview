@@ -1261,12 +1261,12 @@ footer a:hover::after { width: 100%; }
         <!-- v6: CTA hero (lote promo) + barrinha de urgência -->
         <div class="h-in mt-5 sm:mt-6 flex flex-col items-center gap-3">
           <a href="https://pay.hotmart.com/K98392503A?checkoutMode=10" target="_blank" rel="noopener noreferrer" class="inline-flex bg-cta hover:bg-cta-h active:scale-95 text-white w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[14px] sm:text-[15px] font-medium transition-all justify-center shadow-lg shadow-cta/30">Garantir ingresso · Lote promo</a>
-          <!-- Scarcity bar (mesmo padrão usado em v5) -->
+          <!-- Scarcity bar (height inline pq Tailwind nao gera h-[3px]) -->
           <div class="w-full max-w-[260px]">
-            <div class="w-full h-[3px] rounded-full overflow-hidden" style="background:rgba(255,255,255,0.1)">
-              <div class="h-full" style="width:95%;background:#DC2626;border-radius:3px 0 0 3px;box-shadow:0 0 10px rgba(239,68,68,0.5)"></div>
+            <div class="w-full rounded-full overflow-hidden" style="height:6px;background:rgba(255,255,255,0.12);border:1px solid rgba(239,68,68,0.18)">
+              <div style="width:95%;height:100%;background:linear-gradient(90deg,#EF4444,#DC2626);border-radius:6px 0 0 6px;box-shadow:0 0 14px rgba(239,68,68,0.7)"></div>
             </div>
-            <p class="text-[11px] mt-1.5 tracking-wide" style="color:#F87171">Últimas vagas do lote atual</p>
+            <p class="text-[11px] mt-1.5 tracking-wide font-medium" style="color:#F87171">Últimas vagas do lote atual</p>
           </div>
         </div>
 
