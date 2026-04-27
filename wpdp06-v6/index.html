@@ -1211,8 +1211,8 @@ footer a:hover::after { width: 100%; }
     </div>
   </div>
 
-  <!-- Hero content: glass card — mobile sobe levemente, desktop centralizado -->
-  <div class="relative z-10 flex-1 flex flex-col items-center justify-end sm:justify-center px-4 sm:px-6 pt-[clamp(96px,30vh,280px)] sm:pt-12 pb-5 sm:pb-10">
+  <!-- Hero content: glass card — mobile sobe levemente, desktop centralizado (v6: pt reduzido pra subir conteúdo) -->
+  <div class="relative z-10 flex-1 flex flex-col items-center justify-end sm:justify-center px-4 sm:px-6 pt-[clamp(72px,20vh,200px)] sm:pt-10 pb-6 sm:pb-10">
 
     <!-- Logo workshop (v3): acima da data, opacity 30 -->
     <div class="h-in mb-3 sm:mb-4" style="opacity:0.3">
@@ -1230,8 +1230,8 @@ footer a:hover::after { width: 100%; }
 
     <div class="max-w-4xl w-full mx-auto">
 
-      <!-- Glassmorphic card: blur medio + bg moderado (deixa video respirar, text-shadow garante leitura) -->
-      <div class="relative rounded-[18px] sm:rounded-[20px] px-4 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10 text-center" style="background:rgba(10,10,11,0.38);backdrop-filter:blur(45px) saturate(145%);-webkit-backdrop-filter:blur(45px) saturate(145%);border:1px solid rgba(255,255,255,0.15);box-shadow:0 20px 60px -18px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1)">
+      <!-- Glassmorphic card: blur medio + bg moderado (v6: padding ampliado pra respiro nas bordas com CTA+barrinha) -->
+      <div class="relative rounded-[18px] sm:rounded-[20px] px-5 py-6 sm:px-9 sm:py-8 lg:px-12 lg:py-10 text-center" style="background:rgba(10,10,11,0.38);backdrop-filter:blur(45px) saturate(145%);-webkit-backdrop-filter:blur(45px) saturate(145%);border:1px solid rgba(255,255,255,0.15);box-shadow:0 20px 60px -18px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1)">
 
         <!-- Subtle top gradient on card edge -->
         <div class="absolute inset-x-0 top-0 h-px rounded-t-[24px]" style="background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)"></div>
@@ -1258,9 +1258,16 @@ footer a:hover::after { width: 100%; }
           <span class="text-white/35 text-[12px]">· 5 edições realizadas</span>
         </div>
 
-        <!-- v6: CTA hero (lote promo) -->
-        <div class="h-in mt-5 sm:mt-7 flex justify-center">
+        <!-- v6: CTA hero (lote promo) + barrinha de urgência -->
+        <div class="h-in mt-5 sm:mt-6 flex flex-col items-center gap-3">
           <a href="https://pay.hotmart.com/K98392503A?checkoutMode=10" target="_blank" rel="noopener noreferrer" class="inline-flex bg-cta hover:bg-cta-h active:scale-95 text-white w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[14px] sm:text-[15px] font-medium transition-all justify-center shadow-lg shadow-cta/30">Garantir ingresso · Lote promo</a>
+          <!-- Scarcity bar (mesmo padrão usado em v5) -->
+          <div class="w-full max-w-[260px]">
+            <div class="w-full h-[3px] rounded-full overflow-hidden" style="background:rgba(255,255,255,0.1)">
+              <div class="h-full" style="width:95%;background:#DC2626;border-radius:3px 0 0 3px;box-shadow:0 0 10px rgba(239,68,68,0.5)"></div>
+            </div>
+            <p class="text-[11px] mt-1.5 tracking-wide" style="color:#F87171">Últimas vagas do lote atual</p>
+          </div>
         </div>
 
       </div>
