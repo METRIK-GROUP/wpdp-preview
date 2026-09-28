@@ -4,3 +4,6 @@ _optimize.ps1
 _audit.sh
 _originals/
 images/_originals/
+node_modules/
+test-results/
+playwright-report/
