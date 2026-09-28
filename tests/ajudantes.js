@@ -47,6 +47,60 @@ export async function prepararRotas(page, opcoes = {}) {
   return enviados;
 }
 
+/** C1: cardápio com a verificação anti-robô (Turnstile) ligada. */
+export const COM_CHAVE = { ...formulario, protecao: { turnstileSiteKey: 'chave-de-teste' } };
+export const SCRIPT_TURNSTILE = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+
+/**
+ * Turnstile falso servido no lugar do script da Cloudflare. Anota render,
+ * reset e remove em window.__turnstile e entrega 'tok-1', 'tok-2'… 50 ms
+ * depois de cada render/reset (`semToken`: nunca entrega — desafio que
+ * pede interação e não termina). Põe um iframe com título, como o real.
+ */
+export async function servirTurnstile(page, { semToken = false } = {}) {
+  const corpo = `(function () {
+    var registro = { renders: [], resets: [], removes: [] };
+    var emitidos = 0;
+    var atual = null;
+    window.__turnstile = registro;
+    function emitir() {
+      if (${semToken}) return;
+      emitidos += 1;
+      var token = 'tok-' + emitidos;
+      var opcoes = atual;
+      setTimeout(function () { if (opcoes && opcoes === atual) opcoes.callback(token); }, 50);
+    }
+    window.turnstile = {
+      render: function (el, opcoes) {
+        registro.renders.push({
+          sitekey: opcoes.sitekey, appearance: opcoes.appearance, size: opcoes.size, language: opcoes.language,
+          refreshExpired: opcoes['refresh-expired'], responseField: opcoes['response-field'],
+          callbacks: ['callback', 'expired-callback', 'error-callback'].filter(function (k) { return typeof opcoes[k] === 'function'; }),
+          noDocumento: document.contains(el),
+        });
+        var quadro = document.createElement('iframe');
+        quadro.title = 'Widget containing a Cloudflare security challenge';
+        el.appendChild(quadro);
+        atual = opcoes;
+        emitir();
+        return 'w' + registro.renders.length;
+      },
+      reset: function (id) { registro.resets.push(id); emitir(); },
+      remove: function (id) { registro.removes.push(id); atual = null; },
+    };
+  })();`;
+  await page.route('https://challenges.cloudflare.com/**', (r) => r.fulfill({ contentType: 'text/javascript', body: corpo }));
+}
+
+/** Lista (viva) de todo pedido feito a challenges.cloudflare.com. */
+export function vigiarTurnstile(page) {
+  const pedidos = [];
+  page.on('request', (req) => {
+    if (req.url().startsWith('https://challenges.cloudflare.com/')) pedidos.push(req.url());
+  });
+  return pedidos;
+}
+
 export async function preencherEtapa1(page, ex) {
   await page.getByLabel('E-mail (use o mesmo da compra)').fill(ex.email);
   await page.getByLabel('Nome completo').fill(ex.nome);

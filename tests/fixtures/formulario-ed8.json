@@ -428,5 +428,8 @@
       "moraExterior": "Moro fora do Brasil"
     },
     "consentimento": "Autorizo o Instituto METRIK a usar meus dados para organizar minha participação no workshop, me enviar comunicações sobre ele e, se eu for sorteado(a), enviar o prêmio ao endereço informado."
+  },
+  "protecao": {
+    "turnstileSiteKey": null
   }
 }

@@ -79,6 +79,45 @@ test('Instagram: link que não é de perfil é recusado como no servidor', async
   ]);
 });
 
+// C2: mesma gramática do servidor — e-mail válido do WHATWG + pelo menos um
+// ponto no domínio, depois de aparar e passar para minúsculas; até 254.
+test('e-mail validado como no servidor (WHATWG + ponto no domínio)', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    const base = N.estadoInicial(f);
+    const veredito = (v) => (N.errosDaEtapa(1, N.definir(base, 'email', v), f).email ? 'recusado' : 'aceito');
+    const rotulo63 = 'a'.repeat(63);
+    const casos = {
+      'ana@gmail': 'recusado',
+      'x<v@gmail.com>': 'recusado',
+      'v@gmail.com,': 'recusado',
+      'ana souza@gmail.com': 'recusado',
+      'ana@-exemplo.com': 'recusado',
+      'ana@exemplo-.com': 'recusado',
+      'ana@exemplo..com': 'recusado',
+      'ana@.exemplo.com': 'recusado',
+      'ana@exemplo.com.': 'recusado',
+      '@exemplo.com': 'recusado',
+      'ana@@exemplo.com': 'recusado',
+      ['ana@' + rotulo63 + 'a.com']: 'recusado', // rótulo com 64
+      ['a'.repeat(245) + '@exemplo.com']: 'recusado', // 257 no total
+      'ana.souza@exemplo.com.br': 'aceito',
+      'a+b@x.io': 'aceito',
+      '  Ana.Souza@Exemplo.COM.br  ': 'aceito',
+      "o'brien@exemplo.com": 'aceito',
+      'a`b{c}|d~e@x.io': 'aceito',
+      'a!#$%&*/=?^_-b@sub-dominio.exemplo.com': 'aceito',
+      ['ana@' + rotulo63 + '.com']: 'aceito', // rótulo com 63
+      ['a'.repeat(242) + '@exemplo.com']: 'aceito', // 254 no total
+    };
+    const curto = (v) => (v.length > 40 ? v.slice(0, 12) + '... (' + v.length + ' caracteres)' : v);
+    return Object.keys(casos)
+      .filter((v) => veredito(v) !== casos[v])
+      .map((v) => curto(v) + ' deveria ser ' + casos[v]);
+  }, formulario);
+  expect(r).toEqual([]); // lista vazia = todos os casos como no servidor
+});
+
 test('corretor de e-mail', async ({ page }) => {
   const r = await page.evaluate(() => {
     const N = window.CredNucleo;

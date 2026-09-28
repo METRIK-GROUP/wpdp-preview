@@ -26,11 +26,13 @@
      * @param {*} ctx.armazem - localStorage (ou null) já validado
      * @param {Function} ctx.gtm - envia evento ao dataLayer
      * @param {HTMLElement} ctx.app - #app
+     * @param {object} ctx.protecao - verificação anti-robô opcional (window.CredProtecao.criar())
      * @returns {{ enviar: Function, renderEncerrado: Function }}
      */
     criar: function (ctx) {
       var estado = ctx.estado;
       var N = ctx.N;
+      var protecao = ctx.protecao;
       var el = ctx.el;
       var limpar = ctx.limpar;
       var buscar = ctx.buscar;
@@ -92,6 +94,13 @@
 
       var CHAVES_NIVEL_1 = ['email', 'nome', 'whatsapp', 'instagram', 'consentimento'];
       var SUBCHAVES_ENDERECO = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf', 'pais', 'enderecoCompleto'];
+      // Chaves do servidor sem campo próprio na tela: vão para o aviso geral (M-1).
+      var CHAVES_SEM_CAMPO = ['corpo', 'endereco'];
+
+      /** C3: texto do servidor só é usado se for texto — e entra sempre como texto (nunca HTML). */
+      function textoServidor(valor, padrao) {
+        return typeof valor === 'string' && valor ? valor : padrao;
+      }
 
       function todasPerguntas() {
         return estado.formulario.etapas.reduce(function (t, e) { return t.concat(e.perguntas); }, []);
@@ -120,19 +129,23 @@
         var comCampo = {};
         var semCampo = [];
         Object.keys(dados.campos).forEach(function (chave) {
-          if (campoExiste(chave)) comCampo[chave] = dados.campos[chave];
-          else semCampo.push(dados.campos[chave]);
+          var mensagem = dados.campos[chave];
+          if (typeof mensagem !== 'string') return;
+          if (campoExiste(chave)) comCampo[chave] = mensagem;
+          else if (CHAVES_SEM_CAMPO.indexOf(chave) >= 0) semCampo.push(mensagem);
+          // C3: qualquer outra chave é ignorada — o servidor devolve até 5
+          // chaves escolhidas por quem mandou o pedido.
         });
         var teveCampo = Object.keys(comCampo).length > 0;
         if (teveCampo) irParaErros(comCampo);
-        if (semCampo.length) {
-          // M-1: mensagem(ns) sem campo próprio na tela + link de suporte, sem
-          // tentar navegar para etapa nenhuma por causa delas.
-          avisoEnvio(semCampo.join(' '), [' ', linkSuporte()]);
-          if (!teveCampo) focarAviso();
-        } else {
-          avisoEnvio(dados.erro || 'Revise os campos destacados.', []);
+        if (teveCampo && !semCampo.length) {
+          avisoEnvio(textoServidor(dados.erro, 'Revise os campos destacados.'), []);
+          return;
         }
+        // M-1/C3: mensagem sem campo próprio na tela (ou nenhuma chave
+        // conhecida) vai para o aviso geral com o suporte, sem navegar.
+        avisoEnvio(semCampo.length ? semCampo.join(' ') : textoServidor(dados.erro, N.MENSAGENS.falhaEnvio), [' ', linkSuporte()]);
+        if (!teveCampo) focarAviso();
       }
 
       /** I-1: 409 não pede mais para recarregar a página — busca o cardápio
@@ -158,6 +171,7 @@
             if (novo.edicao !== estado.formulario.edicao) throw new Error('outra edição');
             var outraVersao = novo.versao !== estado.formulario.versao;
             estado.formulario = novo;
+            protecao.configurar(novo); // C1: a chave do Turnstile vem com o cardápio
             // O-1: outra versão → autorização desmarcada (o texto pode ter mudado).
             estado.dados = outraVersao ? N.migrarDados(novo, estado.dados) : N.mesclarDados(N.estadoInicial(novo), estado.dados);
             estado.etapa = N.primeiraEtapaComErro(estado.dados, novo, estado.etapa);
@@ -172,7 +186,7 @@
           .catch(function () {
             estado.migrar = true;
             salvarAgora(); // já marcado: vale também para quem recarrega pelo navegador ou volta outro dia
-            avisoEnvio((dados && dados.erro) || 'O formulário foi atualizado. Recarregue a página — suas respostas ficam salvas.', [botaoRecarregar()]);
+            avisoEnvio(textoServidor(dados && dados.erro, 'O formulário foi atualizado. Recarregue a página — suas respostas ficam salvas.'), [botaoRecarregar()]);
             focarAviso();
           });
       }
@@ -198,7 +212,7 @@
         }
         // 429, 5xx, corpo não-JSON (dados===null) e qualquer outra resposta
         // inesperada caem aqui — sempre com o texto do servidor quando existe.
-        avisoEnvio((dados && dados.erro) || N.MENSAGENS.falhaEnvio, []);
+        avisoEnvio(textoServidor(dados && dados.erro, N.MENSAGENS.falhaEnvio), []);
         focarAviso();
       }
 
@@ -215,16 +229,10 @@
         marcarBotao(true);
         var caixa = document.getElementById('aviso-envio');
         if (caixa) limpar(caixa);
-        var oculto = document.getElementById('cred_campo_extra');
-        var corpo = N.montarEnvio(estado.formulario, estado.dados, estado.canal, estado.inicio || Date.now(), Date.now(), oculto ? oculto.value : '');
-        buscar(N.apiBase(window.location) + '/api/public/credenciamento', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(corpo),
-        }, LIMITE_ENVIO_MS)
-          .then(function (res) {
-            return res.json().catch(function () { return null; }).then(function (dados) { return tratarResposta(res.status, dados); });
-          })
+        // C1: com a verificação ligada e ainda sem token, espera até 5 s por
+        // ele (o botão segue em "Enviando…"); depois envia COM ou SEM token.
+        return protecao.token()
+          .then(postar)
           .catch(function () {
             // M-4: falha de rede também ganha um jeito de tentar de novo direto
             // no aviso, além do botão "Confirmar" (que o finally já reabilita).
@@ -235,6 +243,24 @@
             estado.enviando = false;
             marcarBotao(false);
           });
+      }
+
+      /** O POST em si; `token` do Turnstile vai só no corpo (nunca no rascunho). */
+      function postar(token) {
+        var oculto = document.getElementById('cred_campo_extra');
+        var corpo = N.montarEnvio(estado.formulario, estado.dados, estado.canal, estado.inicio || Date.now(), Date.now(), oculto ? oculto.value : '');
+        if (token) corpo = Object.assign({}, corpo, { turnstileToken: token });
+        var pedido = buscar(N.apiBase(window.location) + '/api/public/credenciamento', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(corpo),
+        }, LIMITE_ENVIO_MS);
+        // C1: token é de uso único — depois de QUALQUER tentativa (resposta,
+        // erro, rede, prazo), o widget é reiniciado para gerar outro.
+        pedido.then(protecao.reiniciar, protecao.reiniciar);
+        return pedido.then(function (res) {
+          return res.json().catch(function () { return null; }).then(function (dados) { return tratarResposta(res.status, dados); });
+        });
       }
 
       // ------------------------------------------------------- telas finais
@@ -283,7 +309,7 @@
       function renderSucesso(r) {
         limpar(app);
         var filhos = [
-          el('h2', { id: 'titulo-sucesso', tabindex: '-1', texto: '✅ Credenciamento confirmado, ' + r.primeiroNome + '!' }),
+          el('h2', { id: 'titulo-sucesso', tabindex: '-1', texto: '✅ Credenciamento confirmado, ' + textoServidor(r.primeiroNome, '') + '!' }),
           el('p', { texto: 'Seu acesso à Central do Workshop está pronto.' }),
           linkCentral(r.centralUrl),
         ];

@@ -11,7 +11,9 @@
   var UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
   var DOMINIOS = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com.br', 'yahoo.com', 'icloud.com', 'live.com', 'uol.com.br', 'bol.com.br', 'terra.com.br'];
   var CHAVES_CANAL = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
-  var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  // C2: mesma gramática do servidor — "valid e-mail address" do WHATWG com
+  // pelo menos um ponto no domínio (2+ rótulos), aplicada já em minúsculas.
+  var EMAIL = /^[a-z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/;
   var HANDLE = /^[a-z0-9._]{1,30}$/;
   var LOCAL = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
   var MENSAGENS = {

@@ -591,8 +591,12 @@
     }
     form.appendChild(el('div', { id: 'status', classe: 'sr-only', 'aria-live': 'assertive' }));
     form.appendChild(el('div', { id: 'aviso-envio', tabindex: '-1' })); // M-3: precisa poder receber foco por script após 409/429/5xx/falha de rede
+    // C1: caixa do Turnstile acima dos botões — só na etapa 4 e só se o servidor pediu.
+    var verificacao = estado.etapa === 4 && protecao.ativa() ? el('div', { id: 'verificacao' }) : null;
+    if (verificacao) form.appendChild(verificacao);
     form.appendChild(acoes());
     app.appendChild(form);
+    if (verificacao) protecao.montar(verificacao);
   }
 
   function focarTitulo() {
@@ -732,6 +736,7 @@
     buscarFormulario()
       .then(function (f) {
         estado.formulario = f;
+        protecao.configurar(f); // C1: Turnstile só se o GET trouxer a chave do site
         if (!f.aberto) {
           envio.renderEncerrado();
           return;
@@ -744,9 +749,11 @@
   // Fábrica congelada (fix round 2): envio.js recebe por injeção só o que
   // precisa — o mesmo objeto `estado` por referência (mutações feitas por
   // envio.js aparecem aqui e vice-versa), sem nenhum estado global novo.
+  var protecao = window.CredProtecao.criar(); // C1: verificação anti-robô opcional (protecao.js)
   var envio = window.CredEnvio.criar({
     estado: estado,
     N: N,
+    protecao: protecao,
     el: el,
     limpar: limpar,
     buscar: buscar,

@@ -93,7 +93,7 @@
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
   <script>
-    // Vigia da carga (M-5): se nucleo.js, envio.js ou tela.js não carregar (rede, 404) ou quebrar ao
+    // Vigia da carga (M-5): se nucleo.js, protecao.js, envio.js ou tela.js não carregar (rede, 404) ou quebrar ao
     // iniciar, o aviso inicial "Carregando o formulário…" continua no #app quando o DOMContentLoaded
     // chega (ele só dispara depois dos scripts "defer") — então a página mostra a falha da carga,
     // com "Tentar de novo" e o suporte, em vez de ficar carregando para sempre.
@@ -126,6 +126,7 @@
     });
   </script>
   <script src="nucleo.js" defer></script>
+  <script src="protecao.js" defer></script>
   <script src="envio.js" defer></script>
   <script src="tela.js" defer></script>
 </head>

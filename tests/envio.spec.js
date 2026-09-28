@@ -164,6 +164,74 @@ test('erro de "corpo" (sem campo na tela) aparece no aviso geral, sem travar', a
   await expect(page.getByRole('button', { name: 'Confirmar meu credenciamento' })).toBeEnabled();
 });
 
+// C3: o 400 devolve até 5 chaves escolhidas por quem mandou o pedido
+// ("respostas.<qualquer coisa>") — chave que a página não conhece é ignorada,
+// e texto do servidor sempre entra como texto, nunca como HTML.
+test('erro 400 com chave desconhecida: só o erro do e-mail aparece e nada é injetado', async ({ page }) => {
+  const dialogos = [];
+  const errosDaPagina = [];
+  page.on('dialog', (d) => {
+    dialogos.push(d.message());
+    return d.dismiss();
+  });
+  page.on('pageerror', (e) => errosDaPagina.push(e.message));
+  await prepararRotas(page, {
+    respostasEnvio: [
+      {
+        status: 400,
+        json: {
+          ok: false,
+          erro: 'Revise os campos destacados.',
+          campos: { '<img src=x onerror=alert(1)>': 'x', 'respostas.nao_existe': 'Campo desconhecido.', email: 'E-mail inválido' },
+        },
+      },
+    ],
+  });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+  await expect(page.locator('#erro-email')).toHaveText('E-mail inválido');
+  await expect(page.locator('#aviso-envio')).toHaveText('Revise os campos destacados.'); // nada das chaves desconhecidas
+  expect(await page.locator('#app img').count()).toBe(0);
+  expect(dialogos).toEqual([]);
+  expect(errosDaPagina).toEqual([]);
+});
+
+test('erro 400 só com chaves desconhecidas: aviso geral com o suporte, sem sair da etapa', async ({ page }) => {
+  await prepararRotas(page, {
+    respostasEnvio: [{ status: 400, json: { ok: false, erro: 'Revise os campos destacados.', campos: { 'respostas.nao_existe': 'Campo desconhecido.' } } }],
+  });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.locator('#aviso-envio')).toContainText('Revise os campos destacados.');
+  await expect(page.locator('#aviso-envio')).not.toContainText('Campo desconhecido.');
+  await expect(page.getByRole('link', { name: 'Fale com o suporte' })).toBeVisible();
+  await expect(page.locator('#aviso-envio')).toBeFocused();
+  await expect(page.getByText('Etapa 4 de 4')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Confirmar meu credenciamento' })).toBeEnabled();
+});
+
+// C3 (proteção — já era texto): erro e primeiro nome com marcação HTML
+// aparecem como texto puro, sem criar elemento nenhum.
+test('texto do servidor com marcação HTML aparece como texto, nunca como HTML', async ({ page }) => {
+  await prepararRotas(page, {
+    respostasEnvio: [
+      { status: 429, json: { ok: false, erro: '<img src=x onerror=alert(1)> Muitos envios.' } },
+      { status: 201, json: { ...SUCESSO, primeiroNome: '<b>Ana</b>' } },
+    ],
+  });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.locator('#aviso-envio')).toContainText('<img src=x onerror=alert(1)> Muitos envios.');
+  expect(await page.locator('#app img').count()).toBe(0);
+  await confirmar(page);
+  await expect(page.getByRole('heading', { name: /Credenciamento confirmado, <b>Ana<\/b>!/ })).toBeVisible();
+  expect(await page.locator('#app b').count()).toBe(0);
+});
+
 // I-1: 409 não pede mais para recarregar de cara — busca o cardápio
 // atualizado (sem cache) e mescla o que ainda é válido. A segunda pergunta
 // de "gênero" muda de opções no v2 (perde "Feminino"): a resposta antiga

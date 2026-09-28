@@ -457,7 +457,7 @@ test.describe('carga do formulário', () => {
     expect((await suporte.boundingBox()).height).toBeGreaterThanOrEqual(44);
   }
 
-  for (const arquivo of ['nucleo.js', 'envio.js', 'tela.js']) {
+  for (const arquivo of ['nucleo.js', 'protecao.js', 'envio.js', 'tela.js']) {
     test(`${arquivo} não carrega: mensagem de falha, suporte e "Tentar de novo" que funciona`, async ({ page }) => {
       await prepararRotas(page);
       await page.route(`**/credenciamento/${arquivo}`, (r) => r.fulfill({ status: 404, body: 'não encontrado' }));
