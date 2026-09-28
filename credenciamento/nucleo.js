@@ -113,10 +113,12 @@
 
   function estadoInicial(formulario) {
     var respostas = {};
+    var opcoesPorPergunta = {};
     perguntasDe(formulario).forEach(function (p) {
       respostas[p.id] = respostaVazia(p);
+      if (p.tipo === 'multipla_escolha') opcoesPorPergunta[p.id] = p.opcoes;
     });
-    return {
+    var estado = {
       email: '',
       nome: '',
       whatsapp: '',
@@ -126,6 +128,13 @@
       respostas: respostas,
       consentimento: false,
     };
+    // Metadado interno para mesclarDados saber quais opções de múltipla escolha
+    // são válidas HOJE (o cardápio pode mudar sem trocar a versão do rascunho).
+    // Não enumerável de propósito: não aparece no JSON.stringify do rascunho
+    // salvo, nem no Object.assign de definir(), nem em comparação por
+    // igualdade — não faz parte do formato público do estado.
+    Object.defineProperty(estado, '_opcoesPorPergunta', { value: opcoesPorPergunta, enumerable: false });
+    return estado;
   }
 
   /** Cópia com o valor trocado no caminho "a.b" (nunca altera o original). */
@@ -142,11 +151,18 @@
     }, obj);
   }
 
-  function mesmoFormato(base, salvo) {
+  function mesmoFormato(base, salvo, opcoesValidas) {
     if (typeof base === 'string') return typeof salvo === 'string';
     if (base === null) return salvo === null || (Number.isInteger(salvo) && salvo >= 1 && salvo <= 5);
     if (!salvo || typeof salvo !== 'object') return false;
-    if ('valor' in base) return typeof salvo.valor === 'string' && typeof salvo.outro === 'string';
+    if ('valor' in base) {
+      if (typeof salvo.valor !== 'string' || typeof salvo.outro !== 'string') return false;
+      // Rascunho de múltipla escolha só é aproveitado se a opção ainda
+      // existir no cardápio atual (ou for vazio/OUTRO) — o cardápio pode
+      // mudar sem trocar a versão do formulário.
+      if (!opcoesValidas || salvo.valor === '' || salvo.valor === OUTRO) return true;
+      return opcoesValidas.indexOf(salvo.valor) >= 0;
+    }
     return (
       Array.isArray(salvo.marcadas) &&
       salvo.marcadas.every(function (m) { return typeof m === 'string'; }) &&
@@ -157,10 +173,11 @@
 
   function mesclarDados(base, salvo) {
     if (!salvo || typeof salvo !== 'object') return base;
+    var opcoesPorPergunta = base._opcoesPorPergunta || {};
     var respostas = {};
     Object.keys(base.respostas).forEach(function (id) {
       var s = salvo.respostas ? salvo.respostas[id] : undefined;
-      respostas[id] = mesmoFormato(base.respostas[id], s) ? s : base.respostas[id];
+      respostas[id] = mesmoFormato(base.respostas[id], s, opcoesPorPergunta[id]) ? s : base.respostas[id];
     });
     var endereco = {};
     Object.keys(base.endereco).forEach(function (k) {
@@ -271,7 +288,7 @@
     if (p.tipo === 'escala') return Number.isInteger(r) || !p.obrigatoria ? null : MENSAGENS.escolha;
     if (p.tipo === 'multipla_escolha') {
       if (!r || !r.valor) return p.obrigatoria ? MENSAGENS.escolha : null;
-      if (r.valor !== OUTRO) return null;
+      if (r.valor !== OUTRO) return p.opcoes.indexOf(r.valor) >= 0 ? null : MENSAGENS.escolha;
       var o = texto(r.outro).trim();
       if (!o) return MENSAGENS.outro;
       return o.length > 200 ? MENSAGENS.longo : null;
@@ -355,6 +372,7 @@
 
   function montarEnvio(formulario, d, canal, inicioMs, agoraMs, honeypot) {
     var e = d.endereco;
+    var duracaoS = Math.round((agoraMs - inicioMs) / 1000);
     return {
       edicao: formulario.edicao,
       versao: formulario.versao,
@@ -373,12 +391,12 @@
             complemento: texto(e.complemento).trim(),
             bairro: texto(e.bairro).trim(),
             cidade: texto(e.cidade).trim(),
-            uf: texto(e.uf),
+            uf: texto(e.uf).trim(),
           },
       respostas: montarRespostas(formulario, d.respostas),
       consentimento: d.consentimento === true,
       canal: canal,
-      tempoPreenchimentoS: Math.max(0, Math.round((agoraMs - inicioMs) / 1000)),
+      tempoPreenchimentoS: Number.isFinite(duracaoS) ? Math.max(0, duracaoS) : 0,
       empresa_site: texto(honeypot),
     };
   }

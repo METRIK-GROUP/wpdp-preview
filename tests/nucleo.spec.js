@@ -124,3 +124,123 @@ test('rascunho com formato estranho é ignorado campo a campo', async ({ page })
   }, formulario);
   expect(r).toEqual({ email: 'a@b.com', nome: '', idade: { valor: '', outro: '' }, comp: null, cep: '01310-100', fora: false });
 });
+
+test('rascunho com opção de múltipla escolha removida do cardápio é descartada ao restaurar', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    const base = N.estadoInicial(f);
+    const salvo = {
+      respostas: {
+        acesso_evento: { valor: 'Opção que não existe mais no cardápio', outro: '' },
+        genero: { valor: 'Feminino', outro: '' },
+        formacao: { valor: N.OUTRO, outro: 'Design gráfico' },
+      },
+    };
+    const m = N.mesclarDados(base, salvo);
+    return {
+      outro: N.OUTRO,
+      removida: m.respostas.acesso_evento,
+      mantidaOpcao: m.respostas.genero,
+      mantidaOutro: m.respostas.formacao,
+    };
+  }, formulario);
+  expect(r.removida).toEqual({ valor: '', outro: '' });
+  expect(r.mantidaOpcao).toEqual({ valor: 'Feminino', outro: '' });
+  expect(r.mantidaOutro).toEqual({ valor: r.outro, outro: 'Design gráfico' });
+});
+
+test('validarPergunta recusa valor de múltipla escolha fora do cardápio atual', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    const p = f.etapas[0].perguntas.find((q) => q.id === 'acesso_evento');
+    return [
+      N.validarPergunta(p, { valor: 'Opção que não existe mais no cardápio', outro: '' }),
+      N.validarPergunta(p, { valor: p.opcoes[0], outro: '' }),
+      N.validarPergunta(p, { valor: '', outro: '' }),
+    ];
+  }, formulario);
+  expect(r).toEqual(['Escolha uma opção.', null, 'Escolha uma opção.']);
+});
+
+test('montarEnvio apara o UF e nunca manda tempoPreenchimentoS inválido', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    let d = N.estadoInicial(f);
+    d = N.definir(d, 'endereco.uf', ' SP ');
+    const comEspaco = N.montarEnvio(f, d, {}, 0, 1000, '').endereco.uf;
+    const numeroNormal = N.montarEnvio(f, d, {}, 0, 5000, '').tempoPreenchimentoS;
+    const relogioForaDeOrdem = N.montarEnvio(f, d, {}, 5000, 0, '').tempoPreenchimentoS;
+    const semInicio = N.montarEnvio(f, d, {}, undefined, 5000, '').tempoPreenchimentoS;
+    const naoNumerico = N.montarEnvio(f, d, {}, 'abc', 5000, '').tempoPreenchimentoS;
+    return { comEspaco, numeroNormal, relogioForaDeOrdem, semInicio, naoNumerico };
+  }, formulario);
+  expect(r).toEqual({ comEspaco: 'SP', numeroNormal: 5, relogioForaDeOrdem: 0, semInicio: 0, naoNumerico: 0 });
+});
+
+test('obter lê caminho aninhado e devolve undefined sem lançar quando falta', async ({ page }) => {
+  const r = await page.evaluate(() => {
+    const N = window.CredNucleo;
+    const obj = { endereco: { cep: '01310-100' }, respostas: { idade: null } };
+    return [
+      N.obter(obj, 'endereco.cep'),
+      N.obter(obj, 'respostas.idade'),
+      N.obter(obj, 'endereco.numero'),
+      N.obter(obj, 'nada.aqui.dentro'),
+    ];
+  });
+  expect(r).toEqual(['01310-100', null, undefined, undefined]);
+});
+
+test('armazenamento e rascunho funcionam normalmente e não lançam quando localStorage falha', async ({ page }) => {
+  const r = await page.evaluate(() => {
+    const N = window.CredNucleo;
+
+    const s = N.armazenamento();
+    const funcionaNormal = s !== null;
+    N.salvarRascunho(s, { x: 1 });
+    const lido = N.carregarRascunho(s);
+    N.apagarRascunho(s);
+    const apagado = N.carregarRascunho(s);
+
+    const quebrado = {
+      getItem: () => { throw new Error('bloqueado'); },
+      setItem: () => { throw new Error('bloqueado'); },
+      removeItem: () => { throw new Error('bloqueado'); },
+    };
+    let semLancarComArmazemQuebrado = true;
+    let lidoQuebrado = 'não tentou';
+    try {
+      N.salvarRascunho(quebrado, { x: 1 });
+      lidoQuebrado = N.carregarRascunho(quebrado);
+      N.apagarRascunho(quebrado);
+    } catch (e) {
+      semLancarComArmazemQuebrado = false;
+    }
+
+    let semArmazem = 'não tentou';
+    let semLancarNoAcesso = true;
+    const descritorOriginal = Object.getOwnPropertyDescriptor(window, 'localStorage');
+    try {
+      Object.defineProperty(window, 'localStorage', {
+        configurable: true,
+        get() { throw new Error('bloqueado'); },
+      });
+      semArmazem = N.armazenamento();
+    } catch (e) {
+      semLancarNoAcesso = false;
+    } finally {
+      if (descritorOriginal) Object.defineProperty(window, 'localStorage', descritorOriginal);
+    }
+
+    return { funcionaNormal, lido, apagado, semLancarComArmazemQuebrado, lidoQuebrado, semArmazem, semLancarNoAcesso };
+  });
+  expect(r).toEqual({
+    funcionaNormal: true,
+    lido: { x: 1 },
+    apagado: null,
+    semLancarComArmazemQuebrado: true,
+    lidoQuebrado: null,
+    semArmazem: null,
+    semLancarNoAcesso: true,
+  });
+});
