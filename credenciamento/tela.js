@@ -11,6 +11,11 @@
   var LIMITE_CEP_MS = 5000;
   var armazem = N.armazenamento();
   var temporizador = null;
+  // Lido e apagado do endereço da página ANTES de qualquer busca ao servidor
+  // (I-2): mesmo que o formulário nunca carregue, o e-mail/nome não ficam
+  // expostos na URL (histórico do navegador, GTM, prints de tela).
+  var PREFILL = N.lerPrefill(window.location.hash);
+  if (window.location.hash) history.replaceState(null, '', window.location.pathname + window.location.search);
   var estado = {
     formulario: null,
     etapa: 1,
@@ -22,6 +27,7 @@
     restaurado: false,
     concluido: false,
     ultimoCep: '',
+    cepAutoPreenchido: { logradouro: null, bairro: null, cidade: null, uf: null },
   };
 
   // ------------------------------------------------------------------ DOM
@@ -119,6 +125,23 @@
     setTimeout(function () { regiao.textContent = mensagem; }, 50);
   }
 
+  /**
+   * Qual controle focar para o erro de uma chave. Normalmente é a própria
+   * entrada (`#in-<chave>`) ou o primeiro campo do grupo — MAS se o grupo tem
+   * a caixa "Outro" aberta (`.outro-texto` visível), é ela quem precisa da
+   * atenção (M-3): a pessoa já escolheu "Outro", o problema é o texto que
+   * falta escrever ali, não a primeira opção da lista.
+   */
+  function primeiroControleDoCampo(chave) {
+    var entrada = document.getElementById(idEntrada(chave));
+    if (entrada) return entrada;
+    var campo = document.getElementById(idCampo(chave));
+    if (!campo) return null;
+    var outro = campo.querySelector('.outro-texto');
+    if (outro && !outro.hidden) return outro;
+    return campo.querySelector('input, select, textarea');
+  }
+
   function mostrarErros(erros) {
     var chaves = Object.keys(erros);
     var primeiro = null;
@@ -131,7 +154,7 @@
       var campo = document.getElementById(idCampo(chave));
       if (entrada) entrada.setAttribute('aria-invalid', 'true');
       else if (campo) campo.setAttribute('data-invalido', '');
-      if (!primeiro) primeiro = entrada || (campo ? campo.querySelector('input, select, textarea') : null);
+      if (!primeiro) primeiro = primeiroControleDoCampo(chave);
     });
     if (chaves.length) anunciar('Revise ' + chaves.length + (chaves.length === 1 ? ' campo destacado.' : ' campos destacados.'));
     if (primeiro) {
@@ -218,6 +241,7 @@
       type: 'text',
       classe: 'outro-texto',
       'aria-label': 'Qual? (Outro)',
+      'aria-describedby': idErro(chave), // M-3: erro do campo (ex. "Escreva qual é a outra opção.") é anunciado ao focar aqui
       maxlength: 200,
       hidden: !visivel,
       oninput: function (ev) { mudar(chave, Object.assign({}, N.obter(estado.dados, chave), { outro: ev.target.value })); },
@@ -232,8 +256,11 @@
     var outro = campoOutro(chave, atual.valor === N.OUTRO);
     function escolher(valor) {
       mudar(chave, Object.assign({}, N.obter(estado.dados, chave), { valor: valor }));
+      // M-3 (WCAG 3.2.2): só revela a caixa "Outro" — nunca move o foco para
+      // lá sozinho. O mesmo onchange dispara ao selecionar por clique OU por
+      // seta do teclado, e mover o foco durante a navegação por setas tira a
+      // pessoa do grupo de opções sem ela pedir.
       outro.hidden = valor !== N.OUTRO;
-      if (valor === N.OUTRO) outro.focus();
     }
     var itens = p.opcoes.map(function (opcao, i) {
       return opcaoMarcavel('radio', nome, nome + '-' + i, opcao, atual.valor === opcao, function () { escolher(opcao); });
@@ -345,9 +372,19 @@
     ];
   }
 
-  function preencherSeVeio(chave, valor) {
+  /**
+   * M-5: só preenche se o campo ainda está vazio OU ainda tem exatamente o
+   * que a própria busca por CEP colocou da última vez (`cepAutoPreenchido`).
+   * Se a pessoa já digitou algo diferente enquanto a resposta do ViaCEP
+   * estava a caminho, essa resposta (possivelmente atrasada/fora de ordem)
+   * não pisa em cima do que foi digitado.
+   */
+  function preencherSeVeio(chave, valor, sub) {
     if (!valor) return;
     var entrada = document.getElementById(idEntrada(chave));
+    var atual = entrada ? entrada.value : N.obter(estado.dados, chave) || '';
+    if (atual !== '' && atual !== estado.cepAutoPreenchido[sub]) return;
+    estado.cepAutoPreenchido[sub] = valor;
     if (entrada) entrada.value = valor;
     mudar(chave, valor);
   }
@@ -355,7 +392,6 @@
   function buscarCep(valor, status) {
     var cep = valor.replace(/\D/g, '');
     if (cep.length !== 8 || cep === estado.ultimoCep) return;
-    estado.ultimoCep = cep;
     status.textContent = 'Buscando o endereço…';
     buscar('https://viacep.com.br/ws/' + cep + '/json/', {}, LIMITE_CEP_MS)
       .then(function (res) { return res.ok ? res.json() : null; })
@@ -364,10 +400,14 @@
           status.textContent = N.MENSAGENS.cepNaoEncontrado;
           return;
         }
-        preencherSeVeio('endereco.logradouro', r.logradouro);
-        preencherSeVeio('endereco.bairro', r.bairro);
-        preencherSeVeio('endereco.cidade', r.localidade);
-        preencherSeVeio('endereco.uf', r.uf);
+        // M-5: só marca como "resolvido" numa busca que deu certo — assim,
+        // depois de uma falha, digitar o mesmo CEP de novo tenta de novo em
+        // vez de ficar preso (o guard acima compara com ultimoCep).
+        estado.ultimoCep = cep;
+        preencherSeVeio('endereco.logradouro', r.logradouro, 'logradouro');
+        preencherSeVeio('endereco.bairro', r.bairro, 'bairro');
+        preencherSeVeio('endereco.cidade', r.localidade, 'cidade');
+        preencherSeVeio('endereco.uf', r.uf, 'uf');
         status.textContent = 'Endereço encontrado. Confira e informe o número.';
       })
       .catch(function () {
@@ -440,9 +480,17 @@
   }
 
   function campoOculto() {
+    // M-9: id/name/rótulo neutros de propósito — um preenchimento automático
+    // do navegador (autofill) tende a classificar campos chamados
+    // "empresa"/"company"/"site" como dado de organização e preenchê-los de
+    // verdade, o que faria uma pessoa real cair como "suspeito" (sem e-mail,
+    // sem etiqueta). A chave enviada ao servidor continua "empresa_site"
+    // (contrato do servidor, não muda). Fica fora da tela (não
+    // display:none) para que um robô simples que preenche todo input ainda
+    // caia na armadilha.
     return el('div', { classe: 'campo-oculto', 'aria-hidden': 'true' }, [
-      el('label', { for: 'empresa_site', texto: 'Não preencha este campo' }),
-      el('input', { type: 'text', id: 'empresa_site', name: 'empresa_site', tabindex: '-1', autocomplete: 'off' }),
+      el('label', { for: 'cred_campo_extra', texto: 'Deixe este campo em branco' }),
+      el('input', { type: 'text', id: 'cred_campo_extra', name: 'cred_campo_extra', tabindex: '-1', autocomplete: 'off' }),
     ]);
   }
 
@@ -504,7 +552,7 @@
       form.appendChild(campoOculto());
     }
     form.appendChild(el('div', { id: 'status', classe: 'sr-only', 'aria-live': 'assertive' }));
-    form.appendChild(el('div', { id: 'aviso-envio' }));
+    form.appendChild(el('div', { id: 'aviso-envio', tabindex: '-1' })); // M-3: precisa poder receber foco por script após 409/429/5xx/falha de rede
     form.appendChild(acoes());
     app.appendChild(form);
   }
@@ -537,6 +585,8 @@
   }
 
   function comecarDoZero() {
+    // M-2: apaga tudo o que a pessoa preencheu — confirma antes.
+    if (!window.confirm('Apagar tudo o que você preencheu e começar do zero?')) return;
     N.apagarRascunho(armazem);
     estado.dados = N.estadoInicial(estado.formulario);
     estado.etapa = 1;
@@ -554,20 +604,114 @@
     botao.textContent = ocupado ? 'Enviando…' : estado.etapa < 4 ? 'Próximo' : 'Confirmar meu credenciamento';
   }
 
-  function avisoEnvio(mensagem, comRecarregar) {
+  /** `mensagem` + lista opcional de nós extra (botão/link) dentro do aviso. */
+  function avisoEnvio(mensagem, extras) {
     var caixa = document.getElementById('aviso-envio');
     if (!caixa) return;
     limpar(caixa);
-    caixa.appendChild(el('p', { classe: 'aviso aviso--erro', role: 'alert' }, [
-      mensagem,
-      comRecarregar ? el('button', { type: 'button', texto: 'Recarregar a página', onclick: function () { salvarAgora(); window.location.reload(); } }) : null,
-    ]));
+    caixa.appendChild(el('p', { classe: 'aviso aviso--erro', role: 'alert' }, [mensagem].concat(extras || [])));
+  }
+
+  // M-3: depois de 409/429/5xx/falha de rede, o foco vai para o próprio
+  // aviso (não para um campo) — a pessoa precisa ler o que aconteceu antes
+  // de continuar. `#aviso-envio` ganha tabindex="-1" já no render() para
+  // sempre poder receber foco por script.
+  function focarAviso() {
+    var caixa = document.getElementById('aviso-envio');
+    if (caixa) caixa.focus();
+  }
+
+  function botaoRecarregar() {
+    return el('button', { type: 'button', texto: 'Recarregar a página', onclick: function () { salvarAgora(); window.location.reload(); } });
+  }
+
+  function botaoTentarDeNovo(aoClicar) {
+    return el('button', { type: 'button', texto: 'Tentar de novo', onclick: aoClicar });
+  }
+
+  function linkSuporte() {
+    return el('a', { classe: 'link-toque', href: 'https://www.rodrigorosar.com.br/suporte', target: '_blank', rel: 'noopener noreferrer', texto: 'Fale com o suporte' });
   }
 
   function concluir() {
     estado.concluido = true;
     clearTimeout(temporizador);
     N.apagarRascunho(armazem);
+  }
+
+  var CHAVES_NIVEL_1 = ['email', 'nome', 'whatsapp', 'instagram', 'consentimento'];
+  var SUBCHAVES_ENDERECO = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf', 'pais', 'enderecoCompleto'];
+
+  function todasPerguntas() {
+    return estado.formulario.etapas.reduce(function (t, e) { return t.concat(e.perguntas); }, []);
+  }
+
+  /**
+   * M-1: uma chave de erro do servidor "tem campo na tela" quando existe um
+   * `#in-<chave>` (ou pergunta reconhecida) correspondente — ao contrário de
+   * `document.getElementById`, isso não depende da etapa atualmente
+   * renderizada. `corpo`, `endereco` sozinho (sem subcampo) ou uma
+   * `respostas.<id>` de pergunta que não existe mais no cardápio não têm
+   * campo: precisam aparecer no aviso geral, nunca tentar navegar para lugar
+   * nenhum.
+   */
+  function campoExiste(chave) {
+    if (CHAVES_NIVEL_1.indexOf(chave) >= 0) return true;
+    if (chave.indexOf('endereco.') === 0) return SUBCHAVES_ENDERECO.indexOf(chave.slice('endereco.'.length)) >= 0;
+    if (chave.indexOf('respostas.') === 0) {
+      var id = chave.slice('respostas.'.length);
+      return todasPerguntas().some(function (p) { return p.id === id; });
+    }
+    return false;
+  }
+
+  function primeiraEtapaComErro(dados, formulario, atual) {
+    for (var n = 1; n <= 4; n++) {
+      if (Object.keys(N.errosDaEtapa(n, dados, formulario)).length) return n;
+    }
+    return atual;
+  }
+
+  function tratarErros400(dados) {
+    var comCampo = {};
+    var semCampo = [];
+    Object.keys(dados.campos).forEach(function (chave) {
+      if (campoExiste(chave)) comCampo[chave] = dados.campos[chave];
+      else semCampo.push(dados.campos[chave]);
+    });
+    var teveCampo = Object.keys(comCampo).length > 0;
+    if (teveCampo) irParaErros(comCampo);
+    if (semCampo.length) {
+      // M-1: mensagem(ns) sem campo próprio na tela + link de suporte, sem
+      // tentar navegar para etapa nenhuma por causa delas.
+      avisoEnvio(semCampo.join(' '), [' ', linkSuporte()]);
+      if (!teveCampo) focarAviso();
+    } else {
+      avisoEnvio(dados.erro || 'Revise os campos destacados.', []);
+    }
+  }
+
+  /** I-1: 409 não pede mais para recarregar a página — busca o cardápio
+   * atualizado (sem cache), mescla o que ainda é válido e deixa a pessoa
+   * revisar e reenviar, tudo sem perder o que ela já preencheu. Só cai no
+   * aviso antigo (com "Recarregar a página") se essa nova busca falhar. */
+  function tratar409(dados) {
+    buscarFormulario({ semCache: true })
+      .then(function (novo) {
+        estado.formulario = novo;
+        estado.dados = N.mesclarDados(N.estadoInicial(novo), estado.dados);
+        estado.etapa = primeiraEtapaComErro(estado.dados, novo, estado.etapa);
+        salvarAgora();
+        render();
+        var erros = N.errosDaEtapa(estado.etapa, estado.dados, novo);
+        if (Object.keys(erros).length) mostrarErros(erros);
+        avisoEnvio('O formulário foi atualizado. Confira as respostas e envie de novo.', []);
+        focarAviso();
+      })
+      .catch(function () {
+        avisoEnvio((dados && dados.erro) || 'O formulário foi atualizado. Recarregue a página — suas respostas ficam salvas.', [botaoRecarregar()]);
+        focarAviso();
+      });
   }
 
   function tratarResposta(status, dados) {
@@ -578,13 +722,11 @@
       return;
     }
     if (status === 400 && dados && dados.campos) {
-      irParaErros(dados.campos);
-      avisoEnvio(dados.erro || 'Revise os campos destacados.', false);
+      tratarErros400(dados);
       return;
     }
     if (status === 409) {
-      salvarAgora();
-      avisoEnvio((dados && dados.erro) || 'O formulário foi atualizado. Recarregue a página — suas respostas ficam salvas.', true);
+      tratar409(dados);
       return;
     }
     if (status === 410) {
@@ -592,7 +734,10 @@
       renderEncerrado();
       return;
     }
-    avisoEnvio((dados && dados.erro) || N.MENSAGENS.falhaEnvio, false);
+    // 429, 5xx, corpo não-JSON (dados===null) e qualquer outra resposta
+    // inesperada caem aqui — sempre com o texto do servidor quando existe.
+    avisoEnvio((dados && dados.erro) || N.MENSAGENS.falhaEnvio, []);
+    focarAviso();
   }
 
   function enviar() {
@@ -608,7 +753,7 @@
     marcarBotao(true);
     var caixa = document.getElementById('aviso-envio');
     if (caixa) limpar(caixa);
-    var oculto = document.getElementById('empresa_site');
+    var oculto = document.getElementById('cred_campo_extra');
     var corpo = N.montarEnvio(estado.formulario, estado.dados, estado.canal, estado.inicio || Date.now(), Date.now(), oculto ? oculto.value : '');
     buscar(N.apiBase(window.location) + '/api/public/credenciamento', {
       method: 'POST',
@@ -618,7 +763,12 @@
       .then(function (res) {
         return res.json().catch(function () { return null; }).then(function (dados) { tratarResposta(res.status, dados); });
       })
-      .catch(function () { avisoEnvio(N.MENSAGENS.falhaEnvio, false); })
+      .catch(function () {
+        // M-4: falha de rede também ganha um jeito de tentar de novo direto
+        // no aviso, além do botão "Confirmar" (que o finally já reabilita).
+        avisoEnvio(N.MENSAGENS.falhaEnvio, [botaoTentarDeNovo(enviar)]);
+        focarAviso();
+      })
       .finally(function () {
         estado.enviando = false;
         marcarBotao(false);
@@ -665,10 +815,14 @@
       filhos.push(el('p', { texto: 'Não conseguimos enviar o e-mail agora; vamos tentar de novo nos próximos minutos. Enquanto isso, guarde este link:' }));
       filhos.push(botaoCopiar(r.centralUrl));
     }
-    filhos.push(el('a', {
-      classe: 'botao botao--secundario botao--largo', href: estado.formulario.grupoUrl,
-      target: '_blank', rel: 'noopener noreferrer', texto: 'Entrar no grupo dos participantes',
-    }));
+    // I-3: mesma checagem de esquema do centralUrl — nunca confiar cegamente
+    // numa URL vinda do servidor (poderia ser "javascript:" ou outro esquema perigoso).
+    if (/^https:\/\//.test(estado.formulario.grupoUrl || '')) {
+      filhos.push(el('a', {
+        classe: 'botao botao--secundario botao--largo', href: estado.formulario.grupoUrl,
+        target: '_blank', rel: 'noopener noreferrer', texto: 'Entrar no grupo dos participantes',
+      }));
+    }
     filhos.push(el('p', { classe: 'ajuda', texto: 'Algo errado nas respostas? É só preencher de novo: vale o envio mais recente.' }));
     app.appendChild(el('div', { classe: 'sucesso' }, filhos));
     document.getElementById('titulo-sucesso').focus();
@@ -680,8 +834,9 @@
     var numero = String((estado.formulario && estado.formulario.edicao) || '').replace(/\D/g, '');
     app.appendChild(el('div', { classe: 'sucesso' }, [
       el('h2', { id: 'titulo-encerrado', tabindex: '-1', texto: 'O credenciamento da ' + (numero ? numero + 'ª ' : '') + 'edição foi encerrado.' }),
-      el('p', {}, ['Dúvidas? Fale com o suporte: ', el('a', { href: 'https://www.rodrigorosar.com.br/suporte', target: '_blank', rel: 'noopener noreferrer', texto: 'rodrigorosar.com.br/suporte' })]),
+      el('p', {}, ['Dúvidas? Fale com o suporte: ', el('a', { classe: 'link-toque', href: 'https://www.rodrigorosar.com.br/suporte', target: '_blank', rel: 'noopener noreferrer', texto: 'rodrigorosar.com.br/suporte' })]),
     ]));
+    document.getElementById('titulo-encerrado').focus(); // M-3: tanto ao carregar já encerrado quanto após 410 no envio
   }
 
   function renderFalhaCarga() {
@@ -690,7 +845,7 @@
     app.appendChild(el('div', { classe: 'sucesso' }, [
       el('p', { classe: 'aviso aviso--erro', role: 'alert', texto: 'Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.' }),
       el('button', { type: 'button', classe: 'botao botao--primario botao--largo', texto: 'Tentar de novo', onclick: function () { carregar(); } }),
-      el('p', {}, [el('a', { href: 'https://www.rodrigorosar.com.br/suporte', target: '_blank', rel: 'noopener noreferrer', texto: 'Falar com o suporte' })]),
+      el('p', {}, [el('a', { classe: 'link-toque', href: 'https://www.rodrigorosar.com.br/suporte', target: '_blank', rel: 'noopener noreferrer', texto: 'Falar com o suporte' })]),
     ]));
   }
 
@@ -700,31 +855,51 @@
     var guardado = N.carregarRascunho(armazem);
     if (guardado && guardado.versao === f.versao && guardado.dados) {
       estado.dados = N.mesclarDados(N.estadoInicial(f), guardado.dados);
-      estado.etapa = Math.min(Math.max(1, Number(guardado.etapa) || 1), 4);
+      // M-6: rascunho corrompido (ex.: etapa 2.5, de uma gravação parcial ou
+      // formato antigo) nunca pode virar uma etapa fora de 1..4 nem quebrar
+      // com um número quebrado.
+      estado.etapa = Math.min(Math.max(1, Math.trunc(Number(guardado.etapa)) || 1), 4);
       estado.inicio = Number(guardado.inicio) || null;
       estado.restaurado = true;
     } else {
       if (guardado) N.apagarRascunho(armazem);
       estado.dados = N.estadoInicial(f);
     }
-    var pre = N.lerPrefill(window.location.hash);
-    if (pre.email && !estado.dados.email) estado.dados = N.definir(estado.dados, 'email', pre.email);
-    if (pre.nome && !estado.dados.nome) estado.dados = N.definir(estado.dados, 'nome', pre.nome);
-    if (window.location.hash) history.replaceState(null, '', window.location.pathname + window.location.search);
+    if (PREFILL.email && !estado.dados.email) estado.dados = N.definir(estado.dados, 'email', PREFILL.email);
+    if (PREFILL.nome && !estado.dados.nome) estado.dados = N.definir(estado.dados, 'nome', PREFILL.nome);
     render();
   }
 
-  function carregar() {
-    limpar(app);
-    app.setAttribute('aria-busy', 'true');
-    app.appendChild(el('div', { classe: 'esqueleto', 'aria-hidden': 'true' }, [el('span'), el('span'), el('span')]));
-    buscar(N.apiBase(window.location) + '/api/public/credenciamento/formulario', { headers: { Accept: 'application/json' } })
+  /**
+   * Busca o cardápio no servidor e confere o formato mínimo. Usada tanto na
+   * carga inicial quanto na recuperação do 409 (I-1) — nesse segundo caso,
+   * `semCache: true` força ignorar o cache da CDN (query descartável +
+   * `cache: 'no-store'`), porque um 409 significa que o cardápio ACABOU de
+   * mudar no servidor e a resposta antiga em cache não serviria.
+   */
+  function buscarFormulario(opcoes) {
+    var semCache = !!(opcoes && opcoes.semCache);
+    var url = N.apiBase(window.location) + '/api/public/credenciamento/formulario';
+    if (semCache) url += (url.indexOf('?') >= 0 ? '&' : '?') + '_=' + Date.now();
+    var init = { headers: { Accept: 'application/json' } };
+    if (semCache) init.cache = 'no-store';
+    return buscar(url, init)
       .then(function (res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.json();
       })
       .then(function (f) {
         if (!f || !Array.isArray(f.etapas) || f.etapas.length !== 4) throw new Error('formato inesperado');
+        return f;
+      });
+  }
+
+  function carregar() {
+    limpar(app);
+    app.setAttribute('aria-busy', 'true');
+    app.appendChild(el('div', { classe: 'esqueleto', 'aria-hidden': 'true' }, [el('span'), el('span'), el('span')]));
+    buscarFormulario()
+      .then(function (f) {
         estado.formulario = f;
         if (!f.aberto) {
           renderEncerrado();

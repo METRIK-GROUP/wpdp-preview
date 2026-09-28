@@ -24,7 +24,9 @@ export async function prepararRotas(page, opcoes = {}) {
   const enviados = [];
   const fila = [...(opcoes.respostasEnvio ?? [{ status: 201, json: SUCESSO }])];
   await page.route('https://gtm.rodrigorosar.com.br/**', (r) => r.abort());
-  await page.route('**/api/public/credenciamento/formulario', (r) =>
+  // "*" no fim casa também com a busca sem cache do 409 (I-1), que acrescenta
+  // "?_=<timestamp>" na URL para furar o cache da CDN.
+  await page.route('**/api/public/credenciamento/formulario*', (r) =>
     r.fulfill({ status: opcoes.formularioStatus ?? 200, json: opcoes.formularioResposta ?? formulario }),
   );
   await page.route('**/api/public/credenciamento', async (r) => {
