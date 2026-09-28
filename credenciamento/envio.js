@@ -116,13 +116,6 @@
         return false;
       }
 
-      function primeiraEtapaComErro(dados, formulario, atual) {
-        for (var n = 1; n <= 4; n++) {
-          if (Object.keys(N.errosDaEtapa(n, dados, formulario)).length) return n;
-        }
-        return atual;
-      }
-
       function tratarErros400(dados) {
         var comCampo = {};
         var semCampo = [];
@@ -153,16 +146,21 @@
         // busca do formulário em voo, abrindo brecha para um segundo envio com
         // estado.formulario desatualizado enquanto o primeiro 409 ainda está
         // sendo tratado.
-        // I-2 / M-11: nos DOIS caminhos o rascunho ganha `migrar: true` —
-        // assim a próxima carga mescla (em vez de descartar) um rascunho de
-        // versão diferente da que vier do servidor: a nova (depois do
-        // "Recarregar a página") ou a antiga (CDN ainda com cache depois de
-        // uma recuperação que deu certo).
+        // I-2 / M-11 / N-1: nos DOIS caminhos o rascunho ganha o marcador
+        // `migrar: <edição>` — assim a próxima carga mescla (em vez de
+        // descartar) um rascunho de versão diferente da que vier do servidor,
+        // desde que da MESMA edição: a nova (depois do "Recarregar a página")
+        // ou a antiga (CDN ainda com cache depois de uma recuperação certa).
         return buscarFormulario({ semCache: true })
           .then(function (novo) {
+            // N-1: respostas nunca passam para outra edição — cai no aviso de
+            // recarregar, e a recarga descarta o rascunho da edição antiga.
+            if (novo.edicao !== estado.formulario.edicao) throw new Error('outra edição');
+            var outraVersao = novo.versao !== estado.formulario.versao;
             estado.formulario = novo;
-            estado.dados = N.mesclarDados(N.estadoInicial(novo), estado.dados);
-            estado.etapa = primeiraEtapaComErro(estado.dados, novo, estado.etapa);
+            // O-1: outra versão → autorização desmarcada (o texto pode ter mudado).
+            estado.dados = outraVersao ? N.migrarDados(novo, estado.dados) : N.mesclarDados(N.estadoInicial(novo), estado.dados);
+            estado.etapa = N.primeiraEtapaComErro(estado.dados, novo, estado.etapa);
             estado.migrar = true;
             salvarAgora();
             render();

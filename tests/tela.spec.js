@@ -348,7 +348,7 @@ test.describe('rascunho e preenchimento pelo link', () => {
 
   test('rascunho de versão antiga do formulário é descartado', async ({ page }) => {
     await page.addInitScript(() => {
-      localStorage.setItem('wpdp-credenciamento-ed8-rascunho', JSON.stringify({ versao: 'ed8-v0', etapa: 3, dados: { email: 'velho@exemplo.com.br' } }));
+      localStorage.setItem('wpdp-credenciamento-ed8-rascunho', JSON.stringify({ edicao: 'ed8', versao: 'ed8-v0', etapa: 3, dados: { email: 'velho@exemplo.com.br' } }));
     });
     await prepararRotas(page);
     await page.goto(URL_TESTE);
@@ -425,7 +425,7 @@ test.describe('rascunho e preenchimento pelo link', () => {
     await page.addInitScript(() => {
       localStorage.setItem(
         'wpdp-credenciamento-ed8-rascunho',
-        JSON.stringify({ versao: 'ed8-v1', etapa: 2.5, dados: { email: 'ana@exemplo.com.br' } }),
+        JSON.stringify({ edicao: 'ed8', versao: 'ed8-v1', etapa: 2.5, dados: { email: 'ana@exemplo.com.br' } }),
       );
     });
     await prepararRotas(page);

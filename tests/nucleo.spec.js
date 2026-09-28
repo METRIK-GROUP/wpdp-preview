@@ -269,6 +269,49 @@ test('validarPergunta não aceita "Outro" em pergunta que não aceita "Outro"', 
   expect(r).toEqual(['Escolha uma opção.', 'Marque pelo menos uma opção.', null, 'Marque pelo menos uma opção.']);
 });
 
+// O-1 / N-2: rascunho de outra versão mescla o que ainda vale e zera a
+// autorização; a primeira etapa com erro é a que o rascunho migrado abre.
+test('migrarDados zera a autorização e primeiraEtapaComErro acha a primeira etapa com erro', async ({ page }) => {
+  const r = await page.evaluate(
+    ({ f, ex }) => {
+      const N = window.CredNucleo;
+      let d = N.estadoInicial(f);
+      ['email', 'nome', 'whatsapp', 'instagram'].forEach((k) => {
+        d = N.definir(d, k, ex[k]);
+      });
+      f.etapas.forEach((e) =>
+        e.perguntas.forEach((p) => {
+          const resp = ex.respostas[p.id];
+          if (resp === undefined) return;
+          let ui = resp;
+          if (p.tipo === 'multipla_escolha') ui = 'opcao' in resp ? { valor: resp.opcao, outro: '' } : { valor: N.OUTRO, outro: resp.outro };
+          if (p.tipo === 'caixas_selecao') ui = { marcadas: resp.opcoes, outroMarcado: resp.outro !== null, outro: resp.outro || '' };
+          d = N.definir(d, 'respostas.' + p.id, ui);
+        }),
+      );
+      const ate3 = d; // etapas 1 a 3 completas; endereço e autorização vazios
+      Object.keys(ex.endereco).forEach((k) => {
+        d = N.definir(d, 'endereco.' + k, ex.endereco[k]);
+      });
+      const completo = N.definir(d, 'consentimento', true);
+      const migrado = N.migrarDados(f, completo);
+      return {
+        email: migrado.email,
+        consentimento: migrado.consentimento,
+        original: completo.consentimento, // sem mutação
+        etapas: [
+          N.primeiraEtapaComErro(N.estadoInicial(f), f, 3),
+          N.primeiraEtapaComErro(ate3, f, 3),
+          N.primeiraEtapaComErro(completo, f, 3),
+          N.primeiraEtapaComErro(migrado, f, 2),
+        ],
+      };
+    },
+    { f: formulario, ex: exemplo },
+  );
+  expect(r).toEqual({ email: 'ana.souza@exemplo.com.br', consentimento: false, original: true, etapas: [1, 4, 3, 4] });
+});
+
 test('validarPergunta recusa valor de múltipla escolha fora do cardápio atual', async ({ page }) => {
   const r = await page.evaluate((f) => {
     const N = window.CredNucleo;

@@ -34,7 +34,7 @@
     iniciou: false,
     restaurado: false,
     concluido: false,
-    migrar: false, // I-2: rascunho marcado por um 409 — pode ser mesclado mesmo vindo de outra versão
+    migrar: false, // I-2/N-1: rascunho marcado por um 409 — mesclável vindo de outra versão da MESMA edição
     ultimoCep: '',
     cepAutoPreenchido: { logradouro: null, bairro: null, cidade: null, uf: null },
   };
@@ -100,8 +100,9 @@
     temporizador = null;
     // Depois do sucesso (ou do encerramento) nada volta a gravar rascunho.
     if (estado.concluido || !estado.formulario || !estado.dados) return;
-    var rascunho = { versao: estado.formulario.versao, etapa: estado.etapa, inicio: estado.inicio, dados: estado.dados };
-    N.salvarRascunho(armazem, estado.migrar ? Object.assign({ migrar: true }, rascunho) : rascunho);
+    var edicao = estado.formulario.edicao;
+    var rascunho = { edicao: edicao, versao: estado.formulario.versao, etapa: estado.etapa, inicio: estado.inicio, dados: estado.dados };
+    N.salvarRascunho(armazem, estado.migrar ? Object.assign({ migrar: edicao }, rascunho) : rascunho);
   }
 
   function salvarDepois() {
@@ -669,23 +670,28 @@
   function iniciar(f) {
     estado.formulario = f;
     var guardado = N.carregarRascunho(armazem);
-    var mesmaVersao = !!guardado && guardado.versao === f.versao;
-    // I-2: rascunho de OUTRA versão só é aproveitado se um 409 o marcou
-    // (`migrar: true`); sem marcador, continua descartado (Review Focus #3).
-    var marcado = !!guardado && guardado.migrar === true;
+    // N-1: rascunho de outra edição nunca é aproveitado (nem com a mesma
+    // versão de formulário, que uma edição nova pode reaproveitar).
+    var mesmaEdicao = !!guardado && guardado.edicao === f.edicao;
+    var mesmaVersao = mesmaEdicao && guardado.versao === f.versao;
+    // I-2: de OUTRA versão, só se um 409 desta edição o marcou; sem
+    // marcador, continua descartado (Review Focus #3).
+    var marcado = mesmaEdicao && guardado.migrar === f.edicao;
     if (guardado && guardado.dados && (mesmaVersao || marcado)) {
-      estado.dados = N.mesclarDados(N.estadoInicial(f), guardado.dados);
+      // O-1: vindo de outra versão, a autorização volta desmarcada.
+      estado.dados = mesmaVersao ? N.mesclarDados(N.estadoInicial(f), guardado.dados) : N.migrarDados(f, guardado.dados);
       // M-6: rascunho corrompido (ex.: etapa 2.5, de uma gravação parcial ou
       // formato antigo) nunca pode virar uma etapa fora de 1..4 nem quebrar
       // com um número quebrado.
-      estado.etapa = Math.min(Math.max(1, Math.trunc(Number(guardado.etapa)) || 1), 4);
+      var salva = Math.min(Math.max(1, Math.trunc(Number(guardado.etapa)) || 1), 4);
+      // N-2: migrado abre na primeira etapa com erro, se ela vier antes da salva.
+      estado.etapa = mesmaVersao ? salva : Math.min(salva, N.primeiraEtapaComErro(estado.dados, f, salva));
       estado.inicio = Number(guardado.inicio) || null;
       estado.restaurado = true;
-      // Outra versão: mesclado, marcador consumido e rascunho regravado já na
-      // versão atual. Mesma versão (a CDN ainda serve a versão antiga): o
-      // marcador segue guardado até a versão nova chegar.
-      estado.migrar = marcado && mesmaVersao;
-      if (!mesmaVersao) salvarAgora();
+      // I-2: o marcador fica até o rascunho ser apagado (envio certo, 410,
+      // "Começar do zero") — a CDN pode alternar versões entre recargas.
+      estado.migrar = marcado;
+      if (!mesmaVersao) salvarAgora(); // regravado já na versão atual
     } else {
       if (guardado) N.apagarRascunho(armazem);
       estado.dados = N.estadoInicial(f);

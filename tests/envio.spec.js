@@ -249,20 +249,29 @@ test('409: se a busca do formulário atualizado falhar, cai no aviso de recarreg
   expect(rascunho.dados.email).toBe('ana.souza@exemplo.com.br');
 });
 
-// I-2 / M-11: os dois caminhos do 409 marcam o rascunho com `migrar: true`.
-// Na próxima carga, um rascunho marcado de OUTRA versão é mesclado (não
-// descartado) e o marcador é consumido. Rascunho de outra versão SEM marcador
-// continua descartado (Review Focus #3, em tela.spec.js).
+// I-2 / M-11 / N-1: os dois caminhos do 409 marcam o rascunho com
+// `migrar: <edição>` (e todo rascunho guarda a própria `edicao`). Na próxima
+// carga, um rascunho marcado de OUTRA versão da MESMA edição é mesclado (não
+// descartado) e o marcador fica até o rascunho ser apagado (envio certo, 410,
+// "Começar do zero"). Rascunho de outra edição, ou de outra versão sem
+// marcador, continua descartado (Review Focus #3, em tela.spec.js).
+// O-1: ao mesclar outra versão, a autorização volta desmarcada.
+// N-2: rascunho migrado abre na primeira etapa com erro, se vier antes da salva.
 const CHAVE_RASCUNHO = 'wpdp-credenciamento-ed8-rascunho';
 const lerRascunho = (page) => page.evaluate((chave) => JSON.parse(localStorage.getItem(chave) ?? 'null'), CHAVE_RASCUNHO);
-const V2_GENERO = {
+const trocarOpcoes = (etapa, id, opcoes) => ({
   ...formulario,
   versao: 'ed8-v2',
   etapas: formulario.etapas.map((e, i) =>
-    i === 0 ? { ...e, perguntas: e.perguntas.map((p) => (p.id === 'genero' ? { ...p, opcoes: ['Não-binário', 'Masculino'] } : p)) } : e,
+    i === etapa - 1 ? { ...e, perguntas: e.perguntas.map((p) => (p.id === id ? { ...p, opcoes } : p)) } : e,
   ),
-};
+});
+const V2 = { ...formulario, versao: 'ed8-v2' }; // só a versão muda
+const V2_GENERO = trocarOpcoes(1, 'genero', ['Não-binário', 'Masculino']); // "Feminino" some
+const V2_IDADE = trocarOpcoes(2, 'idade', ['Até 30 anos', 'Mais de 30 anos']); // "26 a 35 anos" some
+const ED9 = { ...formulario, edicao: 'ed9', versao: 'ed9-v1' };
 const ERRO_409 = { status: 409, json: { ok: false, erro: 'O formulário foi atualizado. Recarregue a página — suas respostas ficam salvas.' } };
+const autorizacao = (page) => page.getByLabel(/Autorizo o Instituto METRIK/);
 
 /** Rota do cardápio que responde, em ordem, cada item da lista (número = status de erro). */
 async function cardapioEmSequencia(page, respostas) {
@@ -285,58 +294,186 @@ test('409 → busca atualizada falha → "Recarregar a página" com o servidor j
   await preencherTudo(page, exemplo);
   await confirmar(page);
   await expect(page.getByRole('button', { name: 'Recarregar a página' })).toBeVisible();
-  expect(await lerRascunho(page)).toMatchObject({ versao: 'ed8-v1', migrar: true });
+  expect(await lerRascunho(page)).toMatchObject({ edicao: 'ed8', versao: 'ed8-v1', migrar: 'ed8' });
   await recarregarPeloBotao(page);
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
-  await expect(page.getByText('Etapa 4 de 4')).toBeVisible();
-  await expect(page.getByLabel('Número')).toHaveValue(exemplo.endereco.numero);
-  const rascunho = await lerRascunho(page);
-  expect(rascunho.versao).toBe('ed8-v2'); // regravado já na versão nova...
-  expect(rascunho).not.toHaveProperty('migrar'); // ...e o marcador foi consumido
-  expect(rascunho.dados.email).toBe(exemplo.email);
-  for (let i = 0; i < 3; i += 1) await page.getByRole('button', { name: 'Voltar' }).click();
+  await expect(page.getByText('Etapa 1 de 4')).toBeVisible(); // N-2: "genero" ficou sem resposta válida na v2
   await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue(exemplo.email);
   await expect(page.getByLabel('Nome completo')).toHaveValue(exemplo.nome);
   await expect(page.locator('[data-pergunta="acesso_evento"]').getByRole('radio', { name: exemplo.respostas.acesso_evento.opcao, exact: true })).toBeChecked();
   await expect(page.locator('[data-pergunta="genero"] input:checked')).toHaveCount(0); // "Feminino" não existe na v2
+  const rascunho = await lerRascunho(page);
+  expect(rascunho).toMatchObject({ edicao: 'ed8', versao: 'ed8-v2', migrar: 'ed8' }); // regravado na versão nova; marcador fica
+  expect(rascunho.dados.endereco.numero).toBe(exemplo.endereco.numero);
 });
 
 test('409 recuperado para a v2 e a recarga ainda recebe a v1 (cache da CDN): nada se perde', async ({ page }) => {
   await prepararRotas(page, { respostasEnvio: [ERRO_409] });
-  const v2 = { ...formulario, versao: 'ed8-v2' };
-  await cardapioEmSequencia(page, [formulario, v2, formulario]);
+  await cardapioEmSequencia(page, [formulario, V2, formulario]);
   await page.goto(URL_TESTE);
   await preencherTudo(page, exemplo);
   await confirmar(page);
   await expect(page.getByText('O formulário foi atualizado. Confira as respostas e envie de novo.')).toBeVisible();
-  expect(await lerRascunho(page)).toMatchObject({ versao: 'ed8-v2', migrar: true });
+  expect(await lerRascunho(page)).toMatchObject({ versao: 'ed8-v2', migrar: 'ed8' });
   await page.reload();
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
   await expect(page.getByLabel('Número')).toHaveValue(exemplo.endereco.numero);
   const rascunho = await lerRascunho(page);
-  expect(rascunho.versao).toBe('ed8-v1');
-  expect(rascunho).not.toHaveProperty('migrar');
+  expect(rascunho).toMatchObject({ versao: 'ed8-v1', migrar: 'ed8' });
+  expect(rascunho.dados.email).toBe(exemplo.email);
+  expect(rascunho.dados.respostas.genero).toEqual({ valor: 'Feminino', outro: '' });
+});
+
+// I-2 (resto fechado): o marcador NÃO é consumido na mescla — a CDN pode
+// alternar as versões entre uma recarga e outra.
+test('409 recuperado para a v2, recarga na v1 e de novo na v2: as respostas continuam', async ({ page }) => {
+  await prepararRotas(page, { respostasEnvio: [ERRO_409] });
+  await cardapioEmSequencia(page, [formulario, V2, formulario, V2]);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.getByText('O formulário foi atualizado. Confira as respostas e envie de novo.')).toBeVisible();
+  await page.reload(); // v1 (cache da CDN)
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  await page.reload(); // v2 de novo
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  await expect(page.getByLabel('Número')).toHaveValue(exemplo.endereco.numero);
+  const rascunho = await lerRascunho(page);
+  expect(rascunho).toMatchObject({ versao: 'ed8-v2', migrar: 'ed8' });
   expect(rascunho.dados.email).toBe(exemplo.email);
   expect(rascunho.dados.respostas.genero).toEqual({ valor: 'Feminino', outro: '' });
 });
 
 test('409 → busca falha → recarga ainda na v1 (CDN) guarda o marcador até a v2 chegar', async ({ page }) => {
   await prepararRotas(page, { respostasEnvio: [ERRO_409] });
-  await cardapioEmSequencia(page, [formulario, 503, formulario, V2_GENERO]);
+  await cardapioEmSequencia(page, [formulario, 503, formulario, V2]);
   await page.goto(URL_TESTE);
   await preencherTudo(page, exemplo);
   await confirmar(page);
   await recarregarPeloBotao(page);
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
   await page.getByLabel('Complemento (opcional)').fill('ap 13');
-  await expect.poll(() => lerRascunho(page)).toMatchObject({ versao: 'ed8-v1', migrar: true, dados: { endereco: { complemento: 'ap 13' } } });
+  await expect.poll(() => lerRascunho(page)).toMatchObject({ versao: 'ed8-v1', migrar: 'ed8', dados: { endereco: { complemento: 'ap 13' } } });
   await page.reload();
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
   await expect(page.getByLabel('Complemento (opcional)')).toHaveValue('ap 13');
   const rascunho = await lerRascunho(page);
-  expect(rascunho.versao).toBe('ed8-v2');
-  expect(rascunho).not.toHaveProperty('migrar');
+  expect(rascunho).toMatchObject({ versao: 'ed8-v2', migrar: 'ed8' });
   expect(rascunho.dados.email).toBe(exemplo.email);
+});
+
+// N-1: o marcador leva a edição — um rascunho marcado de OUTRA edição é
+// descartado como um sem marcador: respostas e autorização nunca passam de
+// uma edição para outra.
+test('rascunho marcado de outra edição é descartado', async ({ page }) => {
+  await prepararRotas(page, { respostasEnvio: [ERRO_409] });
+  await cardapioEmSequencia(page, [formulario, V2, ED9]);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.getByText('O formulário foi atualizado. Confira as respostas e envie de novo.')).toBeVisible();
+  await page.reload(); // o servidor já está na ed9
+  await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+  await expect(page.getByText('Continuamos de onde você parou.')).toHaveCount(0);
+  await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue('');
+  expect(await lerRascunho(page)).toBeNull();
+});
+
+// N-1 (mesma raiz): uma edição nova pode reaproveitar a MESMA versão de
+// formulário (dashboard edicoes.ts: formularioVersao) — rascunho de outra
+// edição é descartado mesmo sem marcador e com a mesma versão.
+test('rascunho de outra edição com a mesma versão de formulário é descartado', async ({ page }) => {
+  await prepararRotas(page);
+  await cardapioEmSequencia(page, [formulario, { ...formulario, edicao: 'ed9' }]);
+  await page.goto(URL_TESTE);
+  await page.getByLabel('Nome completo').fill('Ana Souza');
+  await expect.poll(() => lerRascunho(page)).toMatchObject({ versao: 'ed8-v1', dados: { nome: 'Ana Souza' } });
+  await page.reload(); // ed9 com a versão de formulário "ed8-v1"
+  await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+  await expect(page.getByText('Continuamos de onde você parou.')).toHaveCount(0);
+  await expect(page.getByLabel('Nome completo')).toHaveValue('');
+});
+
+// N-1 (mesma raiz): se a busca sem cache do 409 já vier de outra edição, nada
+// é mesclado nela — cai no aviso de recarregar, e a recarga descarta o rascunho.
+test('409 com o servidor já em outra edição não leva as respostas para lá', async ({ page }) => {
+  const enviados = await prepararRotas(page, { respostasEnvio: [ERRO_409] });
+  await cardapioEmSequencia(page, [formulario, ED9, ED9]);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.getByRole('button', { name: 'Recarregar a página' })).toBeVisible();
+  await expect(page.getByText('O formulário foi atualizado. Confira as respostas e envie de novo.')).toHaveCount(0);
+  await recarregarPeloBotao(page);
+  await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+  await expect(page.getByText('Continuamos de onde você parou.')).toHaveCount(0);
+  await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue('');
+  expect(enviados).toHaveLength(1);
+});
+
+// O-1: o texto da autorização vem do servidor e pode ter mudado com a versão —
+// ao mesclar outra versão, a autorização volta desmarcada e é pedida de novo.
+test('409 recuperado para outra versão pede a autorização de novo', async ({ page }) => {
+  const enviados = await prepararRotas(page, { respostasEnvio: [ERRO_409, { status: 201, json: SUCESSO }] });
+  await cardapioEmSequencia(page, [formulario, V2]);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.getByText('O formulário foi atualizado. Confira as respostas e envie de novo.')).toBeVisible();
+  await expect(page.getByText('Etapa 4 de 4')).toBeVisible();
+  await expect(autorizacao(page)).not.toBeChecked();
+  await expect(page.locator('#erro-consentimento')).toHaveText('Para concluir, marque a autorização.');
+  expect((await lerRascunho(page)).dados.consentimento).toBe(false);
+  await autorizacao(page).check();
+  await confirmar(page);
+  await expect(page.getByRole('heading', { name: /Credenciamento confirmado/ })).toBeVisible();
+  expect(enviados).toHaveLength(2);
+  expect(enviados[1]).toMatchObject({ versao: 'ed8-v2', consentimento: true });
+});
+
+test('rascunho migrado de outra versão volta com a autorização desmarcada', async ({ page }) => {
+  await prepararRotas(page, { respostasEnvio: [ERRO_409] });
+  await cardapioEmSequencia(page, [formulario, 503, V2]);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await recarregarPeloBotao(page);
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  await expect(page.getByText('Etapa 4 de 4')).toBeVisible();
+  await expect(autorizacao(page)).not.toBeChecked();
+  expect(await lerRascunho(page)).toMatchObject({ versao: 'ed8-v2', dados: { consentimento: false } });
+});
+
+// N-2: rascunho migrado abre na primeira etapa que ficou com erro quando uma
+// resposta de etapa ANTERIOR à salva deixou de valer — e não volta nem pula à
+// toa quando nada antes da etapa salva mudou (proteção da regra do mínimo).
+test('rascunho migrado abre na primeira etapa que ficou com erro', async ({ page }) => {
+  await prepararRotas(page, { respostasEnvio: [ERRO_409] });
+  await cardapioEmSequencia(page, [formulario, 503, V2_IDADE]);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await recarregarPeloBotao(page);
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  await expect(page.getByText('Etapa 2 de 4')).toBeVisible(); // "idade" mudou de opções na v2
+  await expect(page.locator('[data-pergunta="idade"] input:checked')).toHaveCount(0);
+  await expect(page.locator('[data-pergunta="formacao"]').getByRole('radio', { name: exemplo.respostas.formacao.opcao, exact: true })).toBeChecked();
+});
+
+test('rascunho migrado abre na etapa salva quando nada antes dela ficou inválido', async ({ page }) => {
+  await prepararRotas(page, { respostasEnvio: [ERRO_409] });
+  await cardapioEmSequencia(page, [formulario, 503, V2]);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.getByRole('button', { name: 'Recarregar a página' })).toBeVisible();
+  await page.getByRole('button', { name: 'Voltar' }).click();
+  await page.getByRole('button', { name: 'Voltar' }).click();
+  await expect(page.getByText('Etapa 2 de 4')).toBeVisible();
+  await expect.poll(() => lerRascunho(page)).toMatchObject({ etapa: 2 });
+  await page.reload();
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  await expect(page.getByText('Etapa 2 de 4')).toBeVisible(); // nem volta à 1, nem pula para a 4 (autorização desmarcada)
 });
 
 // M-2: o envio (POST) espera até ~35 s antes de desistir — em pico o servidor

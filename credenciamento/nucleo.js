@@ -216,6 +216,15 @@
     };
   }
 
+  /**
+   * Leva respostas de OUTRA versão do formulário (409 ou CDN com cache) para a
+   * versão `formulario`: mescla o que ainda vale e zera a autorização — o
+   * texto dela vem do servidor e pode ter mudado com a versão (O-1).
+   */
+  function migrarDados(formulario, dados) {
+    return definir(mesclarDados(estadoInicial(formulario), dados), 'consentimento', false);
+  }
+
   function distancia(a, b) {
     var anterior = [];
     for (var j = 0; j <= b.length; j++) anterior.push(j);
@@ -370,6 +379,14 @@
     return erros;
   }
 
+  /** Primeira etapa (1 a 4) com erro; se nenhuma tem erro, `atual` (409 e rascunho migrado, N-2). */
+  function primeiraEtapaComErro(dados, formulario, atual) {
+    for (var n = 1; n <= 4; n++) {
+      if (Object.keys(errosDaEtapa(n, dados, formulario)).length) return n;
+    }
+    return atual;
+  }
+
   function etapaDoCampo(chave, formulario) {
     if (chave.indexOf('endereco') === 0 || chave === 'consentimento') return 4;
     if (chave.indexOf('respostas.') === 0) {
@@ -454,11 +471,13 @@
     definir: definir,
     obter: obter,
     mesclarDados: mesclarDados,
+    migrarDados: migrarDados,
     sugerirEmail: sugerirEmail,
     mascaraWhatsapp: mascaraWhatsapp,
     mascaraCep: mascaraCep,
     validarPergunta: validarPergunta,
     errosDaEtapa: errosDaEtapa,
+    primeiraEtapaComErro: primeiraEtapaComErro,
     etapaDoCampo: etapaDoCampo,
     montarEnvio: montarEnvio,
   });
