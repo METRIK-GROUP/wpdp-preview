@@ -720,7 +720,7 @@
         return res.json();
       })
       .then(function (f) {
-        if (!f || !Array.isArray(f.etapas) || f.etapas.length !== 4) throw new Error('formato inesperado');
+        if (!N.formularioValido(f)) throw new Error('formato inesperado'); // C4: exige edição e versão
         return f;
       });
   }

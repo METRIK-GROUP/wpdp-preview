@@ -476,6 +476,40 @@ test('rascunho migrado abre na etapa salva quando nada antes dela ficou inválid
   await expect(page.getByText('Etapa 2 de 4')).toBeVisible(); // nem volta à 1, nem pula para a 4 (autorização desmarcada)
 });
 
+// C4 (fixa o que já está certo): "Começar do zero" tira o marcador — depois
+// dele, uma recarga já em outra versão descarta o rascunho novo.
+test('"Começar do zero" tira o marcador: recarga em outra versão descarta o rascunho', async ({ page }) => {
+  await prepararRotas(page, { respostasEnvio: [ERRO_409] });
+  await cardapioEmSequencia(page, [formulario, 503, formulario, V2]);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await recarregarPeloBotao(page); // ainda na v1: o rascunho marcado volta
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  page.once('dialog', (d) => d.accept());
+  await page.getByRole('button', { name: 'Começar do zero' }).click();
+  await page.getByLabel('Nome completo').fill('Bia Lima');
+  await expect.poll(() => lerRascunho(page)).toMatchObject({ versao: 'ed8-v1', dados: { nome: 'Bia Lima' } });
+  expect(await lerRascunho(page)).not.toHaveProperty('migrar');
+  await page.reload(); // já na v2
+  await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+  await expect(page.getByText('Continuamos de onde você parou.')).toHaveCount(0);
+  await expect(page.getByLabel('Nome completo')).toHaveValue('');
+});
+
+// C4 (fixa o que já está certo): recarga da MESMA versão devolve a
+// autorização como estava — só a migração de versão a desmarca (O-1).
+test('recarga da mesma versão mantém a autorização marcada', async ({ page }) => {
+  await prepararRotas(page);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo); // termina na etapa 4 com a autorização marcada
+  await expect.poll(() => lerRascunho(page)).toMatchObject({ etapa: 4, dados: { consentimento: true } });
+  await page.reload();
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  await expect(page.getByText('Etapa 4 de 4')).toBeVisible();
+  await expect(autorizacao(page)).toBeChecked();
+});
+
 // M-2: o envio (POST) espera até ~35 s antes de desistir — em pico o servidor
 // pode demorar (banco, e-mail); a carga do formulário (GET) segue com 15 s.
 // Relógio falso do Playwright: nada de esperar 35 s de verdade.

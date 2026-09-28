@@ -98,6 +98,16 @@
     }
   }
 
+  /**
+   * Formato mínimo do cardápio vindo do servidor: 4 etapas e edição/versão
+   * como texto não vazio (C4). Sem edição, `undefined === undefined` faria
+   * todo rascunho sem edição parecer "da mesma edição" e reabriria a mescla.
+   */
+  function formularioValido(f) {
+    var textoCheio = function (v) { return typeof v === 'string' && v !== ''; };
+    return !!f && textoCheio(f.edicao) && textoCheio(f.versao) && Array.isArray(f.etapas) && f.etapas.length === 4;
+  }
+
   function perguntasDe(formulario) {
     return formulario.etapas.reduce(function (todas, etapa) {
       return todas.concat(etapa.perguntas);
@@ -467,6 +477,7 @@
     carregarRascunho: carregarRascunho,
     salvarRascunho: salvarRascunho,
     apagarRascunho: apagarRascunho,
+    formularioValido: formularioValido,
     estadoInicial: estadoInicial,
     definir: definir,
     obter: obter,

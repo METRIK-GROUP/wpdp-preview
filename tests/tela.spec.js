@@ -481,6 +481,21 @@ test.describe('carga do formulário', () => {
     expect(await page.evaluate(() => '__credPrefill' in window)).toBe(false);
   });
 
+  // C4: cardápio sem edição ou sem versão (texto não vazio) é resposta
+  // inválida — com a edição faltando, undefined === undefined faria todo
+  // rascunho sem edição parecer "da mesma edição" e reabriria a mescla.
+  for (const [nome, resposta] of [
+    ['sem edição', { ...formulario, edicao: undefined }],
+    ['com versão vazia', { ...formulario, versao: '' }],
+  ]) {
+    test(`formulário ${nome} cai na falha da carga`, async ({ page }) => {
+      await prepararRotas(page, { formularioResposta: resposta });
+      await page.goto(URL_TESTE);
+      await expect(page.getByText(FALHA_CARGA)).toBeVisible();
+      await expect(page.getByText(/Etapa \d de 4/)).toHaveCount(0);
+    });
+  }
+
   test('tela.js quebra ao iniciar: mensagem de falha em vez de "Carregando…" para sempre', async ({ page }) => {
     await prepararRotas(page);
     await page.route('**/credenciamento/tela.js', (r) =>
