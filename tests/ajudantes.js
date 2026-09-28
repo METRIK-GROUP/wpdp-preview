@@ -52,31 +52,56 @@ export const COM_CHAVE = { ...formulario, protecao: { turnstileSiteKey: 'chave-d
 export const SCRIPT_TURNSTILE = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
 /**
- * Turnstile falso servido no lugar do script da Cloudflare. Anota render,
- * reset e remove em window.__turnstile e entrega 'tok-1', 'tok-2'… 50 ms
- * depois de cada render/reset (`semToken`: nunca entrega — desafio que
- * pede interação e não termina). Põe um iframe com título, como o real.
+ * Turnstile falso servido no lugar do script da Cloudflare. Anota render
+ * (com a largura da caixa), reset e remove em window.__turnstile e entrega
+ * 'tok-1', 'tok-2'… 50 ms depois de cada render/reset. Variantes:
+ * `semToken` — nunca entrega nem entra em modo interativo;
+ * `interativo` — entra em modo interativo (before-interactive-callback) e só
+ *   entrega quando o teste "resolve": window.__resolverDesafio(); erro com
+ *   window.__erroDesafio();
+ * `semSuporte` — chama unsupported-callback logo depois do render.
+ * Põe um iframe com título, como o real.
  */
-export async function servirTurnstile(page, { semToken = false } = {}) {
+export async function servirTurnstile(page, { semToken = false, interativo = false, semSuporte = false } = {}) {
   const corpo = `(function () {
     var registro = { renders: [], resets: [], removes: [] };
     var emitidos = 0;
     var atual = null;
     window.__turnstile = registro;
-    function emitir() {
-      if (${semToken}) return;
-      emitidos += 1;
-      var token = 'tok-' + emitidos;
-      var opcoes = atual;
-      setTimeout(function () { if (opcoes && opcoes === atual) opcoes.callback(token); }, 50);
+    function chamar(opcoes, nome, valor) {
+      if (opcoes && opcoes === atual && typeof opcoes[nome] === 'function') opcoes[nome](valor);
     }
+    function entregar(opcoes) {
+      emitidos += 1;
+      chamar(opcoes, 'callback', 'tok-' + emitidos);
+    }
+    function emitir() {
+      var opcoes = atual;
+      if (${semToken}) return;
+      if (${semSuporte}) {
+        setTimeout(function () { chamar(opcoes, 'unsupported-callback'); }, 10);
+        return;
+      }
+      if (${interativo}) {
+        setTimeout(function () { chamar(opcoes, 'before-interactive-callback'); }, 10);
+        return;
+      }
+      setTimeout(function () { entregar(opcoes); }, 50);
+    }
+    window.__resolverDesafio = function () {
+      chamar(atual, 'after-interactive-callback');
+      entregar(atual);
+    };
+    window.__erroDesafio = function () { chamar(atual, 'error-callback', '300010'); };
     window.turnstile = {
       render: function (el, opcoes) {
         registro.renders.push({
           sitekey: opcoes.sitekey, appearance: opcoes.appearance, size: opcoes.size, language: opcoes.language,
           refreshExpired: opcoes['refresh-expired'], responseField: opcoes['response-field'],
-          callbacks: ['callback', 'expired-callback', 'error-callback'].filter(function (k) { return typeof opcoes[k] === 'function'; }),
+          callbacks: ['callback', 'expired-callback', 'error-callback', 'before-interactive-callback', 'after-interactive-callback', 'unsupported-callback']
+            .filter(function (k) { return typeof opcoes[k] === 'function'; }),
           noDocumento: document.contains(el),
+          largura: el.clientWidth,
         });
         var quadro = document.createElement('iframe');
         quadro.title = 'Widget containing a Cloudflare security challenge';

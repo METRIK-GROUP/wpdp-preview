@@ -55,6 +55,17 @@ test('etapa 4 com a verificação anti-robô (Turnstile) ligada', async ({ page 
   await semViolacoesGraves(page);
 });
 
+// R-b: desafio interativo com a dica visível ao lado do widget.
+test('etapa 4 com o desafio interativo e a dica visível', async ({ page }) => {
+  await prepararRotas(page, { formularioResposta: COM_CHAVE });
+  await servirTurnstile(page, { interativo: true });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await page.getByRole('button', { name: 'Confirmar meu credenciamento' }).click();
+  await expect(page.locator('#verificacao-dica')).toHaveText('Falta só uma confirmação: marque a caixa acima para enviar.');
+  await semViolacoesGraves(page);
+});
+
 // C3: erro 400 do servidor mostrado na etapa 1 (chave desconhecida ignorada).
 test('erro do servidor (400) de volta na etapa 1', async ({ page }) => {
   await prepararRotas(page, {

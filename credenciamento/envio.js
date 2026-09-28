@@ -55,6 +55,10 @@
         if (!botao) return;
         botao.disabled = ocupado;
         botao.textContent = ocupado ? 'Enviando…' : estado.etapa < 4 ? 'Próximo' : 'Confirmar meu credenciamento';
+        // R-b: com a espera do desafio anti-robô (até 120 s), "Voltar" também
+        // espera — senão o envio sairia depois, com a pessoa em outra etapa.
+        var voltar = botao.parentNode ? botao.parentNode.querySelector('.botao--secundario') : null;
+        if (voltar) voltar.disabled = ocupado;
       }
 
       /** `mensagem` + lista opcional de nós extra (botão/link) dentro do aviso. */
