@@ -113,10 +113,12 @@
 
   function estadoInicial(formulario) {
     var respostas = {};
-    var opcoesPorPergunta = {};
+    var regrasPorPergunta = {};
     perguntasDe(formulario).forEach(function (p) {
       respostas[p.id] = respostaVazia(p);
-      if (p.tipo === 'multipla_escolha') opcoesPorPergunta[p.id] = p.opcoes;
+      if (p.tipo === 'multipla_escolha' || p.tipo === 'caixas_selecao') {
+        regrasPorPergunta[p.id] = { opcoes: p.opcoes, permiteOutro: !!p.permiteOutro };
+      }
     });
     var estado = {
       email: '',
@@ -128,12 +130,13 @@
       respostas: respostas,
       consentimento: false,
     };
-    // Metadado interno para mesclarDados saber quais opções de múltipla escolha
-    // são válidas HOJE (o cardápio pode mudar sem trocar a versão do rascunho).
+    // Metadado interno para mesclarDados saber quais opções (e se "Outro")
+    // valem HOJE em cada pergunta de escolha (o cardápio pode mudar sem
+    // trocar a versão do rascunho, e o 409 mescla rascunho de outra versão).
     // Não enumerável de propósito: não aparece no JSON.stringify do rascunho
     // salvo, nem no Object.assign de definir(), nem em comparação por
     // igualdade — não faz parte do formato público do estado.
-    Object.defineProperty(estado, '_opcoesPorPergunta', { value: opcoesPorPergunta, enumerable: false });
+    Object.defineProperty(estado, '_regrasPorPergunta', { value: regrasPorPergunta, enumerable: false });
     return estado;
   }
 
@@ -151,17 +154,19 @@
     }, obj);
   }
 
-  function mesmoFormato(base, salvo, opcoesValidas) {
+  function mesmoFormato(base, salvo, regra) {
     if (typeof base === 'string') return typeof salvo === 'string';
     if (base === null) return salvo === null || (Number.isInteger(salvo) && salvo >= 1 && salvo <= 5);
     if (!salvo || typeof salvo !== 'object') return false;
     if ('valor' in base) {
       if (typeof salvo.valor !== 'string' || typeof salvo.outro !== 'string') return false;
       // Rascunho de múltipla escolha só é aproveitado se a opção ainda
-      // existir no cardápio atual (ou for vazio/OUTRO) — o cardápio pode
-      // mudar sem trocar a versão do formulário.
-      if (!opcoesValidas || salvo.valor === '' || salvo.valor === OUTRO) return true;
-      return opcoesValidas.indexOf(salvo.valor) >= 0;
+      // existir no cardápio atual (ou for vazio) — o cardápio pode mudar sem
+      // trocar a versão do formulário. "Outro" só onde a pergunta ainda o
+      // aceita (M-6).
+      if (!regra || salvo.valor === '') return true;
+      if (salvo.valor === OUTRO) return regra.permiteOutro;
+      return regra.opcoes.indexOf(salvo.valor) >= 0;
     }
     return (
       Array.isArray(salvo.marcadas) &&
@@ -171,13 +176,28 @@
     );
   }
 
+  /** M-6: caixas do rascunho só com opções que ainda existem e "Outro" só se a pergunta ainda o aceita. */
+  function ajustarCaixas(salvo, regra) {
+    if (!regra) return salvo;
+    return {
+      marcadas: salvo.marcadas.filter(function (m) { return regra.opcoes.indexOf(m) >= 0; }),
+      outroMarcado: regra.permiteOutro ? salvo.outroMarcado : false,
+      outro: regra.permiteOutro ? salvo.outro : '',
+    };
+  }
+
+  function aproveitarResposta(base, salvo, regra) {
+    if (!mesmoFormato(base, salvo, regra)) return base;
+    return base !== null && typeof base === 'object' && 'marcadas' in base ? ajustarCaixas(salvo, regra) : salvo;
+  }
+
   function mesclarDados(base, salvo) {
     if (!salvo || typeof salvo !== 'object') return base;
-    var opcoesPorPergunta = base._opcoesPorPergunta || {};
+    var regrasPorPergunta = base._regrasPorPergunta || {};
     var respostas = {};
     Object.keys(base.respostas).forEach(function (id) {
       var s = salvo.respostas ? salvo.respostas[id] : undefined;
-      respostas[id] = mesmoFormato(base.respostas[id], s, opcoesPorPergunta[id]) ? s : base.respostas[id];
+      respostas[id] = aproveitarResposta(base.respostas[id], s, regrasPorPergunta[id]);
     });
     var endereco = {};
     Object.keys(base.endereco).forEach(function (k) {
@@ -228,10 +248,17 @@
     return melhor ? local + '@' + melhor : null;
   }
 
+  /**
+   * I-3 (Armadilha 2 de src/lib/phone.ts no dashboard): sem "+", nunca cortar
+   * em 11 dígitos — "55 19 99999-9999" virava "(55) 19999-9999", um número
+   * incompleto. O zero de discagem na frente cai (igual ao servidor); se ainda
+   * sobram mais de 11 dígitos, é número com DDI: vira "+" + dígitos (até 15).
+   */
   function mascaraWhatsapp(valor) {
     var v = texto(valor);
     if (v.trim().charAt(0) === '+') return '+' + v.replace(/\D/g, '').slice(0, 15);
-    var d = v.replace(/\D/g, '').slice(0, 11);
+    var d = v.replace(/\D/g, '').replace(/^0+/, '');
+    if (d.length > 11) return '+' + d.slice(0, 15);
     if (!d) return '';
     if (d.length <= 2) return '(' + d;
     if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2);
@@ -254,7 +281,12 @@
   function normalizarInstagram(valor) {
     var bruto = texto(valor).trim().replace(/\s+/g, ' ');
     var url = bruto.match(/instagram\.com\/([^/?#\s]+)/i);
-    if (url) bruto = url[1];
+    if (url) {
+      // M-7: espelho do servidor (normalizar.ts) — link de post, reel,
+      // stories, explore ou tv não é perfil; mesma expressão de lá.
+      if (/^(p|reel|reels|stories|explore|tv)($|\/)/.test(url[1])) return null;
+      bruto = url[1];
+    }
     bruto = bruto.replace(/^@+/, '').toLowerCase();
     if (!HANDLE.test(bruto)) return null;
     if (bruto.charAt(0) === '.' || bruto.charAt(bruto.length - 1) === '.' || bruto.indexOf('..') >= 0) return null;
@@ -289,13 +321,17 @@
     if (p.tipo === 'multipla_escolha') {
       if (!r || !r.valor) return p.obrigatoria ? MENSAGENS.escolha : null;
       if (r.valor !== OUTRO) return p.opcoes.indexOf(r.valor) >= 0 ? null : MENSAGENS.escolha;
+      if (!p.permiteOutro) return MENSAGENS.escolha; // M-6: "Outro" onde a pergunta não aceita
       var o = texto(r.outro).trim();
       if (!o) return MENSAGENS.outro;
       return o.length > 200 ? MENSAGENS.longo : null;
     }
-    var nada = !r || (r.marcadas.length === 0 && !r.outroMarcado);
-    if (nada) return p.obrigatoria ? MENSAGENS.marque : null;
-    if (!r.outroMarcado) return null;
+    // Só conta o que montarRespostas de fato envia: opções do cardápio atual e
+    // "Outro" apenas onde a pergunta o aceita (M-6).
+    var validas = r ? r.marcadas.filter(function (m) { return p.opcoes.indexOf(m) >= 0; }) : [];
+    var comOutro = !!r && r.outroMarcado && !!p.permiteOutro;
+    if (validas.length === 0 && !comOutro) return p.obrigatoria ? MENSAGENS.marque : null;
+    if (!comOutro) return null;
     var ot = texto(r.outro).trim();
     if (!ot) return MENSAGENS.outro;
     return ot.length > 200 ? MENSAGENS.longo : null;
@@ -360,11 +396,13 @@
         return;
       }
       if (p.tipo === 'multipla_escolha') {
-        if (r && r.valor) saida[p.id] = r.valor === OUTRO ? { outro: texto(r.outro).trim() } : { opcao: r.valor };
+        if (!r || !r.valor) return;
+        if (r.valor !== OUTRO) saida[p.id] = { opcao: r.valor };
+        else if (p.permiteOutro) saida[p.id] = { outro: texto(r.outro).trim() }; // M-6: nunca "outro" onde não é aceito
         return;
       }
       var marcadas = p.opcoes.filter(function (o) { return !!r && r.marcadas.indexOf(o) >= 0; });
-      var outro = r && r.outroMarcado ? texto(r.outro).trim() : '';
+      var outro = r && r.outroMarcado && p.permiteOutro ? texto(r.outro).trim() : '';
       if (marcadas.length || outro) saida[p.id] = { opcoes: marcadas, outro: outro || null };
     });
     return saida;

@@ -23,6 +23,62 @@ test('máscaras de WhatsApp e CEP', async ({ page }) => {
   expect(r).toEqual(['(11) 91234-5678', '(11) 3456-7890', '(11) 91234-5678', '+351912345678', '(11) 9', '01310-100', '0131']);
 });
 
+// I-3 (Armadilha 2 do phone.ts do dashboard): sem "+", a máscara não pode
+// cortar em 11 dígitos — "55 19 99999-9999" virava "(55) 19999-9999", um
+// número incompleto. Zero de discagem na frente cai; mais de 11 dígitos
+// viram formato internacional ("+" + até 15 dígitos).
+test('máscara do WhatsApp: DDI sem "+" não é cortado e zero de discagem cai', async ({ page }) => {
+  const r = await page.evaluate(() => {
+    const N = window.CredNucleo;
+    return [
+      N.mascaraWhatsapp('5519999999999'),
+      N.mascaraWhatsapp('55 19 99999-9999'),
+      N.mascaraWhatsapp('019 99999-9999'),
+      N.mascaraWhatsapp('0055 19 99999-9999'),
+      N.mascaraWhatsapp('000'),
+      N.mascaraWhatsapp('+55 19 99999-9999'),
+      N.mascaraWhatsapp('5519999999999999999'),
+    ];
+  });
+  expect(r).toEqual(['+5519999999999', '+5519999999999', '(19) 99999-9999', '+5519999999999', '', '+5519999999999', '+551999999999999']);
+});
+
+// M-7: mesma regra do servidor (dashboard normalizar.ts, normalizarInstagram):
+// link de post/reel/stories/explore/tv não é perfil — a página mostra o erro
+// na hora, em vez de o servidor recusar só no envio final.
+test('Instagram: link que não é de perfil é recusado como no servidor', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    const base = N.definir(N.estadoInicial(f), 'email', 'ana@exemplo.com.br');
+    const erro = (v) => N.errosDaEtapa(1, N.definir(base, 'instagram', v), f).instagram || 'aceito';
+    return [
+      'instagram.com/p/Cx1abc',
+      'https://www.instagram.com/reel/abc/',
+      'https://instagram.com/reels/abc',
+      'instagram.com/stories/ana',
+      'https://www.instagram.com/explore/tags/x',
+      'instagram.com/tv/abc',
+      'https://www.instagram.com/ana.souza?igsh=abc',
+      'instagram.com/pedro',
+      'instagram.com/tvglobo',
+      '@anasouza.arq',
+    ].map((v) => [v, erro(v)]);
+  }, formulario);
+  const recusado = 'Use só letras, números, ponto e _ no @.';
+  expect(r).toEqual([
+    ['instagram.com/p/Cx1abc', recusado],
+    ['https://www.instagram.com/reel/abc/', recusado],
+    ['https://instagram.com/reels/abc', recusado],
+    ['instagram.com/stories/ana', recusado],
+    ['https://www.instagram.com/explore/tags/x', recusado],
+    ['instagram.com/tv/abc', recusado],
+    ['https://www.instagram.com/ana.souza?igsh=abc', 'aceito'],
+    ['instagram.com/pedro', 'aceito'],
+    ['instagram.com/tvglobo', 'aceito'],
+    ['@anasouza.arq', 'aceito'],
+  ]);
+});
+
 test('corretor de e-mail', async ({ page }) => {
   const r = await page.evaluate(() => {
     const N = window.CredNucleo;
@@ -147,6 +203,70 @@ test('rascunho com opção de múltipla escolha removida do cardápio é descart
   expect(r.removida).toEqual({ valor: '', outro: '' });
   expect(r.mantidaOpcao).toEqual({ valor: 'Feminino', outro: '' });
   expect(r.mantidaOutro).toEqual({ valor: r.outro, outro: 'Design gráfico' });
+});
+
+// M-6: cardápio novo em que a pergunta deixou de aceitar "Outro" (ou perdeu
+// uma opção de caixa): o rascunho mesclado não pode trazer isso de volta.
+test('mesclarDados descarta "Outro" onde a pergunta não aceita mais e opções de caixa que sumiram', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    const v2 = JSON.parse(JSON.stringify(f));
+    v2.etapas.forEach((e) => e.perguntas.forEach((p) => {
+      if (p.id === 'genero' || p.id === 'servicos') p.permiteOutro = false;
+    }));
+    const salvo = {
+      respostas: {
+        genero: { valor: N.OUTRO, outro: 'Prefiro não dizer' },
+        formacao: { valor: N.OUTRO, outro: 'Design gráfico' },
+        servicos: { marcadas: ['Projetos de interiores', 'Opção que não existe mais'], outroMarcado: true, outro: 'Consultoria de cor' },
+        pos_graduacao: { marcadas: [], outroMarcado: true, outro: 'Iluminação' },
+      },
+    };
+    const m = N.mesclarDados(N.estadoInicial(v2), salvo);
+    return { outro: N.OUTRO, genero: m.respostas.genero, formacao: m.respostas.formacao, servicos: m.respostas.servicos, pos: m.respostas.pos_graduacao };
+  }, formulario);
+  expect(r.genero).toEqual({ valor: '', outro: '' });
+  expect(r.formacao).toEqual({ valor: r.outro, outro: 'Design gráfico' }); // ainda aceita "Outro": fica
+  expect(r.servicos).toEqual({ marcadas: ['Projetos de interiores'], outroMarcado: false, outro: '' });
+  expect(r.pos).toEqual({ marcadas: [], outroMarcado: true, outro: 'Iluminação' }); // ainda aceita "Outro": fica
+});
+
+test('montarEnvio nunca manda "outro" em pergunta que não aceita "Outro"', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    const v2 = JSON.parse(JSON.stringify(f));
+    v2.etapas.forEach((e) => e.perguntas.forEach((p) => {
+      if (p.id === 'genero' || p.id === 'servicos') p.permiteOutro = false;
+    }));
+    let d = N.estadoInicial(v2);
+    d = N.definir(d, 'respostas.genero', { valor: N.OUTRO, outro: 'Prefiro não dizer' });
+    d = N.definir(d, 'respostas.formacao', { valor: N.OUTRO, outro: 'Design gráfico' });
+    d = N.definir(d, 'respostas.servicos', { marcadas: ['Projetos de interiores'], outroMarcado: true, outro: 'Consultoria de cor' });
+    const respostas = N.montarEnvio(v2, d, {}, 0, 60000, '').respostas;
+    return { temGenero: 'genero' in respostas, formacao: respostas.formacao, servicos: respostas.servicos };
+  }, formulario);
+  expect(r).toEqual({
+    temGenero: false,
+    formacao: { outro: 'Design gráfico' },
+    servicos: { opcoes: ['Projetos de interiores'], outro: null },
+  });
+});
+
+test('validarPergunta não aceita "Outro" em pergunta que não aceita "Outro"', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    const todas = f.etapas.reduce((t, e) => t.concat(e.perguntas), []);
+    const genero = { ...todas.find((q) => q.id === 'genero'), permiteOutro: false };
+    const servicos = { ...todas.find((q) => q.id === 'servicos'), permiteOutro: false };
+    return [
+      N.validarPergunta(genero, { valor: N.OUTRO, outro: 'Prefiro não dizer' }),
+      N.validarPergunta(servicos, { marcadas: [], outroMarcado: true, outro: 'Consultoria de cor' }),
+      N.validarPergunta(servicos, { marcadas: ['Projetos de interiores'], outroMarcado: true, outro: '' }),
+      // opção de caixa que não existe mais no cardápio não conta como resposta
+      N.validarPergunta(servicos, { marcadas: ['Opção que não existe mais'], outroMarcado: false, outro: '' }),
+    ];
+  }, formulario);
+  expect(r).toEqual(['Escolha uma opção.', 'Marque pelo menos uma opção.', null, 'Marque pelo menos uma opção.']);
 });
 
 test('validarPergunta recusa valor de múltipla escolha fora do cardápio atual', async ({ page }) => {

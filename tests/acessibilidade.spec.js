@@ -40,6 +40,15 @@ test('tela de sucesso', async ({ page }) => {
   await semViolacoesGraves(page);
 });
 
+// M-5: tela nova da vigia da carga (script da página não carregou).
+test('falha ao carregar um script da página', async ({ page }) => {
+  await prepararRotas(page);
+  await page.route('**/credenciamento/envio.js', (r) => r.fulfill({ status: 404, body: 'não encontrado' }));
+  await page.goto(URL_TESTE);
+  await expect(page.getByRole('button', { name: 'Tentar de novo' })).toBeVisible();
+  await semViolacoesGraves(page);
+});
+
 test('tudo se faz pelo teclado: Enter avança a etapa', async ({ page }) => {
   await prepararRotas(page);
   await page.goto(URL_TESTE);

@@ -26,6 +26,50 @@ test.describe('montagem e navegação', () => {
     await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
   });
 
+  // I-4: no toque duplo em "Próximo"/"Voltar", o 2º toque cai na etapa que
+  // acabou de aparecer embaixo do dedo — não pode marcar nem trocar resposta.
+  // Só no projeto de toque com Chromium: no WebKit do Playwright,
+  // touchscreen.tap dispara touchstart/touchend mas nenhum clique (nem com um
+  // toque só — conferido), então o cenário não acontece lá.
+  async function toqueDuplo(page, nomeDoBotao) {
+    const botao = page.getByRole('button', { name: nomeDoBotao });
+    await botao.scrollIntoViewIfNeeded();
+    const caixa = await botao.boundingBox();
+    const x = caixa.x + caixa.width / 2;
+    const y = caixa.y + caixa.height / 2;
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(120); // intervalo de um toque duplo de verdade
+    await page.touchscreen.tap(x, y);
+  }
+  const marcadas = (page) => page.locator('#app input:checked').evaluateAll((els) => els.map((e) => e.id));
+
+  test('toque duplo em "Próximo" não marca nada na etapa seguinte', async ({ page, browserName }) => {
+    test.skip(!test.info().project.use.hasTouch || browserName === 'webkit', 'sem toque que gere clique neste projeto');
+    await prepararRotas(page);
+    await page.goto(URL_TESTE);
+    await preencherEtapa1(page, exemplo);
+    await toqueDuplo(page, 'Próximo');
+    await expect(page.getByText('Etapa 2 de 4')).toBeVisible();
+    await page.waitForTimeout(400); // prazo para o 2º toque agir, se fosse passar
+    expect(await marcadas(page)).toEqual([]);
+  });
+
+  test('toque duplo em "Voltar" não muda nada na etapa anterior', async ({ page, browserName }) => {
+    test.skip(!test.info().project.use.hasTouch || browserName === 'webkit', 'sem toque que gere clique neste projeto');
+    await prepararRotas(page);
+    await page.goto(URL_TESTE);
+    await preencherEtapa1(page, exemplo);
+    const antes = await marcadas(page);
+    await avancar(page);
+    await expect(page.getByText('Etapa 2 de 4')).toBeVisible();
+    await responderEtapa(page, 2, { idade: exemplo.respostas.idade }); // responde algo na etapa 2 e só então volta
+    await toqueDuplo(page, 'Voltar');
+    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await page.waitForTimeout(400);
+    expect(await marcadas(page)).toEqual(antes);
+    await expect(page.getByLabel('Seu @ no Instagram')).toBeEnabled(); // "Não tenho Instagram" não foi marcado sem querer
+  });
+
   test('voltar não perde o que foi preenchido', async ({ page }) => {
     await prepararRotas(page);
     await page.goto(URL_TESTE);
@@ -42,6 +86,15 @@ test.describe('montagem e navegação', () => {
     await page.goto(URL_TESTE);
     await page.getByLabel('WhatsApp com DDD').pressSequentially('11912345678');
     await expect(page.getByLabel('WhatsApp com DDD')).toHaveValue('(11) 91234-5678');
+  });
+
+  // I-3: digitando tecla a tecla um número com DDI e sem "+", o 12º dígito
+  // não pode ser engolido pela máscara.
+  test('WhatsApp com DDI digitado sem "+" não é cortado', async ({ page }) => {
+    await prepararRotas(page);
+    await page.goto(URL_TESTE);
+    await page.getByLabel('WhatsApp com DDD').pressSequentially('5519999999999');
+    await expect(page.getByLabel('WhatsApp com DDD')).toHaveValue('+5519999999999');
   });
 });
 
@@ -157,6 +210,39 @@ test.describe('campos especiais', () => {
     await expect(page.getByLabel('Rua')).toHaveValue('Rua Digitada Pela Pessoa');
   });
 
+  // M-4: a pessoa troca o CEP enquanto a busca do primeiro ainda está a
+  // caminho — a resposta atrasada do CEP antigo não pode preencher o endereço.
+  test('CEP: resposta atrasada de um CEP que já foi trocado é ignorada', async ({ page }) => {
+    await prepararRotas(page);
+    await page.route('https://viacep.com.br/ws/**', async (r) => {
+      const headers = { 'Access-Control-Allow-Origin': '*' };
+      if (r.request().url().includes('01310100')) {
+        await new Promise((resolver) => setTimeout(resolver, 1200));
+        return r.fulfill({ headers, json: { logradouro: 'Avenida Paulista', bairro: 'Bela Vista', localidade: 'São Paulo', uf: 'SP' } });
+      }
+      return r.fulfill({ headers, json: { logradouro: 'Rua Primeiro de Março', bairro: 'Centro', localidade: 'Rio de Janeiro', uf: 'RJ' } });
+    });
+    await page.goto(URL_TESTE);
+    await preencherEtapa1(page, exemplo);
+    await avancar(page);
+    await responderEtapa(page, 2, exemplo.respostas);
+    await avancar(page);
+    await responderEtapa(page, 3, exemplo.respostas);
+    await avancar(page);
+    const atrasada = page.waitForResponse((res) => res.url().includes('01310100'));
+    await page.getByLabel('CEP').fill('01310-100');
+    await page.getByLabel('CEP').fill('20010-000');
+    await expect(page.getByLabel('Cidade')).toHaveValue('Rio de Janeiro');
+    await atrasada;
+    await page.waitForTimeout(300); // prazo para a resposta atrasada agir, se fosse ser aplicada
+    await expect(page.getByLabel('CEP')).toHaveValue('20010-000');
+    await expect(page.getByLabel('Rua')).toHaveValue('Rua Primeiro de Março');
+    await expect(page.getByLabel('Bairro')).toHaveValue('Centro');
+    await expect(page.getByLabel('Cidade')).toHaveValue('Rio de Janeiro');
+    await expect(page.getByLabel('Estado')).toHaveValue('RJ');
+    await expect(page.getByText('Endereço encontrado. Confira e informe o número.')).toBeVisible();
+  });
+
   // M-5: depois de uma falha, digitar o MESMO CEP de novo precisa tentar de
   // novo (e não ficar preso por já ter sido "o último CEP buscado").
   test('CEP: falha permite tentar de novo com o mesmo CEP', async ({ page }) => {
@@ -233,6 +319,33 @@ test.describe('rascunho e preenchimento pelo link', () => {
     await expect(page.getByLabel('Nome completo')).toHaveValue('Ana Souza'); // recusou: nada foi apagado
   });
 
+  // M-3: o rascunho grava 300 ms depois da última tecla; sair da página antes
+  // disso (fechar, trocar de aba/app, navegar) perdia a última alteração.
+  test('rascunho não perde o que foi digitado logo antes de sair da página', async ({ page }) => {
+    await prepararRotas(page);
+    await page.goto(URL_TESTE);
+    await page.getByLabel('Nome completo').fill('Ana Souza');
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('wpdp-credenciamento-ed8-rascunho'))).not.toBeNull();
+    await page.getByLabel('WhatsApp com DDD').fill('(11) 91234-5678');
+    await page.goto('about:blank'); // sai na hora, bem antes dos 300 ms do rascunho
+    await page.goto(URL_TESTE);
+    await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+    await expect(page.getByLabel('Nome completo')).toHaveValue('Ana Souza');
+    await expect(page.getByLabel('WhatsApp com DDD')).toHaveValue('(11) 91234-5678');
+  });
+
+  test('rascunho grava na hora quando a página fica escondida (troca de aba ou de app)', async ({ page }) => {
+    await prepararRotas(page);
+    await page.goto(URL_TESTE);
+    await page.getByLabel('WhatsApp com DDD').fill('(11) 91234-5678');
+    const gravado = await page.evaluate(() => {
+      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
+      document.dispatchEvent(new Event('visibilitychange'));
+      return JSON.parse(localStorage.getItem('wpdp-credenciamento-ed8-rascunho') ?? 'null');
+    });
+    expect(gravado && gravado.dados.whatsapp).toBe('(11) 91234-5678');
+  });
+
   test('rascunho de versão antiga do formulário é descartado', async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem('wpdp-credenciamento-ed8-rascunho', JSON.stringify({ versao: 'ed8-v0', etapa: 3, dados: { email: 'velho@exemplo.com.br' } }));
@@ -263,6 +376,32 @@ test.describe('rascunho e preenchimento pelo link', () => {
     });
     await page.goto(URL_TESTE + '#email=ana.souza%40exemplo.com.br&nome=Ana%20Souza', { waitUntil: 'domcontentloaded' });
     expect(new URL(page.url()).hash).toBe('');
+  });
+
+  // I-1: o GTM carrega em paralelo (async, no <head>) e pode rodar ANTES do
+  // tela.js (defer) — o "#email=...&nome=..." precisa sumir do endereço antes
+  // que qualquer script de terceiros leia a URL. O GTM aqui é um arquivo falso
+  // que só anota o endereço que viu; o tela.js chega depois (rede lenta), como
+  // num celular com o GTM em cache.
+  test('GTM nunca vê e-mail/nome do # no endereço, mesmo rodando antes do tela.js', async ({ page }) => {
+    await prepararRotas(page);
+    await page.route('https://gtm.rodrigorosar.com.br/**', (r) =>
+      r.fulfill({ contentType: 'text/javascript', body: 'window.__gtmViu = location.href;' }),
+    );
+    await page.route('**/credenciamento/tela.js', async (r) => {
+      await new Promise((resolver) => setTimeout(resolver, 300));
+      return r.continue();
+    });
+    await page.goto(URL_TESTE + '#email=ana.souza%40exemplo.com.br&nome=Ana%20Souza');
+    await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue('ana.souza@exemplo.com.br');
+    await expect(page.getByLabel('Nome completo')).toHaveValue('Ana Souza');
+    await expect.poll(() => page.evaluate(() => typeof window.__gtmViu)).toBe('string');
+    const viu = await page.evaluate(() => window.__gtmViu);
+    expect(viu).toContain('/credenciamento/');
+    expect(viu).not.toContain('email=');
+    expect(viu).not.toContain('nome=');
+    expect(new URL(page.url()).hash).toBe('');
+    expect(await page.evaluate(() => '__credPrefill' in window)).toBe(false); // tela.js consumiu e apagou
   });
 
   test('hash com e-mail/nome some mesmo com o credenciamento encerrado', async ({ page }) => {
@@ -305,6 +444,50 @@ test.describe('carga do formulário', () => {
     await expect(page.getByRole('heading', { name: 'O credenciamento da 8ª edição foi encerrado.' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'rodrigorosar.com.br/suporte' })).toBeVisible();
     await expect(page.locator('#titulo-encerrado')).toBeFocused(); // M-3
+  });
+
+  // M-5: se nucleo.js, envio.js ou tela.js não carregar (rede, 404) ou quebrar
+  // ao iniciar, a página não pode ficar presa em "Carregando o formulário…".
+  const FALHA_CARGA = 'Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.';
+  async function conferirTelaDeFalha(page) {
+    await expect(page.getByText(FALHA_CARGA)).toBeVisible();
+    await expect(page.locator('#app')).toHaveAttribute('aria-busy', 'false');
+    const suporte = page.getByRole('link', { name: 'Falar com o suporte', exact: true });
+    await expect(suporte).toHaveAttribute('href', 'https://www.rodrigorosar.com.br/suporte');
+    expect((await suporte.boundingBox()).height).toBeGreaterThanOrEqual(44);
+  }
+
+  for (const arquivo of ['nucleo.js', 'envio.js', 'tela.js']) {
+    test(`${arquivo} não carrega: mensagem de falha, suporte e "Tentar de novo" que funciona`, async ({ page }) => {
+      await prepararRotas(page);
+      await page.route(`**/credenciamento/${arquivo}`, (r) => r.fulfill({ status: 404, body: 'não encontrado' }));
+      await page.goto(URL_TESTE);
+      await conferirTelaDeFalha(page);
+      await page.unroute(`**/credenciamento/${arquivo}`);
+      await page.getByRole('button', { name: 'Tentar de novo' }).click();
+      await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    });
+  }
+
+  // I-1 + M-5: mesmo sem o tela.js, o "#email=...&nome=..." já saiu do
+  // endereço (script em linha antes do GTM) e a vigia da carga descarta a
+  // cópia em memória que só o tela.js consumiria.
+  test('tela.js não carrega: e-mail/nome do # não ficam no endereço nem na memória', async ({ page }) => {
+    await prepararRotas(page);
+    await page.route('**/credenciamento/tela.js', (r) => r.fulfill({ status: 404, body: 'não encontrado' }));
+    await page.goto(URL_TESTE + '#email=ana.souza%40exemplo.com.br&nome=Ana%20Souza');
+    await conferirTelaDeFalha(page);
+    expect(new URL(page.url()).hash).toBe('');
+    expect(await page.evaluate(() => '__credPrefill' in window)).toBe(false);
+  });
+
+  test('tela.js quebra ao iniciar: mensagem de falha em vez de "Carregando…" para sempre', async ({ page }) => {
+    await prepararRotas(page);
+    await page.route('**/credenciamento/tela.js', (r) =>
+      r.fulfill({ contentType: 'text/javascript', body: 'throw new Error("falha ao iniciar");' }),
+    );
+    await page.goto(URL_TESTE);
+    await conferirTelaDeFalha(page);
   });
 
   test('servidor fora na carga: mensagem e "Tentar de novo" que funciona', async ({ page }) => {
@@ -384,5 +567,14 @@ test.describe('alvos de toque (44px)', () => {
     const suporte = page.getByRole('link', { name: 'Falar com o suporte', exact: true });
     await expect(suporte).toBeVisible();
     expect(await alturaDoAlvo(suporte)).toBeGreaterThanOrEqual(44);
+  });
+
+  // M-8: o link do suporte no rodapé (texto de 12px) também precisa de 44px.
+  test('link do suporte no rodapé', async ({ page }) => {
+    await prepararRotas(page);
+    await page.goto(URL_TESTE);
+    const rodape = page.getByRole('link', { name: 'Precisa de ajuda? Falar com o suporte' });
+    await expect(rodape).toBeVisible();
+    expect(await alturaDoAlvo(rodape)).toBeGreaterThanOrEqual(44);
   });
 });

@@ -43,6 +43,9 @@
       var armazem = ctx.armazem;
       var gtm = ctx.gtm;
       var app = ctx.app;
+      // M-2: o POST espera até 35 s (em pico o servidor pode demorar: banco,
+      // e-mail); as buscas GET seguem com o prazo padrão de buscar() (15 s).
+      var LIMITE_ENVIO_MS = 35000;
 
       // ---------------------------------------------------------------- envio
       function marcarBotao(ocupado) {
@@ -150,11 +153,17 @@
         // busca do formulário em voo, abrindo brecha para um segundo envio com
         // estado.formulario desatualizado enquanto o primeiro 409 ainda está
         // sendo tratado.
+        // I-2 / M-11: nos DOIS caminhos o rascunho ganha `migrar: true` —
+        // assim a próxima carga mescla (em vez de descartar) um rascunho de
+        // versão diferente da que vier do servidor: a nova (depois do
+        // "Recarregar a página") ou a antiga (CDN ainda com cache depois de
+        // uma recuperação que deu certo).
         return buscarFormulario({ semCache: true })
           .then(function (novo) {
             estado.formulario = novo;
             estado.dados = N.mesclarDados(N.estadoInicial(novo), estado.dados);
             estado.etapa = primeiraEtapaComErro(estado.dados, novo, estado.etapa);
+            estado.migrar = true;
             salvarAgora();
             render();
             var erros = N.errosDaEtapa(estado.etapa, estado.dados, novo);
@@ -163,6 +172,8 @@
             focarAviso();
           })
           .catch(function () {
+            estado.migrar = true;
+            salvarAgora(); // já marcado: vale também para quem recarrega pelo navegador ou volta outro dia
             avisoEnvio((dados && dados.erro) || 'O formulário foi atualizado. Recarregue a página — suas respostas ficam salvas.', [botaoRecarregar()]);
             focarAviso();
           });
@@ -212,7 +223,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(corpo),
-        })
+        }, LIMITE_ENVIO_MS)
           .then(function (res) {
             return res.json().catch(function () { return null; }).then(function (dados) { return tratarResposta(res.status, dados); });
           })
@@ -229,8 +240,28 @@
       }
 
       // ------------------------------------------------------- telas finais
+      // M-1: o código do crachá (depois de "#acesso=") nunca vai para um href
+      // nem para o HTML da página — o GTM/GA4 lê o href de links clicados
+      // (cliques de saída, "Just Links"). O link aponta para a Central sem o
+      // código; o clique normal (sem tecla modificadora) navega com ele.
+      function semCodigo(url) {
+        return url.split('#')[0];
+      }
+
+      function linkCentral(url) {
+        return el('a', {
+          classe: 'botao botao--primario botao--largo', href: semCodigo(url), texto: 'Acessar a Central do Workshop',
+          onclick: function (ev) {
+            if (ev.button !== 0 || ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) return; // nova aba/janela: padrão do navegador
+            ev.preventDefault();
+            window.location.assign(url);
+          },
+        });
+      }
+
       function mostrarLinkParaCopiar(botao, url) {
-        var campo = el('input', { type: 'text', readonly: true, 'aria-label': 'Seu link pessoal', value: url });
+        var campo = el('input', { type: 'text', readonly: true, 'aria-label': 'Seu link pessoal' });
+        campo.value = url; // propriedade, não atributo: o código não fica no HTML da página (M-1)
         botao.replaceWith(campo);
         campo.focus();
         campo.select();
@@ -256,7 +287,7 @@
         var filhos = [
           el('h2', { id: 'titulo-sucesso', tabindex: '-1', texto: '✅ Credenciamento confirmado, ' + r.primeiroNome + '!' }),
           el('p', { texto: 'Seu acesso à Central do Workshop está pronto.' }),
-          el('a', { classe: 'botao botao--primario botao--largo', href: r.centralUrl, texto: 'Acessar a Central do Workshop' }),
+          linkCentral(r.centralUrl),
         ];
         if (r.emailEnviado) {
           filhos.push(el('p', {}, [

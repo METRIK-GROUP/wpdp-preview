@@ -12,12 +12,17 @@
   var app = document.getElementById('app');
   var LIMITE_MS = 15000;
   var LIMITE_CEP_MS = 5000;
+  var PAUSA_TOQUE_MS = 350;
   var armazem = N.armazenamento();
   var temporizador = null;
+  var relogioToque = null;
   // Lido e apagado do endereço da página ANTES de qualquer busca ao servidor
   // (I-2): mesmo que o formulário nunca carregue, o e-mail/nome não ficam
-  // expostos na URL (histórico do navegador, GTM, prints de tela).
-  var PREFILL = N.lerPrefill(window.location.hash);
+  // expostos na URL (histórico do navegador, GTM, prints de tela). O script
+  // em linha do <head> (antes do GTM) já leu e apagou o "#" com e-mail/nome e
+  // deixou o valor em window.__credPrefill — consumido e apagado aqui.
+  var PREFILL = N.lerPrefill(window.__credPrefill || window.location.hash);
+  delete window.__credPrefill;
   if (window.location.hash) history.replaceState(null, '', window.location.pathname + window.location.search);
   var estado = {
     formulario: null,
@@ -29,6 +34,7 @@
     iniciou: false,
     restaurado: false,
     concluido: false,
+    migrar: false, // I-2: rascunho marcado por um 409 — pode ser mesclado mesmo vindo de outra versão
     ultimoCep: '',
     cepAutoPreenchido: { logradouro: null, bairro: null, cidade: null, uf: null },
   };
@@ -91,9 +97,11 @@
 
   function salvarAgora() {
     clearTimeout(temporizador);
+    temporizador = null;
     // Depois do sucesso (ou do encerramento) nada volta a gravar rascunho.
     if (estado.concluido || !estado.formulario || !estado.dados) return;
-    N.salvarRascunho(armazem, { versao: estado.formulario.versao, etapa: estado.etapa, inicio: estado.inicio, dados: estado.dados });
+    var rascunho = { versao: estado.formulario.versao, etapa: estado.etapa, inicio: estado.inicio, dados: estado.dados };
+    N.salvarRascunho(armazem, estado.migrar ? Object.assign({ migrar: true }, rascunho) : rascunho);
   }
 
   function salvarDepois() {
@@ -107,6 +115,13 @@
   // ou de um 410).
   function pararTemporizador() {
     clearTimeout(temporizador);
+    temporizador = null;
+  }
+
+  // M-3: grava na hora a alteração que ainda esperava os 300 ms quando a
+  // pessoa sai da página ou a esconde (troca de aba/app, tela bloqueada).
+  function salvarPendente() {
+    if (temporizador !== null) salvarAgora();
   }
 
   function mudar(chave, valor) {
@@ -400,13 +415,24 @@
     mudar(chave, valor);
   }
 
+  // M-4: a resposta do ViaCEP só vale se o campo ainda tem ESTE CEP — a
+  // pessoa pode ter trocado o CEP enquanto a busca anterior estava a caminho.
+  function cepAindaNoCampo(cep) {
+    return String(N.obter(estado.dados, 'endereco.cep') || '').replace(/\D/g, '') === cep;
+  }
+
   function buscarCep(valor, status) {
     var cep = valor.replace(/\D/g, '');
-    if (cep.length !== 8 || cep === estado.ultimoCep) return;
+    if (cep.length !== 8) {
+      status.textContent = ''; // CEP em edição: aviso de uma busca anterior não vale mais
+      return;
+    }
+    if (cep === estado.ultimoCep) return;
     status.textContent = 'Buscando o endereço…';
     buscar('https://viacep.com.br/ws/' + cep + '/json/', {}, LIMITE_CEP_MS)
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (r) {
+        if (!cepAindaNoCampo(cep)) return;
         if (!r || r.erro) {
           status.textContent = N.MENSAGENS.cepNaoEncontrado;
           return;
@@ -422,7 +448,7 @@
         status.textContent = 'Endereço encontrado. Confira e informe o número.';
       })
       .catch(function () {
-        status.textContent = N.MENSAGENS.cepNaoEncontrado;
+        if (cepAindaNoCampo(cep)) status.textContent = N.MENSAGENS.cepNaoEncontrado;
       });
   }
 
@@ -575,6 +601,18 @@
     if (titulo.scrollIntoView) titulo.scrollIntoView({ block: 'start' });
   }
 
+  /**
+   * I-4: logo depois de trocar de etapa, a etapa nova aparece embaixo do dedo
+   * — o 2º toque de um toque duplo em "Próximo"/"Voltar" cairia numa opção
+   * dela e marcaria (ou trocaria) uma resposta sozinho. Por ~350 ms o
+   * formulário ignora toque e clique; o teclado segue funcionando.
+   */
+  function pausarToques() {
+    clearTimeout(relogioToque);
+    app.style.pointerEvents = 'none';
+    relogioToque = setTimeout(function () { app.style.pointerEvents = ''; }, PAUSA_TOQUE_MS);
+  }
+
   function avancar() {
     var erros = N.errosDaEtapa(estado.etapa, estado.dados, estado.formulario);
     if (Object.keys(erros).length) {
@@ -585,6 +623,7 @@
     salvarAgora();
     gtm('credenciamento_etapa', { etapa: estado.etapa });
     render();
+    pausarToques();
     focarTitulo();
   }
 
@@ -592,6 +631,7 @@
     estado.etapa = Math.max(1, estado.etapa - 1);
     salvarAgora();
     render();
+    pausarToques();
     focarTitulo();
   }
 
@@ -603,6 +643,7 @@
     estado.etapa = 1;
     estado.inicio = null;
     estado.ultimoCep = '';
+    estado.migrar = false;
     render();
     focarTitulo();
   }
@@ -628,7 +669,11 @@
   function iniciar(f) {
     estado.formulario = f;
     var guardado = N.carregarRascunho(armazem);
-    if (guardado && guardado.versao === f.versao && guardado.dados) {
+    var mesmaVersao = !!guardado && guardado.versao === f.versao;
+    // I-2: rascunho de OUTRA versão só é aproveitado se um 409 o marcou
+    // (`migrar: true`); sem marcador, continua descartado (Review Focus #3).
+    var marcado = !!guardado && guardado.migrar === true;
+    if (guardado && guardado.dados && (mesmaVersao || marcado)) {
       estado.dados = N.mesclarDados(N.estadoInicial(f), guardado.dados);
       // M-6: rascunho corrompido (ex.: etapa 2.5, de uma gravação parcial ou
       // formato antigo) nunca pode virar uma etapa fora de 1..4 nem quebrar
@@ -636,6 +681,11 @@
       estado.etapa = Math.min(Math.max(1, Math.trunc(Number(guardado.etapa)) || 1), 4);
       estado.inicio = Number(guardado.inicio) || null;
       estado.restaurado = true;
+      // Outra versão: mesclado, marcador consumido e rascunho regravado já na
+      // versão atual. Mesma versão (a CDN ainda serve a versão antiga): o
+      // marcador segue guardado até a versão nova chegar.
+      estado.migrar = marcado && mesmaVersao;
+      if (!mesmaVersao) salvarAgora();
     } else {
       if (guardado) N.apagarRascunho(armazem);
       estado.dados = N.estadoInicial(f);
@@ -705,5 +755,9 @@
     app: app,
   });
 
+  window.addEventListener('pagehide', salvarPendente);
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') salvarPendente();
+  });
   carregar();
 })();

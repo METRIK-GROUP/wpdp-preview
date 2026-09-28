@@ -39,7 +39,8 @@ test('sucesso: link pessoal, grupo, e-mail enviado e rascunho apagado', async ({
   await page.goto(URL_TESTE);
   await preencherTudo(page, exemplo);
   await confirmar(page);
-  await expect(page.getByRole('link', { name: 'Acessar a Central do Workshop' })).toHaveAttribute('href', SUCESSO.centralUrl);
+  // M-1: o href leva à Central SEM o código do crachá (ver teste abaixo)
+  await expect(page.getByRole('link', { name: 'Acessar a Central do Workshop' })).toHaveAttribute('href', 'https://centraldelinks.rodrigorosar.com.br/ed8/');
   await expect(page.getByRole('link', { name: 'Entrar no grupo dos participantes' })).toHaveAttribute('target', '_blank');
   await expect(page.getByText('Também enviamos esse link para')).toContainText('ana.souza@exemplo.com.br');
   expect(await page.evaluate(() => localStorage.getItem('wpdp-credenciamento-ed8-rascunho'))).toBeNull();
@@ -52,6 +53,61 @@ test('sucesso sem e-mail enviado: oferece "Copiar meu link"', async ({ page }) =
   await confirmar(page);
   await expect(page.getByText('Não conseguimos enviar o e-mail agora; vamos tentar de novo nos próximos minutos. Enquanto isso, guarde este link:')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Copiar meu link' })).toBeVisible();
+});
+
+// M-1: o código do crachá (depois de "#acesso=") nunca fica num href nem no
+// HTML da página — o GTM/GA4 lê o href dos links clicados (cliques de saída,
+// "Just Links"). O link leva à Central sem o código; o clique normal navega
+// com o link pessoal completo.
+const semCodigoNaPagina = async (page) => {
+  expect(await page.locator('[href*="acesso="]').count()).toBe(0);
+  expect(await page.evaluate(() => document.documentElement.outerHTML.includes('acesso='))).toBe(false);
+};
+
+test('código do crachá nunca fica em href; o clique em "Acessar a Central" leva ao link pessoal completo', async ({ page }) => {
+  await prepararRotas(page);
+  await page.route('https://centraldelinks.rodrigorosar.com.br/**', (r) =>
+    r.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Central</title><p>Central do Workshop</p>' }),
+  );
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  const central = page.getByRole('link', { name: 'Acessar a Central do Workshop' });
+  await expect(central).toHaveAttribute('href', 'https://centraldelinks.rodrigorosar.com.br/ed8/');
+  await semCodigoNaPagina(page);
+  await central.click();
+  await expect(page).toHaveURL(SUCESSO.centralUrl);
+});
+
+test('sem e-mail enviado: "Copiar meu link" copia o link pessoal completo', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__copiado = null;
+    const area = { writeText: (t) => { window.__copiado = t; return Promise.resolve(); } };
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, get: () => area });
+  });
+  await prepararRotas(page, { respostasEnvio: [{ status: 201, json: { ...SUCESSO, emailEnviado: false } }] });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await page.getByRole('button', { name: 'Copiar meu link' }).click();
+  await expect(page.getByRole('button', { name: /Link copiado/ })).toBeVisible();
+  expect(await page.evaluate(() => window.__copiado)).toBe(SUCESSO.centralUrl);
+  await semCodigoNaPagina(page);
+});
+
+test('sem e-mail enviado e sem área de transferência: o link aparece num campo só de leitura, nunca num link', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, get: () => undefined });
+  });
+  await prepararRotas(page, { respostasEnvio: [{ status: 201, json: { ...SUCESSO, emailEnviado: false } }] });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await page.getByRole('button', { name: 'Copiar meu link' }).click();
+  const campo = page.getByRole('textbox', { name: 'Seu link pessoal' });
+  await expect(campo).toHaveValue(SUCESSO.centralUrl);
+  await expect(campo).toHaveAttribute('readonly', '');
+  await semCodigoNaPagina(page);
 });
 
 // I-3: grupoUrl passa pela mesma checagem de esquema que centralUrl — nunca
@@ -191,6 +247,146 @@ test('409: se a busca do formulário atualizado falhar, cai no aviso de recarreg
   await expect(page.locator('#aviso-envio')).toBeFocused();
   const rascunho = JSON.parse((await page.evaluate(() => localStorage.getItem('wpdp-credenciamento-ed8-rascunho'))) ?? '{}');
   expect(rascunho.dados.email).toBe('ana.souza@exemplo.com.br');
+});
+
+// I-2 / M-11: os dois caminhos do 409 marcam o rascunho com `migrar: true`.
+// Na próxima carga, um rascunho marcado de OUTRA versão é mesclado (não
+// descartado) e o marcador é consumido. Rascunho de outra versão SEM marcador
+// continua descartado (Review Focus #3, em tela.spec.js).
+const CHAVE_RASCUNHO = 'wpdp-credenciamento-ed8-rascunho';
+const lerRascunho = (page) => page.evaluate((chave) => JSON.parse(localStorage.getItem(chave) ?? 'null'), CHAVE_RASCUNHO);
+const V2_GENERO = {
+  ...formulario,
+  versao: 'ed8-v2',
+  etapas: formulario.etapas.map((e, i) =>
+    i === 0 ? { ...e, perguntas: e.perguntas.map((p) => (p.id === 'genero' ? { ...p, opcoes: ['Não-binário', 'Masculino'] } : p)) } : e,
+  ),
+};
+const ERRO_409 = { status: 409, json: { ok: false, erro: 'O formulário foi atualizado. Recarregue a página — suas respostas ficam salvas.' } };
+
+/** Rota do cardápio que responde, em ordem, cada item da lista (número = status de erro). */
+async function cardapioEmSequencia(page, respostas) {
+  let buscas = 0;
+  await page.route('**/api/public/credenciamento/formulario*', (r) => {
+    const resposta = respostas[Math.min(buscas, respostas.length - 1)];
+    buscas += 1;
+    return typeof resposta === 'number' ? r.fulfill({ status: resposta, json: {} }) : r.fulfill({ json: resposta });
+  });
+}
+
+async function recarregarPeloBotao(page) {
+  await Promise.all([page.waitForEvent('load'), page.getByRole('button', { name: 'Recarregar a página' }).click()]);
+}
+
+test('409 → busca atualizada falha → "Recarregar a página" com o servidor já na v2: respostas ainda válidas continuam', async ({ page }) => {
+  await prepararRotas(page, { respostasEnvio: [ERRO_409] });
+  await cardapioEmSequencia(page, [formulario, 503, V2_GENERO]);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.getByRole('button', { name: 'Recarregar a página' })).toBeVisible();
+  expect(await lerRascunho(page)).toMatchObject({ versao: 'ed8-v1', migrar: true });
+  await recarregarPeloBotao(page);
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  await expect(page.getByText('Etapa 4 de 4')).toBeVisible();
+  await expect(page.getByLabel('Número')).toHaveValue(exemplo.endereco.numero);
+  const rascunho = await lerRascunho(page);
+  expect(rascunho.versao).toBe('ed8-v2'); // regravado já na versão nova...
+  expect(rascunho).not.toHaveProperty('migrar'); // ...e o marcador foi consumido
+  expect(rascunho.dados.email).toBe(exemplo.email);
+  for (let i = 0; i < 3; i += 1) await page.getByRole('button', { name: 'Voltar' }).click();
+  await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue(exemplo.email);
+  await expect(page.getByLabel('Nome completo')).toHaveValue(exemplo.nome);
+  await expect(page.locator('[data-pergunta="acesso_evento"]').getByRole('radio', { name: exemplo.respostas.acesso_evento.opcao, exact: true })).toBeChecked();
+  await expect(page.locator('[data-pergunta="genero"] input:checked')).toHaveCount(0); // "Feminino" não existe na v2
+});
+
+test('409 recuperado para a v2 e a recarga ainda recebe a v1 (cache da CDN): nada se perde', async ({ page }) => {
+  await prepararRotas(page, { respostasEnvio: [ERRO_409] });
+  const v2 = { ...formulario, versao: 'ed8-v2' };
+  await cardapioEmSequencia(page, [formulario, v2, formulario]);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.getByText('O formulário foi atualizado. Confira as respostas e envie de novo.')).toBeVisible();
+  expect(await lerRascunho(page)).toMatchObject({ versao: 'ed8-v2', migrar: true });
+  await page.reload();
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  await expect(page.getByLabel('Número')).toHaveValue(exemplo.endereco.numero);
+  const rascunho = await lerRascunho(page);
+  expect(rascunho.versao).toBe('ed8-v1');
+  expect(rascunho).not.toHaveProperty('migrar');
+  expect(rascunho.dados.email).toBe(exemplo.email);
+  expect(rascunho.dados.respostas.genero).toEqual({ valor: 'Feminino', outro: '' });
+});
+
+test('409 → busca falha → recarga ainda na v1 (CDN) guarda o marcador até a v2 chegar', async ({ page }) => {
+  await prepararRotas(page, { respostasEnvio: [ERRO_409] });
+  await cardapioEmSequencia(page, [formulario, 503, formulario, V2_GENERO]);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await recarregarPeloBotao(page);
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  await page.getByLabel('Complemento (opcional)').fill('ap 13');
+  await expect.poll(() => lerRascunho(page)).toMatchObject({ versao: 'ed8-v1', migrar: true, dados: { endereco: { complemento: 'ap 13' } } });
+  await page.reload();
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  await expect(page.getByLabel('Complemento (opcional)')).toHaveValue('ap 13');
+  const rascunho = await lerRascunho(page);
+  expect(rascunho.versao).toBe('ed8-v2');
+  expect(rascunho).not.toHaveProperty('migrar');
+  expect(rascunho.dados.email).toBe(exemplo.email);
+});
+
+// M-2: o envio (POST) espera até ~35 s antes de desistir — em pico o servidor
+// pode demorar (banco, e-mail); a carga do formulário (GET) segue com 15 s.
+// Relógio falso do Playwright: nada de esperar 35 s de verdade.
+const FALHA_ENVIO = 'Não conseguimos registrar agora. Suas respostas estão salvas neste aparelho; tente de novo em instantes.';
+
+test('envio espera até ~35 s pelo servidor antes de desistir', async ({ page }) => {
+  await page.clock.install();
+  let soltar = () => {};
+  const preso = new Promise((resolver) => { soltar = resolver; });
+  await prepararRotas(page);
+  await page.route('**/api/public/credenciamento', async (r) => {
+    if (r.request().method() !== 'POST') return r.fallback();
+    await preso; // servidor que não responde
+    return r.abort().catch(() => {});
+  });
+  try {
+    await page.goto(URL_TESTE);
+    await preencherTudo(page, exemplo);
+    await confirmar(page);
+    await expect(page.getByRole('button', { name: /Enviando/ })).toBeDisabled();
+    await page.clock.fastForward(20_000); // já passou dos 15 s de antes...
+    await page.waitForTimeout(300); // prazo para uma desistência (errada) aparecer na tela
+    await expect(page.getByRole('button', { name: /Enviando/ })).toBeDisabled(); // ...e o envio segue esperando
+    await expect(page.getByText(FALHA_ENVIO)).toHaveCount(0);
+    await page.clock.fastForward(16_000); // 36 s: agora desiste
+    await expect(page.getByText(FALHA_ENVIO)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Confirmar meu credenciamento' })).toBeEnabled();
+  } finally {
+    soltar();
+  }
+});
+
+test('carga do formulário continua desistindo em 15 s', async ({ page }) => {
+  await page.clock.install();
+  let soltar = () => {};
+  const preso = new Promise((resolver) => { soltar = resolver; });
+  await prepararRotas(page);
+  await page.route('**/api/public/credenciamento/formulario*', async (r) => {
+    await preso;
+    return r.abort().catch(() => {});
+  });
+  try {
+    await page.goto(URL_TESTE);
+    await page.clock.fastForward(16_000);
+    await expect(page.getByText('Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.')).toBeVisible();
+  } finally {
+    soltar();
+  }
 });
 
 test('falha de rede: mensagem e nada se perde', async ({ page }) => {
