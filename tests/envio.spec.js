@@ -610,6 +610,49 @@ test('envio espera até ~35 s pelo servidor antes de desistir', async ({ page })
   }
 });
 
+// Ajustes finais, item 5: o prazo de 35 s vale até o CORPO da resposta ser
+// lido. Um corpo que trava depois dos cabeçalhos (aqui: fetch falso com um
+// corpo que nunca termina e que respeita o abort, como o de verdade) também
+// cai no prazo — antes, "Enviando…" ficava para sempre.
+test('resposta que trava depois dos cabeçalhos também cai no prazo de 35 s', async ({ page }) => {
+  await page.clock.install();
+  await page.addInitScript(() => {
+    const original = window.fetch.bind(window);
+    window.fetch = (url, init = {}) => {
+      if (!String(url).endsWith('/api/public/credenciamento') || init.method !== 'POST') return original(url, init);
+      window.__postsTravados = (window.__postsTravados || 0) + 1;
+      let controlador;
+      const corpo = new ReadableStream({
+        start(c) {
+          controlador = c;
+          c.enqueue(new TextEncoder().encode('{"ok":'));
+        },
+      });
+      if (init.signal) init.signal.addEventListener('abort', () => controlador.error(new DOMException('Aborted', 'AbortError')));
+      return Promise.resolve(new Response(corpo, { status: 201, headers: { 'Content-Type': 'application/json' } }));
+    };
+  });
+  await prepararRotas(page);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect.poll(() => page.evaluate(() => window.__postsTravados || 0)).toBe(1);
+  await expect(page.getByRole('button', { name: /Enviando/ })).toBeDisabled();
+  await page.clock.fastForward(36_000);
+  await expect(page.getByText(FALHA_ENVIO)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Confirmar meu credenciamento' })).toBeEnabled();
+});
+
+// Ajustes finais, item 6: sem primeiro nome válido (o servidor só manda
+// quando é uma palavra de letras), o título não fica "confirmado, !".
+test('sem primeiro nome válido, o título do sucesso fica só "Credenciamento confirmado!"', async ({ page }) => {
+  await prepararRotas(page, { respostasEnvio: [{ status: 201, json: { ...SUCESSO, primeiroNome: null } }] });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.locator('#titulo-sucesso')).toHaveText('✅ Credenciamento confirmado!');
+});
+
 test('carga do formulário continua desistindo em 15 s', async ({ page }) => {
   await page.clock.install();
   let soltar = () => {};

@@ -59,10 +59,13 @@ export const SCRIPT_TURNSTILE = 'https://challenges.cloudflare.com/turnstile/v0/
  * `interativo` — entra em modo interativo (before-interactive-callback) e só
  *   entrega quando o teste "resolve": window.__resolverDesafio(); erro com
  *   window.__erroDesafio();
- * `semSuporte` — chama unsupported-callback logo depois do render.
+ * `semSuporte` — chama unsupported-callback logo depois do render;
+ * `renderLanca` — render lança exceção (widget nunca nasce);
+ * `erroAntes` — chama error-callback logo depois do render (antes do clique).
+ * window.__expirarDesafio() chama expired-callback (token vencido).
  * Põe um iframe com título, como o real.
  */
-export async function servirTurnstile(page, { semToken = false, interativo = false, semSuporte = false } = {}) {
+export async function servirTurnstile(page, { semToken = false, interativo = false, semSuporte = false, renderLanca = false, erroAntes = false } = {}) {
   const corpo = `(function () {
     var registro = { renders: [], resets: [], removes: [] };
     var emitidos = 0;
@@ -78,6 +81,10 @@ export async function servirTurnstile(page, { semToken = false, interativo = fal
     function emitir() {
       var opcoes = atual;
       if (${semToken}) return;
+      if (${erroAntes}) {
+        setTimeout(function () { chamar(opcoes, 'error-callback', '300010'); registro.erros = (registro.erros || 0) + 1; }, 10);
+        return;
+      }
       if (${semSuporte}) {
         setTimeout(function () { chamar(opcoes, 'unsupported-callback'); }, 10);
         return;
@@ -93,8 +100,13 @@ export async function servirTurnstile(page, { semToken = false, interativo = fal
       entregar(atual);
     };
     window.__erroDesafio = function () { chamar(atual, 'error-callback', '300010'); };
+    window.__expirarDesafio = function () { chamar(atual, 'expired-callback'); };
     window.turnstile = {
       render: function (el, opcoes) {
+        if (${renderLanca}) {
+          registro.renders.push({ lancou: true });
+          throw new Error('render quebrou');
+        }
         registro.renders.push({
           sitekey: opcoes.sitekey, appearance: opcoes.appearance, size: opcoes.size, language: opcoes.language,
           refreshExpired: opcoes['refresh-expired'], responseField: opcoes['response-field'],

@@ -61,6 +61,24 @@
         if (voltar) voltar.disabled = ocupado;
       }
 
+      // Ajustes finais, item 1: enquanto envia (inclusive na espera de até
+      // 120 s do anti-robô), campos e "Começar do zero" ficam travados (inert)
+      // — nada muda o que vai no corpo. Ficam de fora só o widget do
+      // Turnstile e sua dica, os avisos e a linha de botões.
+      var FORA_DA_TRAVA = ['status', 'aviso-envio', 'verificacao', 'verificacao-dica'];
+
+      function travarFormulario(travar) {
+        var form = app.querySelector('form');
+        if (form) {
+          Array.prototype.forEach.call(form.children, function (filho) {
+            if (FORA_DA_TRAVA.indexOf(filho.id) >= 0 || filho.classList.contains('acoes')) return;
+            filho.toggleAttribute('inert', travar);
+          });
+        }
+        var zero = document.getElementById('comecar-do-zero');
+        if (zero) zero.disabled = travar;
+      }
+
       /** `mensagem` + lista opcional de nós extra (botão/link) dentro do aviso. */
       function avisoEnvio(mensagem, extras) {
         var caixa = document.getElementById('aviso-envio');
@@ -114,10 +132,9 @@
        * M-1: uma chave de erro do servidor "tem campo na tela" quando existe um
        * `#in-<chave>` (ou pergunta reconhecida) correspondente — ao contrário de
        * `document.getElementById`, isso não depende da etapa atualmente
-       * renderizada. `corpo`, `endereco` sozinho (sem subcampo) ou uma
-       * `respostas.<id>` de pergunta que não existe mais no cardápio não têm
-       * campo: precisam aparecer no aviso geral, nunca tentar navegar para lugar
-       * nenhum.
+       * renderizada. Sem campo: `corpo` e `endereco` sozinho (CHAVES_SEM_CAMPO)
+       * vão para o aviso geral; qualquer outra chave — como `respostas.<id>` de
+       * pergunta que não existe no cardápio — é ignorada (C3, ver tratarErros400).
        */
       function campoExiste(chave) {
         if (CHAVES_NIVEL_1.indexOf(chave) >= 0) return true;
@@ -220,17 +237,25 @@
         focarAviso();
       }
 
-      function enviar() {
-        if (estado.enviando) return;
+      /** Erros da primeira etapa (1 a 4) que tiver algum; null se tudo vale. */
+      function errosPendentes() {
         for (var n = 1; n <= 4; n++) {
           var erros = N.errosDaEtapa(n, estado.dados, estado.formulario);
-          if (Object.keys(erros).length) {
-            irParaErros(erros);
-            return;
-          }
+          if (Object.keys(erros).length) return erros;
+        }
+        return null;
+      }
+
+      function enviar() {
+        if (estado.enviando) return;
+        var pendentes = errosPendentes();
+        if (pendentes) {
+          irParaErros(pendentes);
+          return;
         }
         estado.enviando = true;
         marcarBotao(true);
+        travarFormulario(true);
         var caixa = document.getElementById('aviso-envio');
         if (caixa) limpar(caixa);
         // C1: com a verificação ligada e ainda sem token, espera até 5 s por
@@ -245,12 +270,31 @@
           })
           .finally(function () {
             estado.enviando = false;
+            travarFormulario(false);
             marcarBotao(false);
           });
       }
 
+      /**
+       * Depois de uma tentativa (ou de desistir dela): destrava os campos ANTES
+       * de mostrar o resultado (o foco de erro precisa alcançar o campo) e
+       * troca o token do Turnstile — ele é de uso único.
+       */
+      function depoisDaTentativa() {
+        travarFormulario(false);
+        protecao.reiniciar();
+      }
+
       /** O POST em si; `token` do Turnstile vai só no corpo (nunca no rascunho). */
       function postar(token) {
+        // Item 1: valida de novo logo antes do POST — o que ficou inválido na
+        // espera não é enviado (o token não é gasto) e a página mostra o erro.
+        var pendentes = errosPendentes();
+        if (pendentes) {
+          depoisDaTentativa();
+          irParaErros(pendentes);
+          return;
+        }
         var oculto = document.getElementById('cred_campo_extra');
         var corpo = N.montarEnvio(estado.formulario, estado.dados, estado.canal, estado.inicio || Date.now(), Date.now(), oculto ? oculto.value : '');
         if (token) corpo = Object.assign({}, corpo, { turnstileToken: token });
@@ -259,12 +303,10 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(corpo),
         }, LIMITE_ENVIO_MS);
-        // C1: token é de uso único — depois de QUALQUER tentativa (resposta,
-        // erro, rede, prazo), o widget é reiniciado para gerar outro.
-        pedido.then(protecao.reiniciar, protecao.reiniciar);
-        return pedido.then(function (res) {
-          return res.json().catch(function () { return null; }).then(function (dados) { return tratarResposta(res.status, dados); });
-        });
+        // C1: depois de QUALQUER tentativa (resposta, erro, rede, prazo): campos
+        // destravados e token trocado, antes de tratar a resposta.
+        pedido.then(depoisDaTentativa, depoisDaTentativa);
+        return pedido.then(function (res) { return tratarResposta(res.status, res.dados); });
       }
 
       // ------------------------------------------------------- telas finais
@@ -310,10 +352,15 @@
         return botao;
       }
 
+      /** Item 6: sem primeiro nome válido, o título não fica "confirmado, !". */
+      function tituloSucesso(nome) {
+        return nome ? '✅ Credenciamento confirmado, ' + nome + '!' : '✅ Credenciamento confirmado!';
+      }
+
       function renderSucesso(r) {
         limpar(app);
         var filhos = [
-          el('h2', { id: 'titulo-sucesso', tabindex: '-1', texto: '✅ Credenciamento confirmado, ' + textoServidor(r.primeiroNome, '') + '!' }),
+          el('h2', { id: 'titulo-sucesso', tabindex: '-1', texto: tituloSucesso(textoServidor(r.primeiroNome, '')) }),
           el('p', { texto: 'Seu acesso à Central do Workshop está pronto.' }),
           linkCentral(r.centralUrl),
         ];

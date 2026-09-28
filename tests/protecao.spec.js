@@ -204,6 +204,119 @@ test('navegador sem suporte ao Turnstile: envia sem token na hora', async ({ pag
   expect(enviados[0]).not.toHaveProperty('turnstileToken');
 });
 
+// Ajustes finais, item 1: com a espera de até 120 s, nada pode mudar o que vai
+// no corpo — campos e "Começar do zero" ficam travados (inert) durante o
+// envio; só o widget do Turnstile segue clicável.
+const lerRascunho = (page) => page.evaluate(() => JSON.parse(localStorage.getItem('wpdp-credenciamento-ed8-rascunho') ?? 'null'));
+const dentroDeInert = (locator) => locator.evaluate((el) => !!el.closest('[inert]'));
+
+test('durante a espera do anti-robô, campos e "Começar do zero" ficam travados; o widget segue clicável', async ({ page }) => {
+  await page.clock.install();
+  const enviados = await prepararRotas(page, { formularioResposta: COM_CHAVE });
+  await servirTurnstile(page, { interativo: true });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await expect.poll(() => lerRascunho(page)).toMatchObject({ etapa: 4, dados: { consentimento: true } });
+  await page.reload(); // rascunho na etapa 4: aparece "Começar do zero"
+  await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
+  await expect.poll(() => renders(page)).toBe(1);
+  await confirmar(page);
+  await expect(dica(page)).toHaveText(DICA);
+  await expect(page.getByRole('button', { name: 'Começar do zero' })).toBeDisabled();
+  const autorizacao = page.getByLabel(/Autorizo o Instituto METRIK/);
+  expect(await dentroDeInert(autorizacao)).toBe(true);
+  expect(await dentroDeInert(page.locator('#verificacao'))).toBe(false);
+  await page.locator('#verificacao iframe').click(); // o widget segue clicável
+  await autorizacao.uncheck({ timeout: 1000 }).catch(() => {}); // tentar mexer não pega
+  await expect(autorizacao).toBeChecked();
+  await page.evaluate(() => window.__resolverDesafio());
+  await expect(page.getByRole('heading', { name: /Credenciamento confirmado/ })).toBeVisible();
+  expect(enviados).toHaveLength(1);
+  expect(enviados[0]).toMatchObject({ email: exemplo.email, nome: exemplo.nome, consentimento: true, turnstileToken: 'tok-1' });
+});
+
+// Item 1 (defesa extra): num navegador sem `inert` a pessoa ainda conseguiria
+// mexer — simulado por script. Antes do POST tudo é validado de novo: algo
+// inválido não é enviado (o token não é gasto) e a página mostra o erro.
+test('antes do POST valida de novo: o que ficou inválido na espera não é enviado', async ({ page }) => {
+  const enviados = await prepararRotas(page, { formularioResposta: COM_CHAVE });
+  await servirTurnstile(page, { interativo: true });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await expect.poll(() => renders(page)).toBe(1);
+  await confirmar(page);
+  await expect(dica(page)).toHaveText(DICA);
+  await page.evaluate(() => {
+    const caixa = document.getElementById('in-consentimento');
+    caixa.checked = false;
+    caixa.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await page.evaluate(() => window.__resolverDesafio());
+  await expect(page.locator('#erro-consentimento')).toHaveText('Para concluir, marque a autorização.');
+  await expect(page.getByLabel(/Autorizo o Instituto METRIK/)).toBeFocused(); // formulário já destravado
+  await expect(page.getByRole('button', { name: 'Confirmar meu credenciamento' })).toBeEnabled();
+  expect(enviados).toHaveLength(0);
+  expect((await registro(page)).resets).toEqual(['w1']); // token descartado, widget reiniciado
+});
+
+// Item 1 (proteção da ordem trava/destrava): erro 400 de campo da mesma etapa
+// precisa do formulário já destravado para o foco chegar ao campo.
+test('erro 400 de um campo da etapa 4: foco no campo, com o formulário já destravado', async ({ page }) => {
+  await prepararRotas(page, {
+    formularioResposta: COM_CHAVE,
+    respostasEnvio: [{ status: 400, json: { ok: false, erro: 'Revise os campos destacados.', campos: { 'endereco.numero': 'Informe o número.' } } }],
+  });
+  await servirTurnstile(page);
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  await expect(page.locator('#erro-endereco-numero')).toHaveText('Informe o número.');
+  await expect(page.getByLabel('Número')).toBeFocused();
+  expect(await dentroDeInert(page.getByLabel('Número'))).toBe(false);
+});
+
+// Item 2: widget que já falhou ANTES do clique não custa os 5 s de espera.
+test('widget que não chegou a nascer (render lançou erro): envia sem token na hora', async ({ page }) => {
+  const enviados = await prepararRotas(page, { formularioResposta: COM_CHAVE });
+  await servirTurnstile(page, { renderLanca: true });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await expect.poll(() => renders(page)).toBe(1);
+  await confirmar(page);
+  await expect.poll(() => enviados.length, { timeout: 1500 }).toBe(1);
+  expect(enviados[0]).not.toHaveProperty('turnstileToken');
+});
+
+test('widget com erro antes do clique: envia sem token na hora', async ({ page }) => {
+  const enviados = await prepararRotas(page, { formularioResposta: COM_CHAVE });
+  await servirTurnstile(page, { erroAntes: true });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await expect.poll(() => page.evaluate(() => (window.__turnstile && window.__turnstile.erros) || 0)).toBe(1);
+  await confirmar(page);
+  await expect.poll(() => enviados.length, { timeout: 1500 }).toBe(1);
+  expect(enviados[0]).not.toHaveProperty('turnstileToken');
+});
+
+// Item 3: token vencido zera o desafio — o próximo clique volta à espera de
+// 5 s (sem dica), e não fica até 120 s por um modo interativo antigo.
+test('token que venceu zera o desafio: o clique seguinte espera só 5 s, sem dica', async ({ page }) => {
+  await page.clock.install();
+  const enviados = await prepararRotas(page, { formularioResposta: COM_CHAVE });
+  await servirTurnstile(page, { interativo: true });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await expect.poll(() => renders(page)).toBe(1);
+  await page.evaluate(() => window.__resolverDesafio()); // resolveu antes de clicar...
+  await page.evaluate(() => window.__expirarDesafio()); // ...e o token venceu (a renovação não chegou)
+  await confirmar(page);
+  await expect(dica(page)).toHaveText('');
+  await page.clock.fastForward(5100);
+  await expect(page.getByRole('heading', { name: /Credenciamento confirmado/ })).toBeVisible();
+  expect(enviados).toHaveLength(1);
+  expect(enviados[0]).not.toHaveProperty('turnstileToken');
+});
+
 test('5xx e nova tentativa: o widget é reiniciado e a nova tentativa leva outro token', async ({ page }) => {
   const enviados = await prepararRotas(page, { formularioResposta: COM_CHAVE, respostasEnvio: [SEM_TOKEN_503, { status: 201, json: SUCESSO }] });
   await servirTurnstile(page);

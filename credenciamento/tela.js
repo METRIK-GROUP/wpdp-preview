@@ -78,12 +78,23 @@
     window.dataLayer.push(Object.assign({ event: evento }, extra || {}));
   }
 
+  /**
+   * fetch com prazo que vale até o CORPO ser lido: um corpo que trava depois
+   * dos cabeçalhos também cai no prazo (abort → a mesma falha de sempre).
+   * Devolve { status, ok, dados } — dados é o JSON, ou null se não for JSON.
+   */
   function buscar(url, opcoes, limite) {
     var controle = new AbortController();
     var relogio = setTimeout(function () { controle.abort(); }, limite || LIMITE_MS);
-    return fetch(url, Object.assign({}, opcoes || {}, { signal: controle.signal })).finally(function () {
-      clearTimeout(relogio);
-    });
+    return fetch(url, Object.assign({}, opcoes || {}, { signal: controle.signal }))
+      .then(function (res) {
+        var resposta = function (dados) { return { status: res.status, ok: res.ok, dados: dados }; };
+        return res.json().then(resposta, function (erro) {
+          if (controle.signal.aborted) throw erro; // prazo estourou lendo o corpo
+          return resposta(null);
+        });
+      })
+      .finally(function () { clearTimeout(relogio); });
   }
 
   // --------------------------------------------------------------- estado
@@ -431,7 +442,7 @@
     if (cep === estado.ultimoCep) return;
     status.textContent = 'Buscando o endereço…';
     buscar('https://viacep.com.br/ws/' + cep + '/json/', {}, LIMITE_CEP_MS)
-      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (res) { return res.ok ? res.dados : null; })
       .then(function (r) {
         if (!cepAindaNoCampo(cep)) return;
         if (!r || r.erro) {
@@ -547,7 +558,7 @@
   function avisoRestaurado() {
     return el('p', { classe: 'aviso' }, [
       'Continuamos de onde você parou.',
-      el('button', { type: 'button', texto: 'Começar do zero', onclick: comecarDoZero }),
+      el('button', { type: 'button', id: 'comecar-do-zero', texto: 'Começar do zero', onclick: comecarDoZero }),
     ]);
   }
 
@@ -718,15 +729,11 @@
     if (semCache) url += (url.indexOf('?') >= 0 ? '&' : '?') + '_=' + Date.now();
     var init = { headers: { Accept: 'application/json' } };
     if (semCache) init.cache = 'no-store';
-    return buscar(url, init)
-      .then(function (res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.json();
-      })
-      .then(function (f) {
-        if (!N.formularioValido(f)) throw new Error('formato inesperado'); // C4: exige edição e versão
-        return f;
-      });
+    return buscar(url, init).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      if (!N.formularioValido(res.dados)) throw new Error('formato inesperado'); // C4: exige edição e versão
+      return res.dados;
+    });
   }
 
   function carregar() {

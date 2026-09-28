@@ -35,6 +35,9 @@
       // `emInteracao` só decide se a dica aparece.
       var passouInterativo = false;
       var emInteracao = false;
+      // Widget que já falhou (render lançou erro ou error-callback) antes do
+      // clique: o envio segue sem token na hora, sem os 5 s de espera.
+      var desafioFalhou = false;
 
       /** Entrega o token (ou null) a todo envio que está esperando por ele. */
       function avisar(token) {
@@ -64,11 +67,12 @@
         if (dica) dica.textContent = esperas.length && emInteracao ? DICA_INTERATIVA : '';
       }
 
-      /** Widget novo, reiniciado ou com erro: token e modo interativo zerados. */
+      /** Widget novo, reiniciado, com token vencido ou com erro: token e modo interativo zerados. */
       function novoDesafio() {
         tokenAtual = null;
         passouInterativo = false;
         emInteracao = false;
+        desafioFalhou = false;
         atualizarDica();
       }
 
@@ -97,15 +101,18 @@
           callback: function (token) {
             tokenAtual = token;
             emInteracao = false;
+            desafioFalhou = false;
             avisar(token);
           },
-          'expired-callback': function () { tokenAtual = null; },
+          'expired-callback': novoDesafio, // token vencido: o próximo desafio começa do zero (item 3)
           'error-callback': function () {
             novoDesafio();
+            desafioFalhou = true;
             avisar(null);
             return true; // erro tratado: o Turnstile não lança exceção nem escreve no console
           },
           'before-interactive-callback': function () {
+            desafioFalhou = false;
             passouInterativo = true;
             emInteracao = true;
             atualizarDica();
@@ -127,7 +134,10 @@
         var t = api();
         if (!t || !caixa || !caixa.isConnected) return;
         widget = tentar(function () { return t.render(caixa, opcoes()); }) || null;
-        if (widget === null) avisar(null);
+        if (widget === null) {
+          desafioFalhou = true;
+          avisar(null);
+        }
       }
 
       function carregar() {
@@ -161,10 +171,11 @@
        * Promessa do token para o envio: na hora, se já existe. Senão espera:
        * sem desafio interativo, até 5 s; se o desafio pediu a pessoa (antes ou
        * durante a espera), até o token chegar, com teto de 120 s desde o
-       * clique (R-b). Erro, sem suporte ou script que falhou: null na hora.
+       * clique (R-b). Erro (inclusive antes do clique), sem suporte ou script
+       * que falhou: null na hora.
        */
       function token() {
-        if (chave === null || script === 'falhou') return Promise.resolve(null);
+        if (chave === null || script === 'falhou' || desafioFalhou) return Promise.resolve(null);
         if (tokenAtual) return Promise.resolve(tokenAtual);
         return new Promise(function (resolver) {
           var curto = setTimeout(function () { if (!passouInterativo) sair(null); }, ESPERA_TOKEN_MS);
