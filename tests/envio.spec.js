@@ -143,6 +143,37 @@ test('409: busca o formulário atualizado sem recarregar e mantém o que ainda �
   expect(rascunho.dados.email).toBe(exemplo.email);
 });
 
+// Fix round 2 (Important): a busca do formulário atualizado no 409 é
+// assíncrona — enquanto ela não termina, o botão precisa continuar
+// desabilitado (senão um segundo clique dispara um novo envio com
+// estado.formulario desatualizado, concorrendo com a própria recuperação).
+test('409: botão fica desabilitado até a recuperação terminar (sem segundo envio)', async ({ page }) => {
+  const enviados = await prepararRotas(page, {
+    respostasEnvio: [{ status: 409, json: { ok: false, erro: 'O formulário foi atualizado.' } }],
+  });
+  let tentativas = 0;
+  await page.route('**/api/public/credenciamento/formulario*', async (r) => {
+    tentativas += 1;
+    if (tentativas > 1) await new Promise((resolver) => setTimeout(resolver, 1000));
+    return r.fulfill({ json: formulario });
+  });
+  await page.goto(URL_TESTE);
+  await preencherTudo(page, exemplo);
+  await confirmar(page);
+  const botao = page.getByRole('button', { name: /Confirmar meu credenciamento|Enviando/ });
+  // Espera bem menos que o atraso de 1s da busca — se o botão já reabilitou
+  // aqui, é a recuperação assíncrona do 409 "vazando" antes de terminar
+  // (checar toBeDisabled() logo após o clique é frágil: nos engines mais
+  // rápidos o poll do Playwright pode cair, por sorte, antes do reabilita
+  // prematuro do bug — o problema é justamente essa corrida).
+  await page.waitForTimeout(300);
+  await expect(botao).toBeDisabled();
+  await botao.click({ force: true }); // tenta clicar mesmo desabilitado, durante a busca de 1s
+  await expect(page.getByText('O formulário foi atualizado. Confira as respostas e envie de novo.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Confirmar meu credenciamento' })).toBeEnabled();
+  expect(enviados).toHaveLength(1); // só o POST original — nada de segundo envio
+});
+
 test('409: se a busca do formulário atualizado falhar, cai no aviso de recarregar', async ({ page }) => {
   await prepararRotas(page, {
     respostasEnvio: [{ status: 409, json: { ok: false, erro: 'O formulário foi atualizado. Recarregue a página — suas respostas ficam salvas.' } }],
