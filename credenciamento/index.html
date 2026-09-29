@@ -93,10 +93,13 @@
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
   <script>
-    // Vigia da carga (M-5): se nucleo.js, protecao.js, envio.js ou tela.js não carregar (rede, 404) ou quebrar ao
-    // iniciar, o aviso inicial "Carregando o formulário…" continua no #app quando o DOMContentLoaded
+    // Vigia da carga (M-5): se nucleo.js, protecao.js, envio.js, carga.js ou tela.js não carregar (rede, 404) ou
+    // quebrar ao iniciar, o aviso inicial "Carregando o formulário…" continua no #app quando o DOMContentLoaded
     // chega (ele só dispara depois dos scripts "defer") — então a página mostra a falha da carga,
-    // com "Tentar de novo" e o suporte, em vez de ficar carregando para sempre.
+    // com "Tentar de novo" e o suporte, em vez de ficar carregando para sempre. Isso não depende de prazo
+    // nenhum (só do evento DOMContentLoaded): a busca do cardápio em si tem o prazo dela (45 s por
+    // tentativa, com retentativa automática — carga.js), que corre DEPOIS de tela.js já ter limpado
+    // este aviso inicial — o prazo maior da busca não atrasa nem interfere nesta vigia.
     document.addEventListener('DOMContentLoaded', function () {
       var app = document.getElementById('app');
       if (!app || !document.getElementById('carregando-inicial')) return;
@@ -128,6 +131,7 @@
   <script src="nucleo.js" defer></script>
   <script src="protecao.js" defer></script>
   <script src="envio.js" defer></script>
+  <script src="carga.js" defer></script>
   <script src="tela.js" defer></script>
 </head>
 <body>

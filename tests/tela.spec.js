@@ -457,7 +457,7 @@ test.describe('carga do formulário', () => {
     expect((await suporte.boundingBox()).height).toBeGreaterThanOrEqual(44);
   }
 
-  for (const arquivo of ['nucleo.js', 'protecao.js', 'envio.js', 'tela.js']) {
+  for (const arquivo of ['nucleo.js', 'protecao.js', 'envio.js', 'carga.js', 'tela.js']) {
     test(`${arquivo} não carrega: mensagem de falha, suporte e "Tentar de novo" que funciona`, async ({ page }) => {
       await prepararRotas(page);
       await page.route(`**/credenciamento/${arquivo}`, (r) => r.fulfill({ status: 404, body: 'não encontrado' }));
@@ -505,7 +505,24 @@ test.describe('carga do formulário', () => {
     await conferirTelaDeFalha(page);
   });
 
-  test('servidor fora na carga: mensagem e "Tentar de novo" que funciona', async ({ page }) => {
+  // Fix "página espera o servidor acordar": depois de um deploy do
+  // dashboard (ou período ocioso), a primeira resposta pode demorar — a
+  // carga tenta de novo sozinha (uma vez) antes de admitir derrota.
+  test('servidor fora nas duas tentativas da carga: mensagem e "Tentar de novo" que funciona', async ({ page }) => {
+    let tentativas = 0;
+    await prepararRotas(page);
+    await page.route('**/api/public/credenciamento/formulario*', (r) => {
+      tentativas += 1;
+      return tentativas <= 2 ? r.fulfill({ status: 503, json: {} }) : r.fulfill({ json: formulario });
+    });
+    await page.goto(URL_TESTE);
+    await expect(page.getByText('Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.')).toBeVisible();
+    expect(tentativas).toBe(2); // 1ª tentativa + 1 retentativa automática, sem ação da pessoa
+    await page.getByRole('button', { name: 'Tentar de novo' }).click();
+    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+  });
+
+  test('servidor com uma falha passageira (5xx) na carga se recupera sozinho, sem mostrar erro', async ({ page }) => {
     let tentativas = 0;
     await prepararRotas(page);
     await page.route('**/api/public/credenciamento/formulario*', (r) => {
@@ -513,9 +530,163 @@ test.describe('carga do formulário', () => {
       return tentativas === 1 ? r.fulfill({ status: 503, json: {} }) : r.fulfill({ json: formulario });
     });
     await page.goto(URL_TESTE);
-    await expect(page.getByText('Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.')).toBeVisible();
-    await page.getByRole('button', { name: 'Tentar de novo' }).click();
     await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(page.getByText('Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.')).toHaveCount(0);
+    expect(tentativas).toBe(2);
+  });
+
+  test('falha de rede na carga tenta de novo automaticamente e recupera sozinha', async ({ page }) => {
+    let tentativas = 0;
+    await prepararRotas(page);
+    await page.route('**/api/public/credenciamento/formulario*', (r) => {
+      tentativas += 1;
+      return tentativas === 1 ? r.abort('failed') : r.fulfill({ json: formulario });
+    });
+    await page.goto(URL_TESTE);
+    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    expect(tentativas).toBe(2);
+  });
+
+  // 4xx é resposta REAL do servidor sobre o pedido (não um problema
+  // passageiro dele) — nunca tenta de novo sozinha.
+  test('4xx na carga não tenta de novo', async ({ page }) => {
+    let tentativas = 0;
+    await prepararRotas(page);
+    await page.route('**/api/public/credenciamento/formulario*', (r) => {
+      tentativas += 1;
+      return r.fulfill({ status: 404, json: {} });
+    });
+    await page.goto(URL_TESTE);
+    await expect(page.getByText('Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.')).toBeVisible();
+    expect(tentativas).toBe(1);
+  });
+});
+
+// Fix "página espera o servidor acordar": prazo de 45 s por tentativa da
+// carga (bem maior que o antigo, de 15 s — visto em produção: 38,9 s e
+// 19,4 s na 1ª resposta depois de um deploy do dashboard) e a mensagem de
+// espera depois de ~8 s. Usa o relógio falso do Playwright (page.clock) para
+// verificar esses prazos sem esperar de verdade — a resposta do servidor
+// simulado fica pendurada numa promise controlada pelo teste (o Node por
+// trás da rota não usa o relógio falso da página) até o teste liberar.
+test.describe('carga resiliente do formulário (relógio falso)', () => {
+  const FALHA_CARGA = 'Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.';
+  const MENSAGEM_ESPERA = 'Carregando o formulário… pode levar alguns segundos.';
+
+  function segurarResposta() {
+    let liberar;
+    const pronta = new Promise((resolver) => {
+      liberar = resolver;
+    });
+    return { pronta, liberar: () => liberar() };
+  }
+
+  test('primeira resposta demorada (30 s, dentro do prazo de 45 s): formulário aparece sem erro', async ({ page }) => {
+    let tentativas = 0;
+    const { pronta, liberar } = segurarResposta();
+    await prepararRotas(page);
+    await page.route('**/api/public/credenciamento/formulario*', async (r) => {
+      tentativas += 1;
+      await pronta;
+      return r.fulfill({ json: formulario });
+    });
+    await page.clock.install();
+    await page.goto(URL_TESTE);
+    await page.clock.fastForward(30_000);
+    liberar();
+    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(page.getByText(FALHA_CARGA)).toHaveCount(0);
+    expect(tentativas).toBe(1); // não precisou de retentativa
+  });
+
+  test('primeira tentativa trava além de 45 s: retentativa automática recupera e mostra o formulário', async ({ page }) => {
+    let tentativas = 0;
+    let soltarPrimeira = () => {};
+    const presaPrimeira = new Promise((resolver) => {
+      soltarPrimeira = resolver;
+    });
+    await prepararRotas(page);
+    await page.route('**/api/public/credenciamento/formulario*', async (r) => {
+      tentativas += 1;
+      if (tentativas === 1) {
+        await presaPrimeira; // só a 1ª tentativa trava; quem desiste dela é o prazo do CLIENTE (45 s)
+        return r.abort().catch(() => {});
+      }
+      return r.fulfill({ json: formulario });
+    });
+    try {
+      await page.clock.install();
+      await page.goto(URL_TESTE);
+      await page.clock.fastForward(46_000); // estoura o prazo (45 s) da 1ª tentativa
+      await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+      await expect(page.getByText(FALHA_CARGA)).toHaveCount(0);
+      expect(tentativas).toBe(2);
+    } finally {
+      soltarPrimeira();
+    }
+  });
+
+  test('as duas tentativas travam além de 45 s: tela de falha da carga (a existente)', async ({ page }) => {
+    let soltar = () => {};
+    const presa = new Promise((resolver) => {
+      soltar = resolver;
+    });
+    await prepararRotas(page);
+    await page.route('**/api/public/credenciamento/formulario*', async (r) => {
+      await presa; // nenhuma das duas tentativas responde: quem desiste é sempre o prazo do CLIENTE
+      return r.abort().catch(() => {});
+    });
+    try {
+      await page.clock.install();
+      await page.goto(URL_TESTE);
+      await page.clock.fastForward(46_000); // estoura a 1ª tentativa e já dispara a retentativa
+      await page.clock.fastForward(46_000); // estoura a retentativa também
+      await expect(page.getByText(FALHA_CARGA)).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Tentar de novo' })).toBeVisible();
+    } finally {
+      soltar();
+    }
+  });
+
+  test('mensagem de espera aparece depois de ~8 s e some quando o formulário chega', async ({ page }) => {
+    const { pronta, liberar } = segurarResposta();
+    await prepararRotas(page);
+    await page.route('**/api/public/credenciamento/formulario*', async (r) => {
+      await pronta;
+      return r.fulfill({ json: formulario });
+    });
+    await page.clock.install();
+    await page.goto(URL_TESTE);
+    await expect(page.getByText(MENSAGEM_ESPERA)).toHaveCount(0);
+    await page.clock.fastForward(8_001);
+    await expect(page.getByText(MENSAGEM_ESPERA)).toBeVisible();
+    liberar();
+    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(page.getByText(MENSAGEM_ESPERA)).toHaveCount(0);
+  });
+
+  test('mensagem de espera some quando as duas tentativas falham (tela de erro)', async ({ page }) => {
+    let soltar = () => {};
+    const presa = new Promise((resolver) => {
+      soltar = resolver;
+    });
+    await prepararRotas(page);
+    await page.route('**/api/public/credenciamento/formulario*', async (r) => {
+      await presa;
+      return r.abort().catch(() => {});
+    });
+    try {
+      await page.clock.install();
+      await page.goto(URL_TESTE);
+      await page.clock.fastForward(8_001);
+      await expect(page.getByText(MENSAGEM_ESPERA)).toBeVisible();
+      await page.clock.fastForward(46_000);
+      await page.clock.fastForward(46_000);
+      await expect(page.getByText(FALHA_CARGA)).toBeVisible();
+      await expect(page.getByText(MENSAGEM_ESPERA)).toHaveCount(0);
+    } finally {
+      soltar();
+    }
   });
 });
 

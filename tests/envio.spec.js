@@ -653,7 +653,16 @@ test('sem primeiro nome válido, o título do sucesso fica só "Credenciamento c
   await expect(page.locator('#titulo-sucesso')).toHaveText('✅ Credenciamento confirmado!');
 });
 
-test('carga do formulário continua desistindo em 15 s', async ({ page }) => {
+// Fix "página espera o servidor acordar": o prazo da carga do formulário
+// agora é 45 s por tentativa, com uma retentativa automática antes de
+// desistir (era 15 s, sem retentativa — visto em produção, o servidor levou
+// até 38,9 s para responder pela primeira vez depois de um deploy do
+// dashboard; o prazo antigo derrubava gente real por um problema que se
+// resolvia sozinho em segundos). As duas tentativas passam pelo mesmo
+// `preso`: quem desiste é sempre o prazo do CLIENTE (relógio falso), nunca o
+// servidor simulado — por isso 16 s (o antigo prazo +1 s) já não é mais
+// suficiente para a tela de falha aparecer.
+test('carga do formulário só desiste depois de 45 s × 2 tentativas (antes eram 15 s sem retentativa)', async ({ page }) => {
   await page.clock.install();
   let soltar = () => {};
   const preso = new Promise((resolver) => { soltar = resolver; });
@@ -665,6 +674,9 @@ test('carga do formulário continua desistindo em 15 s', async ({ page }) => {
   try {
     await page.goto(URL_TESTE);
     await page.clock.fastForward(16_000);
+    await expect(page.getByText('Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.')).toHaveCount(0);
+    await page.clock.fastForward(46_000); // estoura o prazo (45 s) da 1ª tentativa e dispara a retentativa automática
+    await page.clock.fastForward(46_000); // estoura o prazo da retentativa também
     await expect(page.getByText('Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.')).toBeVisible();
   } finally {
     soltar();
