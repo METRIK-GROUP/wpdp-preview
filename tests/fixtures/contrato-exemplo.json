@@ -4,18 +4,6 @@
   "email": "ana.souza@exemplo.com.br",
   "nome": "Ana Souza",
   "whatsapp": "(11) 91234-5678",
-  "instagram": "@anasouza.arq",
-  "semInstagram": false,
-  "endereco": {
-    "moraExterior": false,
-    "cep": "01310-100",
-    "logradouro": "Av. Paulista",
-    "numero": "1000",
-    "complemento": "ap 12",
-    "bairro": "Bela Vista",
-    "cidade": "São Paulo",
-    "uf": "SP"
-  },
   "respostas": {
     "acesso_evento": {
       "opcao": "Ingresso + conteúdo editado por 1 ano."

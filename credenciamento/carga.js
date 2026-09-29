@@ -20,7 +20,7 @@
 //
 // A REGIÃO da mensagem nasce vazia, já no DOM, dentro de #app (irmã do
 // esqueleto) — só o texto chega depois, aos ~8 s (mesmo padrão de
-// #status-cep em tela.js e #verificacao-dica em protecao.js): uma região
+// #status em tela.js, o anúncio dos erros, e #verificacao-dica em protecao.js): uma região
 // aria-live só é anunciada de forma confiável numa MUDANÇA de conteúdo, não
 // quando o nó já nasce pronto/preenchido. Por isso #app também deixou de
 // ficar com aria-busy="true" durante a carga (nem no HTML estático de
@@ -40,8 +40,8 @@
   'use strict';
 
   // Prazo de CADA tentativa da carga do formulário (cobre o cold start acima
-  // com folga). O POST do envio segue com o prazo dele (35 s, em envio.js) e
-  // a busca de CEP com o dela (5 s, em tela.js): nenhum dos dois muda aqui.
+  // com folga). O POST do envio segue com o prazo dele (35 s, em envio.js):
+  // não muda aqui.
   var LIMITE_CARGA_MS = 45000;
   var ESPERA_MENSAGEM_MS = 8000;
   var ESPERA_RETENTATIVA_MS = 1500;
@@ -111,7 +111,7 @@
 
       /**
        * Região da mensagem de espera: nasce vazia e já dentro de #app (irmã
-       * do esqueleto) — igual a #status-cep (tela.js) e #verificacao-dica
+       * do esqueleto) — igual a #status (tela.js) e #verificacao-dica
        * (protecao.js): só o texto chega depois, numa mutação de um nó que o
        * leitor de tela já está observando (não um nó novo que chega pronto).
        */

@@ -55,7 +55,7 @@
         var botao = document.getElementById('botao-principal');
         if (!botao) return;
         botao.disabled = ocupado;
-        botao.textContent = ocupado ? 'Enviando…' : estado.etapa < 4 ? 'Próximo' : 'Confirmar meu credenciamento';
+        botao.textContent = ocupado ? 'Enviando…' : estado.etapa < N.totalEtapas(estado.formulario) ? 'Próximo' : 'Confirmar meu credenciamento';
         // R-b: com a espera do desafio anti-robô (até 120 s), "Voltar" também
         // espera — senão o envio sairia depois, com a pessoa em outra etapa.
         var voltar = botao.parentNode ? botao.parentNode.querySelector('.botao--secundario') : null;
@@ -115,10 +115,12 @@
         N.apagarRascunho(armazem);
       }
 
-      var CHAVES_NIVEL_1 = ['email', 'nome', 'whatsapp', 'instagram', 'consentimento'];
-      var SUBCHAVES_ENDERECO = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf', 'pais', 'enderecoCompleto'];
+      // Sem Instagram e sem endereço (decisão do dono, 29/09/2026): a página
+      // não manda essas chaves, e um erro do servidor sobre elas não tem
+      // campo na tela — cai na regra das chaves desconhecidas (C3).
+      var CHAVES_NIVEL_1 = ['email', 'nome', 'whatsapp', 'consentimento'];
       // Chaves do servidor sem campo próprio na tela: vão para o aviso geral (M-1).
-      var CHAVES_SEM_CAMPO = ['corpo', 'endereco'];
+      var CHAVES_SEM_CAMPO = ['corpo'];
 
       /** C3: texto do servidor só é usado se for texto — e entra sempre como texto (nunca HTML). */
       function textoServidor(valor, padrao) {
@@ -133,13 +135,12 @@
        * M-1: uma chave de erro do servidor "tem campo na tela" quando existe um
        * `#in-<chave>` (ou pergunta reconhecida) correspondente — ao contrário de
        * `document.getElementById`, isso não depende da etapa atualmente
-       * renderizada. Sem campo: `corpo` e `endereco` sozinho (CHAVES_SEM_CAMPO)
-       * vão para o aviso geral; qualquer outra chave — como `respostas.<id>` de
-       * pergunta que não existe no cardápio — é ignorada (C3, ver tratarErros400).
+       * renderizada. Sem campo: `corpo` (CHAVES_SEM_CAMPO) vai para o aviso
+       * geral; qualquer outra chave — como `respostas.<id>` de pergunta que não
+       * existe no cardápio — é ignorada (C3, ver tratarErros400).
        */
       function campoExiste(chave) {
         if (CHAVES_NIVEL_1.indexOf(chave) >= 0) return true;
-        if (chave.indexOf('endereco.') === 0) return SUBCHAVES_ENDERECO.indexOf(chave.slice('endereco.'.length)) >= 0;
         if (chave.indexOf('respostas.') === 0) {
           var id = chave.slice('respostas.'.length);
           return todasPerguntas().some(function (p) { return p.id === id; });
@@ -238,9 +239,10 @@
         focarAviso();
       }
 
-      /** Erros da primeira etapa (1 a 4) que tiver algum; null se tudo vale. */
+      /** Erros da primeira etapa visível que tiver algum; null se tudo vale. */
       function errosPendentes() {
-        for (var n = 1; n <= 4; n++) {
+        var total = N.totalEtapas(estado.formulario);
+        for (var n = 1; n <= total; n++) {
           var erros = N.errosDaEtapa(n, estado.dados, estado.formulario);
           if (Object.keys(erros).length) return erros;
         }
@@ -355,12 +357,29 @@
 
       /** Item 6: sem primeiro nome válido, o título não fica "confirmado, !". */
       function tituloSucesso(nome) {
-        return nome ? '✅ Credenciamento confirmado, ' + nome + '!' : '✅ Credenciamento confirmado!';
+        return nome ? 'Credenciamento confirmado, ' + nome + '!' : 'Credenciamento confirmado!';
+      }
+
+      /**
+       * Refino de design (29/09/2026): ícone de verdade (SVG, o traço "check"
+       * do Lucide) no lugar do emoji que abria o título. Só visual — o
+       * título já diz tudo, então o leitor de tela não lê o ícone.
+       */
+      function iconeConfirmado() {
+        var SVG = 'http://www.w3.org/2000/svg';
+        var desenho = document.createElementNS(SVG, 'svg');
+        var atributos = { viewBox: '0 0 24 24', width: '24', height: '24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2.5', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true', focusable: 'false' };
+        Object.keys(atributos).forEach(function (nome) { desenho.setAttribute(nome, atributos[nome]); });
+        var traco = document.createElementNS(SVG, 'path');
+        traco.setAttribute('d', 'M20 6 9 17l-5-5');
+        desenho.appendChild(traco);
+        return el('span', { classe: 'sucesso__icone' }, [desenho]);
       }
 
       function renderSucesso(r) {
         limpar(app);
         var filhos = [
+          iconeConfirmado(),
           el('h2', { id: 'titulo-sucesso', tabindex: '-1', texto: tituloSucesso(textoServidor(r.primeiroNome, '')) }),
           el('p', { texto: 'Seu acesso à Central do Workshop está pronto.' }),
           linkCentral(r.centralUrl),

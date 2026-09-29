@@ -1,15 +1,17 @@
 // tests/tela.spec.js
 import { expect, test } from '@playwright/test';
-import { avancar, exemplo, formulario, prepararRotas, preencherEndereco, preencherEtapa1, responderEtapa, URL_TESTE } from './ajudantes.js';
+import { avancar, campoEmail, exemplo, formulario, preencherEtapa1, preencherTudo, prepararRotas, responderEtapa, URL_TESTE } from './ajudantes.js';
 
 test.describe('montagem e navegação', () => {
   test('monta a etapa 1 a partir do servidor', async ({ page }) => {
     await prepararRotas(page);
     await page.goto(URL_TESTE);
-    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Seus dados' })).toBeVisible();
-    await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toBeVisible();
-    await expect(page.getByText('É por ele que vamos te identificar e enviar seu acesso.')).toBeVisible();
+    await expect(campoEmail(page)).toBeVisible();
+    // Decisão do dono (29/09/2026): só o rótulo "E-mail", sem texto de ajuda
+    // embaixo — quem não lembra o e-mail da compra não pode ficar travado.
+    await expect(page.locator('#campo-email .ajuda')).toHaveCount(0);
     await expect(page.locator('[data-pergunta="acesso_evento"] legend')).toContainText(formulario.etapas[0].perguntas[0].rotulo);
   });
 
@@ -20,10 +22,9 @@ test.describe('montagem e navegação', () => {
     await expect(page.locator('#erro-email')).toHaveText('Confira o e-mail: parece que falta algo.');
     await expect(page.locator('#erro-nome')).toHaveText('Preencha este campo.');
     await expect(page.locator('#erro-whatsapp')).toHaveText('Informe o WhatsApp com DDD.');
-    await expect(page.locator('#erro-instagram')).toHaveText('Preencha este campo.');
     await expect(page.locator('#erro-respostas-acesso_evento')).toHaveText('Escolha uma opção.');
-    await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toBeFocused();
-    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(campoEmail(page)).toBeFocused();
+    await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
   });
 
   // I-4: no toque duplo em "Próximo"/"Voltar", o 2º toque cai na etapa que
@@ -49,7 +50,7 @@ test.describe('montagem e navegação', () => {
     await page.goto(URL_TESTE);
     await preencherEtapa1(page, exemplo);
     await toqueDuplo(page, 'Próximo');
-    await expect(page.getByText('Etapa 2 de 4')).toBeVisible();
+    await expect(page.getByText('Etapa 2 de 3')).toBeVisible();
     await page.waitForTimeout(400); // prazo para o 2º toque agir, se fosse passar
     expect(await marcadas(page)).toEqual([]);
   });
@@ -61,13 +62,12 @@ test.describe('montagem e navegação', () => {
     await preencherEtapa1(page, exemplo);
     const antes = await marcadas(page);
     await avancar(page);
-    await expect(page.getByText('Etapa 2 de 4')).toBeVisible();
+    await expect(page.getByText('Etapa 2 de 3')).toBeVisible();
     await responderEtapa(page, 2, { idade: exemplo.respostas.idade }); // responde algo na etapa 2 e só então volta
     await toqueDuplo(page, 'Voltar');
-    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
     await page.waitForTimeout(400);
     expect(await marcadas(page)).toEqual(antes);
-    await expect(page.getByLabel('Seu @ no Instagram')).toBeEnabled(); // "Não tenho Instagram" não foi marcado sem querer
   });
 
   test('voltar não perde o que foi preenchido', async ({ page }) => {
@@ -75,7 +75,7 @@ test.describe('montagem e navegação', () => {
     await page.goto(URL_TESTE);
     await preencherEtapa1(page, exemplo);
     await avancar(page);
-    await expect(page.getByText('Etapa 2 de 4')).toBeVisible();
+    await expect(page.getByText('Etapa 2 de 3')).toBeVisible();
     await page.getByRole('button', { name: 'Voltar' }).click();
     await expect(page.getByLabel('Nome completo')).toHaveValue('Ana Souza');
     await expect(page.locator('[data-pergunta="genero"]').getByRole('radio', { name: 'Feminino', exact: true })).toBeChecked();
@@ -114,8 +114,6 @@ test.describe('campos especiais', () => {
     await responderEtapa(page, 2, exemplo.respostas);
     await avancar(page);
     await responderEtapa(page, 3, exemplo.respostas);
-    await avancar(page);
-    await preencherEndereco(page, exemplo.endereco);
     await page.getByLabel(/Autorizo o Instituto METRIK/).check();
     await page.getByRole('button', { name: 'Confirmar meu credenciamento' }).click();
     await expect(page.getByRole('heading', { name: /Credenciamento confirmado/ })).toBeVisible();
@@ -154,140 +152,11 @@ test.describe('campos especiais', () => {
   test('corretor de e-mail', async ({ page }) => {
     await prepararRotas(page);
     await page.goto(URL_TESTE);
-    const email = page.getByLabel('E-mail (use o mesmo da compra)');
+    const email = campoEmail(page);
     await email.fill('ana@gmial.com');
     await email.blur();
     await page.getByRole('button', { name: 'ana@gmail.com' }).click();
     await expect(email).toHaveValue('ana@gmail.com');
-  });
-
-  test('"Não tenho Instagram" desativa o campo e dispensa o @', async ({ page }) => {
-    await prepararRotas(page);
-    await page.goto(URL_TESTE);
-    await page.getByLabel('Não tenho Instagram').check();
-    await expect(page.getByLabel('Seu @ no Instagram')).toBeDisabled();
-    await avancar(page);
-    await expect(page.locator('#erro-instagram')).toBeHidden();
-  });
-
-  test('CEP fora do ar não trava: avisa e deixa preencher à mão', async ({ page }) => {
-    await prepararRotas(page, { viaCep: 'falha' });
-    await page.goto(URL_TESTE);
-    await preencherEtapa1(page, exemplo);
-    await avancar(page);
-    await responderEtapa(page, 2, exemplo.respostas);
-    await avancar(page);
-    await responderEtapa(page, 3, exemplo.respostas);
-    await avancar(page);
-    await page.getByLabel('CEP').fill('01310-100');
-    await expect(page.getByText('CEP não encontrado. Preencha o endereço manualmente.')).toBeVisible();
-    await expect(page.getByLabel('Rua')).toBeEditable();
-  });
-
-  // M-5: uma resposta lenta do ViaCEP não pode pisar em cima do que a
-  // pessoa já digitou enquanto esperava.
-  test('CEP: resposta lenta não sobrescreve o que a pessoa já digitou', async ({ page }) => {
-    await prepararRotas(page);
-    await page.route('https://viacep.com.br/ws/**', async (r) => {
-      await new Promise((resolver) => setTimeout(resolver, 800));
-      return r.fulfill({
-        headers: { 'Access-Control-Allow-Origin': '*' },
-        json: { cep: '01310-100', logradouro: 'Avenida Paulista', bairro: 'Bela Vista', localidade: 'São Paulo', uf: 'SP' },
-      });
-    });
-    await page.goto(URL_TESTE);
-    await preencherEtapa1(page, exemplo);
-    await avancar(page);
-    await responderEtapa(page, 2, exemplo.respostas);
-    await avancar(page);
-    await responderEtapa(page, 3, exemplo.respostas);
-    await avancar(page);
-    const resposta = page.waitForResponse((res) => res.url().includes('viacep.com.br'));
-    await page.getByLabel('CEP').fill('01310-100');
-    await page.getByLabel('Rua').fill('Rua Digitada Pela Pessoa');
-    await resposta;
-    await expect(page.getByText('Endereço encontrado. Confira e informe o número.')).toBeVisible();
-    await expect(page.getByLabel('Rua')).toHaveValue('Rua Digitada Pela Pessoa');
-  });
-
-  // M-4: a pessoa troca o CEP enquanto a busca do primeiro ainda está a
-  // caminho — a resposta atrasada do CEP antigo não pode preencher o endereço.
-  test('CEP: resposta atrasada de um CEP que já foi trocado é ignorada', async ({ page }) => {
-    await prepararRotas(page);
-    await page.route('https://viacep.com.br/ws/**', async (r) => {
-      const headers = { 'Access-Control-Allow-Origin': '*' };
-      if (r.request().url().includes('01310100')) {
-        await new Promise((resolver) => setTimeout(resolver, 1200));
-        return r.fulfill({ headers, json: { logradouro: 'Avenida Paulista', bairro: 'Bela Vista', localidade: 'São Paulo', uf: 'SP' } });
-      }
-      return r.fulfill({ headers, json: { logradouro: 'Rua Primeiro de Março', bairro: 'Centro', localidade: 'Rio de Janeiro', uf: 'RJ' } });
-    });
-    await page.goto(URL_TESTE);
-    await preencherEtapa1(page, exemplo);
-    await avancar(page);
-    await responderEtapa(page, 2, exemplo.respostas);
-    await avancar(page);
-    await responderEtapa(page, 3, exemplo.respostas);
-    await avancar(page);
-    const atrasada = page.waitForResponse((res) => res.url().includes('01310100'));
-    await page.getByLabel('CEP').fill('01310-100');
-    await page.getByLabel('CEP').fill('20010-000');
-    await expect(page.getByLabel('Cidade')).toHaveValue('Rio de Janeiro');
-    await atrasada;
-    await page.waitForTimeout(300); // prazo para a resposta atrasada agir, se fosse ser aplicada
-    await expect(page.getByLabel('CEP')).toHaveValue('20010-000');
-    await expect(page.getByLabel('Rua')).toHaveValue('Rua Primeiro de Março');
-    await expect(page.getByLabel('Bairro')).toHaveValue('Centro');
-    await expect(page.getByLabel('Cidade')).toHaveValue('Rio de Janeiro');
-    await expect(page.getByLabel('Estado')).toHaveValue('RJ');
-    await expect(page.getByText('Endereço encontrado. Confira e informe o número.')).toBeVisible();
-  });
-
-  // M-5: depois de uma falha, digitar o MESMO CEP de novo precisa tentar de
-  // novo (e não ficar preso por já ter sido "o último CEP buscado").
-  test('CEP: falha permite tentar de novo com o mesmo CEP', async ({ page }) => {
-    await prepararRotas(page);
-    let tentativas = 0;
-    await page.route('https://viacep.com.br/ws/**', (r) => {
-      tentativas += 1;
-      return tentativas === 1
-        ? r.abort('failed')
-        : r.fulfill({
-            headers: { 'Access-Control-Allow-Origin': '*' },
-            json: { cep: '01310-100', logradouro: 'Avenida Paulista', bairro: 'Bela Vista', localidade: 'São Paulo', uf: 'SP' },
-          });
-    });
-    await page.goto(URL_TESTE);
-    await preencherEtapa1(page, exemplo);
-    await avancar(page);
-    await responderEtapa(page, 2, exemplo.respostas);
-    await avancar(page);
-    await responderEtapa(page, 3, exemplo.respostas);
-    await avancar(page);
-    await page.getByLabel('CEP').fill('01310-100');
-    await expect(page.getByText('CEP não encontrado. Preencha o endereço manualmente.')).toBeVisible();
-    await page.getByLabel('CEP').fill('');
-    await page.getByLabel('CEP').fill('01310-100');
-    await expect(page.getByLabel('Rua')).toHaveValue('Avenida Paulista');
-  });
-
-  test('"Moro fora do Brasil" troca os campos de endereço', async ({ page }) => {
-    const enviados = await prepararRotas(page);
-    await page.goto(URL_TESTE);
-    await preencherEtapa1(page, exemplo);
-    await avancar(page);
-    await responderEtapa(page, 2, exemplo.respostas);
-    await avancar(page);
-    await responderEtapa(page, 3, exemplo.respostas);
-    await avancar(page);
-    await page.getByLabel('Moro fora do Brasil').check();
-    await expect(page.getByLabel('CEP')).toBeHidden();
-    await page.getByLabel('País').fill('Portugal');
-    await page.getByLabel('Endereço completo').fill('Rua das Flores 10, 1200-195 Lisboa');
-    await page.getByLabel(/Autorizo o Instituto METRIK/).check();
-    await page.getByRole('button', { name: 'Confirmar meu credenciamento' }).click();
-    await expect(page.getByRole('heading', { name: /Credenciamento confirmado/ })).toBeVisible();
-    expect(enviados[0].endereco).toEqual({ moraExterior: true, pais: 'Portugal', enderecoCompleto: 'Rua das Flores 10, 1200-195 Lisboa' });
   });
 });
 
@@ -352,15 +221,15 @@ test.describe('rascunho e preenchimento pelo link', () => {
     });
     await prepararRotas(page);
     await page.goto(URL_TESTE);
-    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
-    await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue('');
+    await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
+    await expect(campoEmail(page)).toHaveValue('');
     await expect(page.getByText('Continuamos de onde você parou.')).toHaveCount(0);
   });
 
   test('preenche e-mail e nome pelo # e limpa o endereço da página', async ({ page }) => {
     await prepararRotas(page);
     await page.goto(URL_TESTE + '#email=ana.souza%40exemplo.com.br&nome=Ana%20Souza');
-    await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue('ana.souza@exemplo.com.br');
+    await expect(campoEmail(page)).toHaveValue('ana.souza@exemplo.com.br');
     await expect(page.getByLabel('Nome completo')).toHaveValue('Ana Souza');
     expect(new URL(page.url()).hash).toBe('');
   });
@@ -393,7 +262,7 @@ test.describe('rascunho e preenchimento pelo link', () => {
       return r.continue();
     });
     await page.goto(URL_TESTE + '#email=ana.souza%40exemplo.com.br&nome=Ana%20Souza');
-    await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue('ana.souza@exemplo.com.br');
+    await expect(campoEmail(page)).toHaveValue('ana.souza@exemplo.com.br');
     await expect(page.getByLabel('Nome completo')).toHaveValue('Ana Souza');
     await expect.poll(() => page.evaluate(() => typeof window.__gtmViu)).toBe('string');
     const viu = await page.evaluate(() => window.__gtmViu);
@@ -430,10 +299,10 @@ test.describe('rascunho e preenchimento pelo link', () => {
     });
     await prepararRotas(page);
     await page.goto(URL_TESTE);
-    await expect(page.getByText('Etapa 2 de 4')).toBeVisible(); // Math.trunc(2.5) = 2
+    await expect(page.getByText('Etapa 2 de 3')).toBeVisible(); // Math.trunc(2.5) = 2
     await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
     await page.getByRole('button', { name: 'Voltar' }).click();
-    await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue('ana@exemplo.com.br');
+    await expect(campoEmail(page)).toHaveValue('ana@exemplo.com.br');
   });
 });
 
@@ -449,7 +318,7 @@ test.describe('alvos de toque (44px)', () => {
   test('botão da sugestão de e-mail', async ({ page }) => {
     await prepararRotas(page);
     await page.goto(URL_TESTE);
-    const email = page.getByLabel('E-mail (use o mesmo da compra)');
+    const email = campoEmail(page);
     await email.fill('ana@gmial.com');
     await email.blur();
     const sugestao = page.getByRole('button', { name: 'ana@gmail.com' });
@@ -478,14 +347,7 @@ test.describe('alvos de toque (44px)', () => {
       return tentativas === 1 ? r.fulfill({ json: formulario }) : r.fulfill({ status: 503, json: {} });
     });
     await page.goto(URL_TESTE);
-    await preencherEtapa1(page, exemplo);
-    await avancar(page);
-    await responderEtapa(page, 2, exemplo.respostas);
-    await avancar(page);
-    await responderEtapa(page, 3, exemplo.respostas);
-    await avancar(page);
-    await preencherEndereco(page, exemplo.endereco);
-    await page.getByLabel(/Autorizo o Instituto METRIK/).check();
+    await preencherTudo(page, exemplo);
     await page.getByRole('button', { name: 'Confirmar meu credenciamento' }).click();
     const recarregar = page.getByRole('button', { name: 'Recarregar a página' });
     await expect(recarregar).toBeVisible();

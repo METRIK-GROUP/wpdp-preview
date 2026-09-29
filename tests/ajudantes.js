@@ -1,13 +1,22 @@
 // tests/ajudantes.js
-// Rotas simuladas do dashboard e do ViaCEP + preenchimento a partir do exemplo oficial.
+// Rotas simuladas do dashboard + preenchimento a partir do exemplo oficial.
 import { readFileSync } from 'node:fs';
-import { expect } from '@playwright/test';
 
 export const formulario = JSON.parse(readFileSync(new URL('./fixtures/formulario-ed8.json', import.meta.url), 'utf8'));
 export const exemplo = JSON.parse(readFileSync(new URL('./fixtures/contrato-exemplo.json', import.meta.url), 'utf8'));
 
 /** Mesma origem da página: o servidor simulado responde em localhost:4173 (sem CORS no teste). */
 export const URL_TESTE = '/credenciamento/?api=http://localhost:4173&utm_source=grupo';
+
+/**
+ * Campo de e-mail pelo nome acessível exato ("E-mail"). getByLabel não serve:
+ * ele casa o texto do <label> inteiro, que inclui o asterisco de obrigatório
+ * ("E-mail*"), e o rótulo curto casaria outros por pedaço.
+ */
+export const campoEmail = (page) => page.getByRole('textbox', { name: 'E-mail', exact: true });
+
+export const CHAVE_RASCUNHO = 'wpdp-credenciamento-ed8-rascunho';
+export const lerRascunho = (page) => page.evaluate((chave) => JSON.parse(localStorage.getItem(chave) ?? 'null'), CHAVE_RASCUNHO);
 
 /**
  * Avança o relógio falso (page.clock) em passos pequenos em vez de um salto
@@ -36,7 +45,7 @@ export const SUCESSO = {
 
 /**
  * @param {import('@playwright/test').Page} page
- * @param {{ formularioResposta?: object, formularioStatus?: number, respostasEnvio?: Array<{status:number, json?:object}>, envioFalhaRede?: boolean, viaCep?: 'ok'|'falha' }} [opcoes]
+ * @param {{ formularioResposta?: object, formularioStatus?: number, respostasEnvio?: Array<{status:number, json?:object}>, envioFalhaRede?: boolean }} [opcoes]
  */
 export async function prepararRotas(page, opcoes = {}) {
   const enviados = [];
@@ -54,14 +63,6 @@ export async function prepararRotas(page, opcoes = {}) {
     const resposta = fila.length > 1 ? fila.shift() : fila[0];
     return r.fulfill({ status: resposta.status, json: resposta.json ?? {} });
   });
-  await page.route('https://viacep.com.br/ws/**', (r) =>
-    opcoes.viaCep === 'falha'
-      ? r.abort('failed')
-      : r.fulfill({
-          headers: { 'Access-Control-Allow-Origin': '*' },
-          json: { cep: '01310-100', logradouro: 'Avenida Paulista', bairro: 'Bela Vista', localidade: 'São Paulo', uf: 'SP' },
-        }),
-  );
   return enviados;
 }
 
@@ -157,10 +158,9 @@ export function vigiarTurnstile(page) {
 }
 
 export async function preencherEtapa1(page, ex) {
-  await page.getByLabel('E-mail (use o mesmo da compra)').fill(ex.email);
+  await campoEmail(page).fill(ex.email);
   await page.getByLabel('Nome completo').fill(ex.nome);
   await page.getByLabel('WhatsApp com DDD').fill(ex.whatsapp);
-  await page.getByLabel('Seu @ no Instagram').fill(ex.instagram);
   await responderEtapa(page, 1, ex.respostas);
 }
 
@@ -190,28 +190,16 @@ export async function responderEtapa(page, n, respostas) {
   }
 }
 
-export async function preencherEndereco(page, e) {
-  await page.getByLabel('CEP').fill(e.cep);
-  await expect(page.getByLabel('Rua')).toHaveValue('Avenida Paulista');
-  await page.getByLabel('Rua').fill(e.logradouro);
-  await page.getByLabel('Número').fill(e.numero);
-  await page.getByLabel('Complemento (opcional)').fill(e.complemento);
-  await page.getByLabel('Bairro').fill(e.bairro);
-  await page.getByLabel('Cidade').fill(e.cidade);
-  await page.getByLabel('Estado').selectOption(e.uf);
-}
-
 export async function avancar(page) {
   await page.getByRole('button', { name: 'Próximo' }).click();
 }
 
+/** Responde as três etapas e marca a autorização, que fica no fim da etapa 3 (a última). */
 export async function preencherTudo(page, ex) {
   await preencherEtapa1(page, ex);
   await avancar(page);
   await responderEtapa(page, 2, ex.respostas);
   await avancar(page);
   await responderEtapa(page, 3, ex.respostas);
-  await avancar(page);
-  await preencherEndereco(page, ex.endereco);
   await page.getByLabel(/Autorizo o Instituto METRIK/).check();
 }

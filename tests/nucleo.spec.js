@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto(URL_TESTE);
 });
 
-test('máscaras de WhatsApp e CEP', async ({ page }) => {
+test('máscara do WhatsApp', async ({ page }) => {
   const r = await page.evaluate(() => {
     const N = window.CredNucleo;
     return [
@@ -16,11 +16,22 @@ test('máscaras de WhatsApp e CEP', async ({ page }) => {
       N.mascaraWhatsapp('(11) 91234-5678'),
       N.mascaraWhatsapp('+351 912 345 678'),
       N.mascaraWhatsapp('119'),
-      N.mascaraCep('01310100'),
-      N.mascaraCep('0131'),
     ];
   });
-  expect(r).toEqual(['(11) 91234-5678', '(11) 3456-7890', '(11) 91234-5678', '+351912345678', '(11) 9', '01310-100', '0131']);
+  expect(r).toEqual(['(11) 91234-5678', '(11) 3456-7890', '(11) 91234-5678', '+351912345678', '(11) 9']);
+});
+
+// Decisão do dono (29/09/2026): sem endereço e sem Instagram — o núcleo não
+// guarda mais regra, máscara nem mensagem de nenhum dos dois.
+test('o núcleo não tem mais nada de endereço, CEP nem Instagram', async ({ page }) => {
+  const r = await page.evaluate(() => {
+    const N = window.CredNucleo;
+    return {
+      funcoes: ['mascaraCep', 'UFS', 'normalizarInstagram'].filter((k) => k in N),
+      mensagens: ['instagram', 'cep', 'uf', 'cepNaoEncontrado'].filter((k) => k in N.MENSAGENS),
+    };
+  });
+  expect(r).toEqual({ funcoes: [], mensagens: [] });
 });
 
 // I-3 (Armadilha 2 do phone.ts do dashboard): sem "+", a máscara não pode
@@ -41,42 +52,6 @@ test('máscara do WhatsApp: DDI sem "+" não é cortado e zero de discagem cai',
     ];
   });
   expect(r).toEqual(['+5519999999999', '+5519999999999', '(19) 99999-9999', '+5519999999999', '', '+5519999999999', '+551999999999999']);
-});
-
-// M-7: mesma regra do servidor (dashboard normalizar.ts, normalizarInstagram):
-// link de post/reel/stories/explore/tv não é perfil — a página mostra o erro
-// na hora, em vez de o servidor recusar só no envio final.
-test('Instagram: link que não é de perfil é recusado como no servidor', async ({ page }) => {
-  const r = await page.evaluate((f) => {
-    const N = window.CredNucleo;
-    const base = N.definir(N.estadoInicial(f), 'email', 'ana@exemplo.com.br');
-    const erro = (v) => N.errosDaEtapa(1, N.definir(base, 'instagram', v), f).instagram || 'aceito';
-    return [
-      'instagram.com/p/Cx1abc',
-      'https://www.instagram.com/reel/abc/',
-      'https://instagram.com/reels/abc',
-      'instagram.com/stories/ana',
-      'https://www.instagram.com/explore/tags/x',
-      'instagram.com/tv/abc',
-      'https://www.instagram.com/ana.souza?igsh=abc',
-      'instagram.com/pedro',
-      'instagram.com/tvglobo',
-      '@anasouza.arq',
-    ].map((v) => [v, erro(v)]);
-  }, formulario);
-  const recusado = 'Use só letras, números, ponto e _ no @.';
-  expect(r).toEqual([
-    ['instagram.com/p/Cx1abc', recusado],
-    ['https://www.instagram.com/reel/abc/', recusado],
-    ['https://instagram.com/reels/abc', recusado],
-    ['instagram.com/stories/ana', recusado],
-    ['https://www.instagram.com/explore/tags/x', recusado],
-    ['instagram.com/tv/abc', recusado],
-    ['https://www.instagram.com/ana.souza?igsh=abc', 'aceito'],
-    ['instagram.com/pedro', 'aceito'],
-    ['instagram.com/tvglobo', 'aceito'],
-    ['@anasouza.arq', 'aceito'],
-  ]);
 });
 
 // C2: mesma gramática do servidor — e-mail válido do WHATWG + pelo menos um
@@ -165,17 +140,95 @@ test('erros da etapa 1 vazia, na ordem da tela', async ({ page }) => {
     const N = window.CredNucleo;
     return N.errosDaEtapa(1, N.estadoInicial(f), f);
   }, formulario);
-  expect(Object.keys(r)).toEqual(['email', 'nome', 'whatsapp', 'instagram', 'respostas.acesso_evento', 'respostas.genero']);
+  expect(Object.keys(r)).toEqual(['email', 'nome', 'whatsapp', 'respostas.acesso_evento', 'respostas.genero']);
   expect(r.email).toBe('Confira o e-mail: parece que falta algo.');
   expect(r['respostas.genero']).toBe('Escolha uma opção.');
 });
 
-test('etapa de cada campo', async ({ page }) => {
+test('etapa de cada campo (a autorização fica na última etapa visível)', async ({ page }) => {
   const r = await page.evaluate((f) => {
     const N = window.CredNucleo;
-    return ['email', 'respostas.idade', 'respostas.comprometimento', 'endereco.cep', 'consentimento'].map((c) => N.etapaDoCampo(c, f));
+    const campos = ['email', 'nome', 'whatsapp', 'respostas.acesso_evento', 'respostas.idade', 'respostas.comprometimento', 'consentimento'];
+    const semAEtapa2 = { ...f, etapas: f.etapas.map((e, i) => (i === 1 ? { ...e, perguntas: [] } : e)) };
+    return { normal: campos.map((c) => N.etapaDoCampo(c, f)), semAEtapa2: campos.map((c) => N.etapaDoCampo(c, semAEtapa2)) };
   }, formulario);
-  expect(r).toEqual([1, 2, 3, 4, 4]);
+  expect(r.normal).toEqual([1, 1, 1, 1, 2, 3, 3]);
+  expect(r.semAEtapa2).toEqual([1, 1, 1, 1, 1, 2, 2]); // "idade" sumiu do cardápio: cai no padrão (etapa 1)
+});
+
+// O servidor segue mandando as 4 etapas ([2, 12, 12, 0] perguntas) durante a
+// transição: a 4ª (sem perguntas) era a do endereço. Só as que têm perguntas
+// aparecem, em qualquer posição.
+test('etapas visíveis: só as que têm perguntas', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    const titulos = (form) => N.etapasVisiveis(form).map((e) => e.titulo);
+    const semAEtapa2 = { ...f, etapas: f.etapas.map((e, i) => (i === 1 ? { ...e, perguntas: [] } : e)) };
+    const soTres = { ...f, etapas: f.etapas.slice(0, 3) };
+    return {
+      contrato: [titulos(f), N.totalEtapas(f)],
+      semAEtapa2: [titulos(semAEtapa2), N.totalEtapas(semAEtapa2)],
+      soTres: [titulos(soTres), N.totalEtapas(soTres)],
+    };
+  }, formulario);
+  expect(r).toEqual({
+    contrato: [['Seus dados', 'Perfil profissional', 'Seu momento'], 3],
+    semAEtapa2: [['Seus dados', 'Seu momento'], 2],
+    soTres: [['Seus dados', 'Perfil profissional', 'Seu momento'], 3],
+  });
+});
+
+// Rascunho da página anterior pode estar na etapa 4 (a do endereço, que
+// saiu); gravação parcial ou formato antigo podem trazer lixo. A etapa salva
+// sempre vira uma etapa que existe: inteira, entre 1 e a última visível.
+test('etapa salva no rascunho é limitada às etapas visíveis', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    return [4, 3, 2.5, '2', 0, -3, 99, 'abc', null, undefined, NaN, Infinity].map((v) => N.limitarEtapa(v, f));
+  }, formulario);
+  expect(r).toEqual([3, 3, 2, 2, 1, 1, 3, 1, 1, 1, 1, 3]);
+});
+
+// C4 + etapas visíveis: o cardápio precisa de edição e versão (texto não
+// vazio) e de pelo menos uma etapa com perguntas; cada etapa com a sua lista
+// de perguntas. Continua aceitando as 4 etapas de hoje — e também 3, se o
+// servidor um dia deixar de mandar a do endereço.
+test('formato mínimo do cardápio', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    const casos = {
+      contrato: f,
+      soTres: { ...f, etapas: f.etapas.slice(0, 3) },
+      semEdicao: { ...f, edicao: undefined },
+      versaoVazia: { ...f, versao: '' },
+      semEtapas: { ...f, etapas: [] },
+      nenhumaComPerguntas: { ...f, etapas: f.etapas.map((e) => ({ ...e, perguntas: [] })) },
+      etapaSemLista: { ...f, etapas: [...f.etapas.slice(0, 3), { numero: 4, titulo: 'x', ajuda: null }] },
+      etapaNula: { ...f, etapas: [...f.etapas.slice(0, 3), null] },
+      nulo: null,
+    };
+    return Object.fromEntries(Object.entries(casos).map(([nome, form]) => [nome, N.formularioValido(form)]));
+  }, formulario);
+  expect(r).toEqual({
+    contrato: true,
+    soTres: true,
+    semEdicao: false,
+    versaoVazia: false,
+    semEtapas: false,
+    nenhumaComPerguntas: false,
+    etapaSemLista: false,
+    etapaNula: false,
+    nulo: false,
+  });
+});
+
+test('autorização só é pedida na última etapa visível', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    const vazio = N.estadoInicial(f);
+    return [1, 2, 3, 4].map((n) => 'consentimento' in N.errosDaEtapa(n, vazio, f));
+  }, formulario);
+  expect(r).toEqual([false, false, true, false]);
 });
 
 test('montarEnvio produz exatamente o contrato (exemplo oficial)', async ({ page }) => {
@@ -187,10 +240,6 @@ test('montarEnvio produz exatamente o contrato (exemplo oficial)', async ({ page
       d = N.definir(d, 'email', ex.email);
       d = N.definir(d, 'nome', ex.nome);
       d = N.definir(d, 'whatsapp', ex.whatsapp);
-      d = N.definir(d, 'instagram', ex.instagram);
-      Object.keys(ex.endereco).forEach((k) => {
-        d = N.definir(d, 'endereco.' + k, ex.endereco[k]);
-      });
       d = N.definir(d, 'consentimento', true);
       f.etapas.forEach((e) =>
         e.perguntas.forEach((p) => {
@@ -213,11 +262,47 @@ test('rascunho com formato estranho é ignorado campo a campo', async ({ page })
   const r = await page.evaluate((f) => {
     const N = window.CredNucleo;
     const base = N.estadoInicial(f);
-    const salvo = { email: 'a@b.com', nome: 123, respostas: { idade: 'texto no lugar de objeto', comprometimento: 9 }, endereco: { cep: '01310-100', moraExterior: 'sim' } };
+    const salvo = { email: 'a@b.com', nome: 123, respostas: { idade: 'texto no lugar de objeto', comprometimento: 9 }, consentimento: 'sim' };
     const m = N.mesclarDados(base, salvo);
-    return { email: m.email, nome: m.nome, idade: m.respostas.idade, comp: m.respostas.comprometimento, cep: m.endereco.cep, fora: m.endereco.moraExterior };
+    return { email: m.email, nome: m.nome, idade: m.respostas.idade, comp: m.respostas.comprometimento, consentimento: m.consentimento };
   }, formulario);
-  expect(r).toEqual({ email: 'a@b.com', nome: '', idade: { valor: '', outro: '' }, comp: null, cep: '01310-100', fora: false });
+  expect(r).toEqual({ email: 'a@b.com', nome: '', idade: { valor: '', outro: '' }, comp: null, consentimento: false });
+});
+
+// Rascunho gravado pela página anterior: Instagram e endereço são ignorados
+// (não voltam, não vão no envio, não são regravados); o resto continua.
+test('rascunho da página anterior: Instagram e endereço ficam de fora', async ({ page }) => {
+  const r = await page.evaluate((f) => {
+    const N = window.CredNucleo;
+    const salvo = {
+      email: 'ana@exemplo.com.br',
+      nome: 'Ana Souza',
+      whatsapp: '(11) 91234-5678',
+      instagram: '@anasouza.arq',
+      semInstagram: false,
+      endereco: { moraExterior: false, cep: '01310-100', logradouro: 'Av. Paulista', numero: '1000', complemento: '', bairro: 'Bela Vista', cidade: 'São Paulo', uf: 'SP', pais: '', enderecoCompleto: '' },
+      respostas: { idade: { valor: '26 a 35 anos', outro: '' } },
+      consentimento: true,
+    };
+    const m = N.mesclarDados(N.estadoInicial(f), salvo);
+    const migrado = N.migrarDados(f, salvo);
+    return {
+      chaves: Object.keys(m),
+      chavesMigrado: Object.keys(migrado),
+      estadoInicial: Object.keys(N.estadoInicial(f)),
+      idade: m.respostas.idade,
+      consentimento: m.consentimento,
+      envio: Object.keys(N.montarEnvio(f, m, {}, 0, 1000, '')),
+    };
+  }, formulario);
+  expect(r).toEqual({
+    chaves: ['email', 'nome', 'whatsapp', 'respostas', 'consentimento'],
+    chavesMigrado: ['email', 'nome', 'whatsapp', 'respostas', 'consentimento'],
+    estadoInicial: ['email', 'nome', 'whatsapp', 'respostas', 'consentimento'],
+    idade: { valor: '26 a 35 anos', outro: '' },
+    consentimento: true,
+    envio: ['edicao', 'versao', 'email', 'nome', 'whatsapp', 'respostas', 'consentimento', 'canal', 'tempoPreenchimentoS', 'empresa_site'],
+  });
 });
 
 test('rascunho com opção de múltipla escolha removida do cardápio é descartada ao restaurar', async ({ page }) => {
@@ -315,7 +400,7 @@ test('migrarDados zera a autorização e primeiraEtapaComErro acha a primeira et
     ({ f, ex }) => {
       const N = window.CredNucleo;
       let d = N.estadoInicial(f);
-      ['email', 'nome', 'whatsapp', 'instagram'].forEach((k) => {
+      ['email', 'nome', 'whatsapp'].forEach((k) => {
         d = N.definir(d, k, ex[k]);
       });
       f.etapas.forEach((e) =>
@@ -328,10 +413,7 @@ test('migrarDados zera a autorização e primeiraEtapaComErro acha a primeira et
           d = N.definir(d, 'respostas.' + p.id, ui);
         }),
       );
-      const ate3 = d; // etapas 1 a 3 completas; endereço e autorização vazios
-      Object.keys(ex.endereco).forEach((k) => {
-        d = N.definir(d, 'endereco.' + k, ex.endereco[k]);
-      });
+      const semAutorizacao = d; // as 3 etapas respondidas; só a autorização vazia
       const completo = N.definir(d, 'consentimento', true);
       const migrado = N.migrarDados(f, completo);
       return {
@@ -340,15 +422,16 @@ test('migrarDados zera a autorização e primeiraEtapaComErro acha a primeira et
         original: completo.consentimento, // sem mutação
         etapas: [
           N.primeiraEtapaComErro(N.estadoInicial(f), f, 3),
-          N.primeiraEtapaComErro(ate3, f, 3),
+          N.primeiraEtapaComErro(semAutorizacao, f, 2),
           N.primeiraEtapaComErro(completo, f, 3),
+          N.primeiraEtapaComErro(completo, f, 4), // etapa atual além da última visível: fica na última
           N.primeiraEtapaComErro(migrado, f, 2),
         ],
       };
     },
     { f: formulario, ex: exemplo },
   );
-  expect(r).toEqual({ email: 'ana.souza@exemplo.com.br', consentimento: false, original: true, etapas: [1, 4, 3, 4] });
+  expect(r).toEqual({ email: 'ana.souza@exemplo.com.br', consentimento: false, original: true, etapas: [1, 3, 3, 3, 3] });
 });
 
 test('validarPergunta recusa valor de múltipla escolha fora do cardápio atual', async ({ page }) => {
@@ -364,33 +447,33 @@ test('validarPergunta recusa valor de múltipla escolha fora do cardápio atual'
   expect(r).toEqual(['Escolha uma opção.', null, 'Escolha uma opção.']);
 });
 
-test('montarEnvio apara o UF e nunca manda tempoPreenchimentoS inválido', async ({ page }) => {
+test('montarEnvio apara os contatos e nunca manda tempoPreenchimentoS inválido', async ({ page }) => {
   const r = await page.evaluate((f) => {
     const N = window.CredNucleo;
     let d = N.estadoInicial(f);
-    d = N.definir(d, 'endereco.uf', ' SP ');
-    const comEspaco = N.montarEnvio(f, d, {}, 0, 1000, '').endereco.uf;
+    d = N.definir(d, 'nome', '  Ana Souza ');
+    const comEspaco = N.montarEnvio(f, d, {}, 0, 1000, '').nome;
     const numeroNormal = N.montarEnvio(f, d, {}, 0, 5000, '').tempoPreenchimentoS;
     const relogioForaDeOrdem = N.montarEnvio(f, d, {}, 5000, 0, '').tempoPreenchimentoS;
     const semInicio = N.montarEnvio(f, d, {}, undefined, 5000, '').tempoPreenchimentoS;
     const naoNumerico = N.montarEnvio(f, d, {}, 'abc', 5000, '').tempoPreenchimentoS;
     return { comEspaco, numeroNormal, relogioForaDeOrdem, semInicio, naoNumerico };
   }, formulario);
-  expect(r).toEqual({ comEspaco: 'SP', numeroNormal: 5, relogioForaDeOrdem: 0, semInicio: 0, naoNumerico: 0 });
+  expect(r).toEqual({ comEspaco: 'Ana Souza', numeroNormal: 5, relogioForaDeOrdem: 0, semInicio: 0, naoNumerico: 0 });
 });
 
 test('obter lê caminho aninhado e devolve undefined sem lançar quando falta', async ({ page }) => {
   const r = await page.evaluate(() => {
     const N = window.CredNucleo;
-    const obj = { endereco: { cep: '01310-100' }, respostas: { idade: null } };
+    const obj = { respostas: { motivacao: 'Indicação', idade: null } };
     return [
-      N.obter(obj, 'endereco.cep'),
+      N.obter(obj, 'respostas.motivacao'),
       N.obter(obj, 'respostas.idade'),
-      N.obter(obj, 'endereco.numero'),
+      N.obter(obj, 'respostas.renda'),
       N.obter(obj, 'nada.aqui.dentro'),
     ];
   });
-  expect(r).toEqual(['01310-100', null, undefined, undefined]);
+  expect(r).toEqual(['Indicação', null, undefined, undefined]);
 });
 
 test('armazenamento e rascunho funcionam normalmente e não lançam quando localStorage falha', async ({ page }) => {

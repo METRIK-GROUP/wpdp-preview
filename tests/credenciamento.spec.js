@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { prepararRotas, URL_TESTE } from './ajudantes.js';
+import { campoEmail, prepararRotas, URL_TESTE } from './ajudantes.js';
 
 test.describe('estrutura da página', () => {
   test('noindex, título, logo sem lazy e sem Tailwind CDN', async ({ page }) => {
@@ -21,7 +21,7 @@ test.describe('estrutura da página', () => {
     await prepararRotas(page);
     await page.goto(URL_TESTE);
     await expect(page.locator('.selo')).toHaveCSS('color', 'rgb(13, 107, 99)');
-    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
-    await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveCSS('border-top-color', 'rgb(136, 135, 128)');
+    await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
+    await expect(campoEmail(page)).toHaveCSS('border-top-color', 'rgb(136, 135, 128)');
   });
 });

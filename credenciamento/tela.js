@@ -1,10 +1,11 @@
 // credenciamento/tela.js
-// Tela da página de credenciamento: monta as 4 etapas, guarda rascunho no
-// aparelho e preenche o endereço pelo CEP. Regras sem tela ficam em
-// nucleo.js (window.CredNucleo); o envio em si e as telas de resultado
-// (sucesso/encerrado/erros do servidor) ficam em envio.js (window.CredEnvio);
-// a busca resiliente do cardápio no servidor (prazo de 45 s, retentativa
-// automática e a mensagem de espera) fica em carga.js (window.CredCarga).
+// Tela da página de credenciamento: monta as etapas que têm perguntas (3 no
+// cardápio de hoje, com a autorização no fim da última) e guarda rascunho no
+// aparelho. Regras sem tela ficam em nucleo.js (window.CredNucleo); o envio
+// em si e as telas de resultado (sucesso/encerrado/erros do servidor) ficam
+// em envio.js (window.CredEnvio); a busca resiliente do cardápio no servidor
+// (prazo de 45 s, retentativa automática e a mensagem de espera) fica em
+// carga.js (window.CredCarga).
 // Este arquivo monta os três por injeção de dependência ao final (ver
 // `var carga = window.CredCarga.criar({...})` e `var envio = window.CredEnvio.criar({...})`).
 (function () {
@@ -13,7 +14,6 @@
   var N = window.CredNucleo;
   var app = document.getElementById('app');
   var LIMITE_MS = 15000; // prazo padrão de buscar() — hoje só usado se um chamador futuro não passar `limite` explícito
-  var LIMITE_CEP_MS = 5000;
   var PAUSA_TOQUE_MS = 350;
   var armazem = N.armazenamento();
   var temporizador = null;
@@ -28,7 +28,7 @@
   if (window.location.hash) history.replaceState(null, '', window.location.pathname + window.location.search);
   var estado = {
     formulario: null,
-    etapa: 1,
+    etapa: 1, // posição entre as etapas VISÍVEIS (1 = primeira), ver N.etapasVisiveis
     dados: null,
     inicio: null,
     canal: N.lerCanal(window.location.search),
@@ -37,8 +37,6 @@
     restaurado: false,
     concluido: false,
     migrar: false, // I-2/N-1: rascunho marcado por um 409 — mesclável vindo de outra versão da MESMA edição
-    ultimoCep: '',
-    cepAutoPreenchido: { logradouro: null, bairro: null, cidade: null, uf: null },
   };
 
   // ------------------------------------------------------------------ DOM
@@ -179,7 +177,7 @@
     if (!campo) return null;
     var outro = campo.querySelector('.outro-texto');
     if (outro && !outro.hidden) return outro;
-    return campo.querySelector('input, select, textarea');
+    return campo.querySelector('input, textarea');
   }
 
   function mostrarErros(erros) {
@@ -226,7 +224,7 @@
     var opcoes = o || {};
     var id = idEntrada(chave);
     var descritores = [];
-    var filhos = [el('label', { for: id }, [rotulo].concat(marcaObrigatoria(opcoes.obrigatoria, false)))];
+    var filhos = [el('label', { classe: 'campo__titulo', for: id }, [rotulo].concat(marcaObrigatoria(opcoes.obrigatoria, false)))];
     if (opcoes.ajuda) {
       filhos.push(el('p', { classe: 'ajuda', id: id + '-ajuda', texto: opcoes.ajuda }));
       descritores.push(id + '-ajuda');
@@ -248,12 +246,11 @@
           if (mascarado !== alvo.value) alvo.value = mascarado;
         }
         mudar(chave, alvo.value);
-        if (opcoes.aoDigitar) opcoes.aoDigitar(alvo.value);
       },
       onblur: opcoes.aoSair ? function (ev) { opcoes.aoSair(ev.target.value); } : null,
     });
     entrada.value = N.obter(estado.dados, chave) || '';
-    filhos.push(opcoes.prefixo ? el('div', { classe: 'prefixo' }, [el('span', { 'aria-hidden': 'true', texto: opcoes.prefixo }), entrada]) : entrada);
+    filhos.push(entrada);
     if (opcoes.extra) filhos.push(opcoes.extra);
     filhos.push(el('p', { classe: 'erro-campo', id: idErro(chave), hidden: true }));
     return el('div', { classe: 'campo', id: idCampo(chave) }, filhos);
@@ -261,7 +258,7 @@
 
   function grupo(p, chave, conteudo) {
     var idAjuda = idEntrada(chave) + '-ajuda';
-    var filhos = [el('legend', {}, [p.rotulo].concat(marcaObrigatoria(p.obrigatoria, true)))];
+    var filhos = [el('legend', { classe: 'campo__titulo' }, [p.rotulo].concat(marcaObrigatoria(p.obrigatoria, true)))];
     if (p.ajuda) filhos.push(el('p', { classe: 'ajuda', id: idAjuda, texto: p.ajuda }));
     filhos.push(conteudo);
     filhos.push(el('p', { classe: 'erro-campo', id: idErro(chave), hidden: true }));
@@ -382,21 +379,7 @@
     caixa.appendChild(document.createTextNode('?'));
   }
 
-  function campoInstagram(textos) {
-    var bloco = campoTexto('instagram', textos.rotulo, { obrigatoria: true, max: 100, prefixo: '@' });
-    var entrada = bloco.querySelector('input');
-    entrada.disabled = estado.dados.semInstagram;
-    var caixa = opcaoMarcavel('checkbox', 'semInstagram', 'in-sem-instagram', textos.semInstagram, estado.dados.semInstagram, function (ev) {
-      marcarInicio();
-      estado.dados = N.definir(estado.dados, 'semInstagram', ev.target.checked);
-      entrada.disabled = ev.target.checked;
-      limparErro('instagram');
-      salvarDepois();
-    });
-    bloco.insertBefore(caixa, bloco.querySelector('.erro-campo'));
-    return bloco;
-  }
-
+  /** Contatos da primeira etapa: e-mail, nome e WhatsApp (sem Instagram, decisão do dono em 29/09/2026). */
   function camposContato() {
     var t = estado.formulario.campos;
     var sugestao = el('p', { classe: 'sugestao', id: 'sugestao-email', 'aria-live': 'polite', hidden: true });
@@ -408,116 +391,10 @@
       }),
       campoTexto('nome', t.nome.rotulo, { autocomplete: 'name', obrigatoria: true, max: 120 }),
       campoTexto('whatsapp', t.whatsapp.rotulo, { tipo: 'tel', autocomplete: 'tel', inputmode: 'tel', obrigatoria: true, max: 20, mascara: N.mascaraWhatsapp }),
-      campoInstagram(t.instagram),
     ];
   }
 
-  /**
-   * M-5: só preenche se o campo ainda está vazio OU ainda tem exatamente o
-   * que a própria busca por CEP colocou da última vez (`cepAutoPreenchido`).
-   * Se a pessoa já digitou algo diferente enquanto a resposta do ViaCEP
-   * estava a caminho, essa resposta (possivelmente atrasada/fora de ordem)
-   * não pisa em cima do que foi digitado.
-   */
-  function preencherSeVeio(chave, valor, sub) {
-    if (!valor) return;
-    var entrada = document.getElementById(idEntrada(chave));
-    var atual = entrada ? entrada.value : N.obter(estado.dados, chave) || '';
-    if (atual !== '' && atual !== estado.cepAutoPreenchido[sub]) return;
-    estado.cepAutoPreenchido[sub] = valor;
-    if (entrada) entrada.value = valor;
-    mudar(chave, valor);
-  }
-
-  // M-4: a resposta do ViaCEP só vale se o campo ainda tem ESTE CEP — a
-  // pessoa pode ter trocado o CEP enquanto a busca anterior estava a caminho.
-  function cepAindaNoCampo(cep) {
-    return String(N.obter(estado.dados, 'endereco.cep') || '').replace(/\D/g, '') === cep;
-  }
-
-  function buscarCep(valor, status) {
-    var cep = valor.replace(/\D/g, '');
-    if (cep.length !== 8) {
-      status.textContent = ''; // CEP em edição: aviso de uma busca anterior não vale mais
-      return;
-    }
-    if (cep === estado.ultimoCep) return;
-    status.textContent = 'Buscando o endereço…';
-    buscar('https://viacep.com.br/ws/' + cep + '/json/', {}, LIMITE_CEP_MS)
-      .then(function (res) { return res.ok ? res.dados : null; })
-      .then(function (r) {
-        if (!cepAindaNoCampo(cep)) return;
-        if (!r || r.erro) {
-          status.textContent = N.MENSAGENS.cepNaoEncontrado;
-          return;
-        }
-        // M-5: só marca como "resolvido" numa busca que deu certo — assim,
-        // depois de uma falha, digitar o mesmo CEP de novo tenta de novo em
-        // vez de ficar preso (o guard acima compara com ultimoCep).
-        estado.ultimoCep = cep;
-        preencherSeVeio('endereco.logradouro', r.logradouro, 'logradouro');
-        preencherSeVeio('endereco.bairro', r.bairro, 'bairro');
-        preencherSeVeio('endereco.cidade', r.localidade, 'cidade');
-        preencherSeVeio('endereco.uf', r.uf, 'uf');
-        status.textContent = 'Endereço encontrado. Confira e informe o número.';
-      })
-      .catch(function () {
-        if (cepAindaNoCampo(cep)) status.textContent = N.MENSAGENS.cepNaoEncontrado;
-      });
-  }
-
-  function campoUf() {
-    var chave = 'endereco.uf';
-    var id = idEntrada(chave);
-    var opcoes = [el('option', { value: '', texto: 'Selecione' })].concat(
-      N.UFS.map(function (uf) { return el('option', { value: uf, texto: uf }); }),
-    );
-    var selecao = el('select', {
-      id: id, name: chave, autocomplete: 'address-level1', 'aria-required': 'true', 'aria-describedby': idErro(chave),
-      onchange: function (ev) { mudar(chave, ev.target.value); },
-    }, opcoes);
-    selecao.value = N.obter(estado.dados, chave) || '';
-    return el('div', { classe: 'campo', id: idCampo(chave) }, [
-      el('label', { for: id }, ['Estado'].concat(marcaObrigatoria(true, false))),
-      selecao,
-      el('p', { classe: 'erro-campo', id: idErro(chave), hidden: true }),
-    ]);
-  }
-
-  function blocoEndereco() {
-    var t = estado.formulario.campos.endereco;
-    var e = estado.dados.endereco;
-    var status = el('p', { classe: 'ajuda', id: 'status-cep', 'aria-live': 'polite' });
-    var brasil = el('div', { hidden: e.moraExterior }, [
-      el('div', { classe: 'linha linha--cep' }, [
-        campoTexto('endereco.cep', 'CEP', {
-          inputmode: 'numeric', autocomplete: 'postal-code', obrigatoria: true, max: 9, mascara: N.mascaraCep,
-          aoDigitar: function (v) { buscarCep(v, status); }, extra: status,
-        }),
-        campoTexto('endereco.logradouro', 'Rua', { autocomplete: 'address-line1', obrigatoria: true, max: 200 }),
-      ]),
-      el('div', { classe: 'linha linha--2' }, [
-        campoTexto('endereco.numero', 'Número', { obrigatoria: true, max: 20 }),
-        campoTexto('endereco.complemento', 'Complemento (opcional)', { autocomplete: 'address-line2', max: 100 }),
-      ]),
-      campoTexto('endereco.bairro', 'Bairro', { obrigatoria: true, max: 100 }),
-      el('div', { classe: 'linha linha--2' }, [
-        campoTexto('endereco.cidade', 'Cidade', { autocomplete: 'address-level2', obrigatoria: true, max: 100 }),
-        campoUf(),
-      ]),
-    ]);
-    var exterior = el('div', { hidden: !e.moraExterior }, [
-      campoTexto('endereco.pais', 'País', { autocomplete: 'country-name', obrigatoria: true, max: 60 }),
-      campoTexto('endereco.enderecoCompleto', 'Endereço completo', { multilinha: true, obrigatoria: true, max: 500 }),
-    ]);
-    var fora = opcaoMarcavel('checkbox', 'moraExterior', 'in-endereco-moraExterior', t.moraExterior, e.moraExterior, function (ev) {
-      mudar('endereco.moraExterior', ev.target.checked);
-      brasil.hidden = ev.target.checked;
-      exterior.hidden = !ev.target.checked;
-    });
-    return el('div', { classe: 'endereco' }, [el('p', { classe: 'aviso', texto: t.texto }), fora, brasil, exterior]);
-  }
-
+  /** Autorização no fim da última etapa, com a mesma cara (e o mesmo alvo de toque) de uma opção. */
   function blocoConsentimento() {
     var chave = 'consentimento';
     var caixa = el('input', {
@@ -525,7 +402,7 @@
       onchange: function (ev) { mudar(chave, ev.target.checked); },
     });
     return el('div', { classe: 'campo', id: idCampo(chave) }, [
-      el('label', { classe: 'consentimento', for: idEntrada(chave) }, [caixa, el('span', { texto: estado.formulario.campos.consentimento })]),
+      el('label', { classe: 'opcao consentimento', for: idEntrada(chave) }, [caixa, el('span', { texto: estado.formulario.campos.consentimento })]),
       el('p', { classe: 'erro-campo', id: idErro(chave), hidden: true }),
     ]);
   }
@@ -546,10 +423,15 @@
   }
 
   // --------------------------------------------------------------- etapas
+  function ultimaEtapa() {
+    return N.totalEtapas(estado.formulario);
+  }
+
   function progresso() {
-    var pct = Math.round((estado.etapa / 4) * 100);
+    var total = ultimaEtapa();
+    var pct = Math.round((estado.etapa / total) * 100);
     return el('div', { classe: 'progresso' }, [
-      el('div', { classe: 'progresso__texto' }, [el('span', { texto: 'Etapa ' + estado.etapa + ' de 4' }), el('span', { texto: pct + '%' })]),
+      el('div', { classe: 'progresso__texto' }, [el('span', { texto: 'Etapa ' + estado.etapa + ' de ' + total }), el('span', { texto: pct + '%' })]),
       el('div', {
         classe: 'progresso__barra', role: 'progressbar', 'aria-label': 'Progresso do credenciamento',
         'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(pct),
@@ -570,21 +452,23 @@
     filhos.push(el('button', {
       type: 'submit', id: 'botao-principal',
       classe: 'botao botao--primario' + (estado.etapa === 1 ? ' botao--largo' : ''),
-      texto: estado.etapa < 4 ? 'Próximo' : 'Confirmar meu credenciamento',
+      texto: estado.etapa < ultimaEtapa() ? 'Próximo' : 'Confirmar meu credenciamento',
     }));
     return el('div', { classe: 'acoes' }, filhos);
   }
 
   function render() {
     var f = estado.formulario;
-    var etapa = f.etapas[estado.etapa - 1];
+    estado.etapa = N.limitarEtapa(estado.etapa, f); // nunca uma etapa que não existe (rascunho antigo, 409)
+    var ultima = estado.etapa === ultimaEtapa();
+    var etapa = N.etapasVisiveis(f)[estado.etapa - 1];
     limpar(app);
     app.setAttribute('aria-busy', 'false');
     var form = el('form', {
       novalidate: true,
       onsubmit: function (ev) {
         ev.preventDefault();
-        if (estado.etapa < 4) avancar();
+        if (estado.etapa < ultimaEtapa()) avancar();
         else envio.enviar();
       },
     });
@@ -595,17 +479,18 @@
     }
     form.appendChild(el('h2', { classe: 'etapa__titulo', id: 'titulo-etapa', tabindex: '-1', texto: etapa.titulo }));
     if (etapa.ajuda) form.appendChild(el('p', { classe: 'etapa__ajuda', texto: etapa.ajuda }));
-    if (estado.etapa === 1) camposContato().forEach(function (c) { form.appendChild(c); });
-    etapa.perguntas.forEach(function (p) { form.appendChild(renderPergunta(p)); });
-    if (estado.etapa === 4) {
-      form.appendChild(blocoEndereco());
-      form.appendChild(blocoConsentimento());
-      form.appendChild(campoOculto());
-    }
+    // Perguntas num contêiner só delas: o espaço entre uma e outra vem do
+    // "gap" dele (CSS .perguntas), não de margens soltas.
+    var perguntas = el('div', { classe: 'perguntas' });
+    if (estado.etapa === 1) camposContato().forEach(function (c) { perguntas.appendChild(c); });
+    etapa.perguntas.forEach(function (p) { perguntas.appendChild(renderPergunta(p)); });
+    if (ultima) perguntas.appendChild(blocoConsentimento());
+    form.appendChild(perguntas);
+    if (ultima) form.appendChild(campoOculto());
     form.appendChild(el('div', { id: 'status', classe: 'sr-only', 'aria-live': 'assertive' }));
     form.appendChild(el('div', { id: 'aviso-envio', tabindex: '-1' })); // M-3: precisa poder receber foco por script após 409/429/5xx/falha de rede
-    // C1: caixa do Turnstile acima dos botões — só na etapa 4 e só se o servidor pediu.
-    var verificacao = estado.etapa === 4 && protecao.ativa() ? el('div', { id: 'verificacao' }) : null;
+    // C1: caixa do Turnstile acima dos botões — só na última etapa e só se o servidor pediu.
+    var verificacao = ultima && protecao.ativa() ? el('div', { id: 'verificacao' }) : null;
     if (verificacao) form.appendChild(verificacao);
     form.appendChild(acoes());
     app.appendChild(form);
@@ -660,7 +545,6 @@
     estado.dados = N.estadoInicial(estado.formulario);
     estado.etapa = 1;
     estado.inicio = null;
-    estado.ultimoCep = '';
     estado.migrar = false;
     render();
     focarTitulo();
@@ -696,11 +580,12 @@
     var marcado = mesmaEdicao && guardado.migrar === f.edicao;
     if (guardado && guardado.dados && (mesmaVersao || marcado)) {
       // O-1: vindo de outra versão, a autorização volta desmarcada.
+      // Rascunho da página anterior: Instagram e endereço ficam de fora
+      // (mesclarDados só aproveita o que o estado de hoje tem).
       estado.dados = mesmaVersao ? N.mesclarDados(N.estadoInicial(f), guardado.dados) : N.migrarDados(f, guardado.dados);
-      // M-6: rascunho corrompido (ex.: etapa 2.5, de uma gravação parcial ou
-      // formato antigo) nunca pode virar uma etapa fora de 1..4 nem quebrar
-      // com um número quebrado.
-      var salva = Math.min(Math.max(1, Math.trunc(Number(guardado.etapa)) || 1), 4);
+      // M-6: etapa inteira entre 1 e a última visível — a da página anterior
+      // pode ser a 4 (a do endereço, que saiu): volta na última (a 3).
+      var salva = N.limitarEtapa(guardado.etapa, f);
       // N-2: migrado abre na primeira etapa com erro, se ela vier antes da salva.
       estado.etapa = mesmaVersao ? salva : Math.min(salva, N.primeiraEtapaComErro(estado.dados, f, salva));
       estado.inicio = Number(guardado.inicio) || null;

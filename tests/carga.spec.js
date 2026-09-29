@@ -37,7 +37,7 @@ test.describe('carga do formulário', () => {
       await conferirTelaDeFalha(page);
       await page.unroute(`**/credenciamento/${arquivo}`);
       await page.getByRole('button', { name: 'Tentar de novo' }).click();
-      await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+      await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
     });
   }
 
@@ -64,7 +64,7 @@ test.describe('carga do formulário', () => {
       await prepararRotas(page, { formularioResposta: resposta });
       await page.goto(URL_TESTE);
       await expect(page.getByText(FALHA_CARGA)).toBeVisible();
-      await expect(page.getByText(/Etapa \d de 4/)).toHaveCount(0);
+      await expect(page.getByText(/Etapa \d de \d/)).toHaveCount(0);
     });
   }
 
@@ -91,7 +91,7 @@ test.describe('carga do formulário', () => {
     await expect(page.getByText('Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.')).toBeVisible();
     expect(tentativas).toBe(2); // 1ª tentativa + 1 retentativa automática, sem ação da pessoa
     await page.getByRole('button', { name: 'Tentar de novo' }).click();
-    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
   });
 
   test('servidor com uma falha passageira (5xx) na carga se recupera sozinho, sem mostrar erro', async ({ page }) => {
@@ -102,7 +102,7 @@ test.describe('carga do formulário', () => {
       return tentativas === 1 ? r.fulfill({ status: 503, json: {} }) : r.fulfill({ json: formulario });
     });
     await page.goto(URL_TESTE);
-    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
     await expect(page.getByText('Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.')).toHaveCount(0);
     expect(tentativas).toBe(2);
   });
@@ -115,7 +115,7 @@ test.describe('carga do formulário', () => {
       return tentativas === 1 ? r.abort('failed') : r.fulfill({ json: formulario });
     });
     await page.goto(URL_TESTE);
-    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
     expect(tentativas).toBe(2);
   });
 
@@ -132,7 +132,7 @@ test.describe('carga do formulário', () => {
       return r.fulfill({ json: formulario });
     });
     await page.goto(URL_TESTE);
-    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
     expect(tentativas).toBe(2);
   });
 
@@ -187,7 +187,7 @@ test.describe('carga resiliente do formulário (relógio falso)', () => {
     await page.goto(URL_TESTE);
     await page.clock.fastForward(30_000);
     liberar();
-    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
     await expect(page.getByText(FALHA_CARGA)).toHaveCount(0);
     expect(tentativas).toBe(1); // não precisou de retentativa
   });
@@ -215,7 +215,7 @@ test.describe('carga resiliente do formulário (relógio falso)', () => {
       await page.clock.fastForward(44_000); // ainda dentro do prazo: nenhuma retentativa disparou
       expect(tentativas).toBe(1);
       await page.clock.fastForward(4_000); // passa dos 45 s + a pausa de 1,5 s antes da retentativa
-      await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+      await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
       await expect(page.getByText(FALHA_CARGA)).toHaveCount(0);
       expect(tentativas).toBe(2);
     } finally {
@@ -266,7 +266,7 @@ test.describe('carga resiliente do formulário (relógio falso)', () => {
     await page.clock.fastForward(8_001);
     await expect(regiao).toHaveText(MENSAGEM_ESPERA);
     liberar();
-    await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+    await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
     await expect(regiaoDeEspera(page)).toHaveCount(0);
   });
 

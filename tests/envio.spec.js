@@ -1,15 +1,17 @@
 // tests/envio.spec.js
 import { expect, test } from '@playwright/test';
-import { avancarRelogio, exemplo, formulario, prepararRotas, preencherTudo, SUCESSO, URL_TESTE } from './ajudantes.js';
+import { avancarRelogio, campoEmail, exemplo, formulario, preencherTudo, prepararRotas, SUCESSO, URL_TESTE } from './ajudantes.js';
 
 const confirmar = (page) => page.getByRole('button', { name: 'Confirmar meu credenciamento' }).click();
+// Campo de texto da etapa 3 (a última): serve para conferir que o rascunho volta inteiro.
+const motivacao = (page) => page.locator('[data-pergunta="motivacao"]').getByRole('textbox');
 
 test('CONTRATO: o envio é idêntico ao exemplo oficial do servidor', async ({ page }) => {
   const enviados = await prepararRotas(page);
   await page.goto(URL_TESTE);
   await preencherTudo(page, exemplo);
   await confirmar(page);
-  await expect(page.getByRole('heading', { name: '✅ Credenciamento confirmado, Ana!' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Credenciamento confirmado, Ana!', exact: true })).toBeVisible();
   expect(enviados).toHaveLength(1);
   const { tempoPreenchimentoS, ...recebido } = enviados[0];
   const { tempoPreenchimentoS: _ignorado, ...esperado } = exemplo;
@@ -142,7 +144,7 @@ test('erro do servidor em campo de outra etapa leva à etapa certa', async ({ pa
   await page.goto(URL_TESTE);
   await preencherTudo(page, exemplo);
   await confirmar(page);
-  await expect(page.getByText('Etapa 2 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 2 de 3')).toBeVisible();
   await expect(page.locator('#erro-respostas-idade')).toHaveText('Escolha uma opção.');
 });
 
@@ -157,7 +159,7 @@ test('erro de "corpo" (sem campo na tela) aparece no aviso geral, sem travar', a
   await page.goto(URL_TESTE);
   await preencherTudo(page, exemplo);
   await confirmar(page);
-  await expect(page.getByText('Etapa 4 de 4')).toBeVisible(); // não navegou para lugar nenhum
+  await expect(page.getByText('Etapa 3 de 3')).toBeVisible(); // não navegou para lugar nenhum
   await expect(page.getByText('Valor inválido.')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Fale com o suporte' })).toBeVisible();
   await expect(page.locator('#aviso-envio')).toBeFocused();
@@ -190,7 +192,7 @@ test('erro 400 com chave desconhecida: só o erro do e-mail aparece e nada é in
   await page.goto(URL_TESTE);
   await preencherTudo(page, exemplo);
   await confirmar(page);
-  await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
   await expect(page.locator('#erro-email')).toHaveText('E-mail inválido');
   await expect(page.locator('#aviso-envio')).toHaveText('Revise os campos destacados.'); // nada das chaves desconhecidas
   expect(await page.locator('#app img').count()).toBe(0);
@@ -209,7 +211,7 @@ test('erro 400 só com chaves desconhecidas: aviso geral com o suporte, sem sair
   await expect(page.locator('#aviso-envio')).not.toContainText('Campo desconhecido.');
   await expect(page.getByRole('link', { name: 'Fale com o suporte' })).toBeVisible();
   await expect(page.locator('#aviso-envio')).toBeFocused();
-  await expect(page.getByText('Etapa 4 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 3 de 3')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Confirmar meu credenciamento' })).toBeEnabled();
 });
 
@@ -258,9 +260,9 @@ test('409: busca o formulário atualizado sem recarregar e mantém o que ainda �
   await confirmar(page);
   await expect(page.getByText('O formulário foi atualizado. Confira as respostas e envie de novo.')).toBeVisible();
   await expect(page.locator('#aviso-envio')).toBeFocused();
-  await expect(page.getByText('Etapa 1 de 4')).toBeVisible(); // genero (obrigatório) ficou sem resposta válida
+  await expect(page.getByText('Etapa 1 de 3')).toBeVisible(); // genero (obrigatório) ficou sem resposta válida
   await expect(page.locator('#erro-respostas-genero')).toHaveText('Escolha uma opção.');
-  await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue(exemplo.email);
+  await expect(campoEmail(page)).toHaveValue(exemplo.email);
   await expect(page.getByLabel('Nome completo')).toHaveValue(exemplo.nome);
   const rascunho = JSON.parse((await page.evaluate(() => localStorage.getItem('wpdp-credenciamento-ed8-rascunho'))) ?? '{}');
   expect(rascunho.versao).toBe('ed8-v2');
@@ -365,14 +367,14 @@ test('409 → busca atualizada falha → "Recarregar a página" com o servidor j
   expect(await lerRascunho(page)).toMatchObject({ edicao: 'ed8', versao: 'ed8-v1', migrar: 'ed8' });
   await recarregarPeloBotao(page);
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
-  await expect(page.getByText('Etapa 1 de 4')).toBeVisible(); // N-2: "genero" ficou sem resposta válida na v2
-  await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue(exemplo.email);
+  await expect(page.getByText('Etapa 1 de 3')).toBeVisible(); // N-2: "genero" ficou sem resposta válida na v2
+  await expect(campoEmail(page)).toHaveValue(exemplo.email);
   await expect(page.getByLabel('Nome completo')).toHaveValue(exemplo.nome);
   await expect(page.locator('[data-pergunta="acesso_evento"]').getByRole('radio', { name: exemplo.respostas.acesso_evento.opcao, exact: true })).toBeChecked();
   await expect(page.locator('[data-pergunta="genero"] input:checked')).toHaveCount(0); // "Feminino" não existe na v2
   const rascunho = await lerRascunho(page);
   expect(rascunho).toMatchObject({ edicao: 'ed8', versao: 'ed8-v2', migrar: 'ed8' }); // regravado na versão nova; marcador fica
-  expect(rascunho.dados.endereco.numero).toBe(exemplo.endereco.numero);
+  expect(rascunho.dados.respostas.motivacao).toBe(exemplo.respostas.motivacao);
 });
 
 test('409 recuperado para a v2 e a recarga ainda recebe a v1 (cache da CDN): nada se perde', async ({ page }) => {
@@ -385,7 +387,7 @@ test('409 recuperado para a v2 e a recarga ainda recebe a v1 (cache da CDN): nad
   expect(await lerRascunho(page)).toMatchObject({ versao: 'ed8-v2', migrar: 'ed8' });
   await page.reload();
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
-  await expect(page.getByLabel('Número')).toHaveValue(exemplo.endereco.numero);
+  await expect(motivacao(page)).toHaveValue(exemplo.respostas.motivacao);
   const rascunho = await lerRascunho(page);
   expect(rascunho).toMatchObject({ versao: 'ed8-v1', migrar: 'ed8' });
   expect(rascunho.dados.email).toBe(exemplo.email);
@@ -405,7 +407,7 @@ test('409 recuperado para a v2, recarga na v1 e de novo na v2: as respostas cont
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
   await page.reload(); // v2 de novo
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
-  await expect(page.getByLabel('Número')).toHaveValue(exemplo.endereco.numero);
+  await expect(motivacao(page)).toHaveValue(exemplo.respostas.motivacao);
   const rascunho = await lerRascunho(page);
   expect(rascunho).toMatchObject({ versao: 'ed8-v2', migrar: 'ed8' });
   expect(rascunho.dados.email).toBe(exemplo.email);
@@ -420,11 +422,11 @@ test('409 → busca falha → recarga ainda na v1 (CDN) guarda o marcador até a
   await confirmar(page);
   await recarregarPeloBotao(page);
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
-  await page.getByLabel('Complemento (opcional)').fill('ap 13');
-  await expect.poll(() => lerRascunho(page)).toMatchObject({ versao: 'ed8-v1', migrar: 'ed8', dados: { endereco: { complemento: 'ap 13' } } });
+  await motivacao(page).fill('Outra motivação');
+  await expect.poll(() => lerRascunho(page)).toMatchObject({ versao: 'ed8-v1', migrar: 'ed8', dados: { respostas: { motivacao: 'Outra motivação' } } });
   await page.reload();
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
-  await expect(page.getByLabel('Complemento (opcional)')).toHaveValue('ap 13');
+  await expect(motivacao(page)).toHaveValue('Outra motivação');
   const rascunho = await lerRascunho(page);
   expect(rascunho).toMatchObject({ versao: 'ed8-v2', migrar: 'ed8' });
   expect(rascunho.dados.email).toBe(exemplo.email);
@@ -441,9 +443,9 @@ test('rascunho marcado de outra edição é descartado', async ({ page }) => {
   await confirmar(page);
   await expect(page.getByText('O formulário foi atualizado. Confira as respostas e envie de novo.')).toBeVisible();
   await page.reload(); // o servidor já está na ed9
-  await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
   await expect(page.getByText('Continuamos de onde você parou.')).toHaveCount(0);
-  await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue('');
+  await expect(campoEmail(page)).toHaveValue('');
   expect(await lerRascunho(page)).toBeNull();
 });
 
@@ -457,7 +459,7 @@ test('rascunho de outra edição com a mesma versão de formulário é descartad
   await page.getByLabel('Nome completo').fill('Ana Souza');
   await expect.poll(() => lerRascunho(page)).toMatchObject({ versao: 'ed8-v1', dados: { nome: 'Ana Souza' } });
   await page.reload(); // ed9 com a versão de formulário "ed8-v1"
-  await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
   await expect(page.getByText('Continuamos de onde você parou.')).toHaveCount(0);
   await expect(page.getByLabel('Nome completo')).toHaveValue('');
 });
@@ -473,9 +475,9 @@ test('409 com o servidor já em outra edição não leva as respostas para lá',
   await expect(page.getByRole('button', { name: 'Recarregar a página' })).toBeVisible();
   await expect(page.getByText('O formulário foi atualizado. Confira as respostas e envie de novo.')).toHaveCount(0);
   await recarregarPeloBotao(page);
-  await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
   await expect(page.getByText('Continuamos de onde você parou.')).toHaveCount(0);
-  await expect(page.getByLabel('E-mail (use o mesmo da compra)')).toHaveValue('');
+  await expect(campoEmail(page)).toHaveValue('');
   expect(enviados).toHaveLength(1);
 });
 
@@ -488,7 +490,7 @@ test('409 recuperado para outra versão pede a autorização de novo', async ({ 
   await preencherTudo(page, exemplo);
   await confirmar(page);
   await expect(page.getByText('O formulário foi atualizado. Confira as respostas e envie de novo.')).toBeVisible();
-  await expect(page.getByText('Etapa 4 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 3 de 3')).toBeVisible();
   await expect(autorizacao(page)).not.toBeChecked();
   await expect(page.locator('#erro-consentimento')).toHaveText('Para concluir, marque a autorização.');
   expect((await lerRascunho(page)).dados.consentimento).toBe(false);
@@ -507,7 +509,7 @@ test('rascunho migrado de outra versão volta com a autorização desmarcada', a
   await confirmar(page);
   await recarregarPeloBotao(page);
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
-  await expect(page.getByText('Etapa 4 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 3 de 3')).toBeVisible();
   await expect(autorizacao(page)).not.toBeChecked();
   expect(await lerRascunho(page)).toMatchObject({ versao: 'ed8-v2', dados: { consentimento: false } });
 });
@@ -523,7 +525,7 @@ test('rascunho migrado abre na primeira etapa que ficou com erro', async ({ page
   await confirmar(page);
   await recarregarPeloBotao(page);
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
-  await expect(page.getByText('Etapa 2 de 4')).toBeVisible(); // "idade" mudou de opções na v2
+  await expect(page.getByText('Etapa 2 de 3')).toBeVisible(); // "idade" mudou de opções na v2
   await expect(page.locator('[data-pergunta="idade"] input:checked')).toHaveCount(0);
   await expect(page.locator('[data-pergunta="formacao"]').getByRole('radio', { name: exemplo.respostas.formacao.opcao, exact: true })).toBeChecked();
 });
@@ -536,12 +538,11 @@ test('rascunho migrado abre na etapa salva quando nada antes dela ficou inválid
   await confirmar(page);
   await expect(page.getByRole('button', { name: 'Recarregar a página' })).toBeVisible();
   await page.getByRole('button', { name: 'Voltar' }).click();
-  await page.getByRole('button', { name: 'Voltar' }).click();
-  await expect(page.getByText('Etapa 2 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 2 de 3')).toBeVisible();
   await expect.poll(() => lerRascunho(page)).toMatchObject({ etapa: 2 });
   await page.reload();
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
-  await expect(page.getByText('Etapa 2 de 4')).toBeVisible(); // nem volta à 1, nem pula para a 4 (autorização desmarcada)
+  await expect(page.getByText('Etapa 2 de 3')).toBeVisible(); // nem volta à 1, nem pula para a 3 (autorização desmarcada)
 });
 
 // C4 (fixa o que já está certo): "Começar do zero" tira o marcador — depois
@@ -560,7 +561,7 @@ test('"Começar do zero" tira o marcador: recarga em outra versão descarta o ra
   await expect.poll(() => lerRascunho(page)).toMatchObject({ versao: 'ed8-v1', dados: { nome: 'Bia Lima' } });
   expect(await lerRascunho(page)).not.toHaveProperty('migrar');
   await page.reload(); // já na v2
-  await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 1 de 3')).toBeVisible();
   await expect(page.getByText('Continuamos de onde você parou.')).toHaveCount(0);
   await expect(page.getByLabel('Nome completo')).toHaveValue('');
 });
@@ -570,11 +571,11 @@ test('"Começar do zero" tira o marcador: recarga em outra versão descarta o ra
 test('recarga da mesma versão mantém a autorização marcada', async ({ page }) => {
   await prepararRotas(page);
   await page.goto(URL_TESTE);
-  await preencherTudo(page, exemplo); // termina na etapa 4 com a autorização marcada
-  await expect.poll(() => lerRascunho(page)).toMatchObject({ etapa: 4, dados: { consentimento: true } });
+  await preencherTudo(page, exemplo); // termina na etapa 3 (a última) com a autorização marcada
+  await expect.poll(() => lerRascunho(page)).toMatchObject({ etapa: 3, dados: { consentimento: true } });
   await page.reload();
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
-  await expect(page.getByText('Etapa 4 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 3 de 3')).toBeVisible();
   await expect(autorizacao(page)).toBeChecked();
 });
 
@@ -651,7 +652,7 @@ test('sem primeiro nome válido, o título do sucesso fica só "Credenciamento c
   await page.goto(URL_TESTE);
   await preencherTudo(page, exemplo);
   await confirmar(page);
-  await expect(page.locator('#titulo-sucesso')).toHaveText('✅ Credenciamento confirmado!');
+  await expect(page.locator('#titulo-sucesso')).toHaveText('Credenciamento confirmado!');
 });
 
 // Fix "página espera o servidor acordar": o prazo da carga do formulário
@@ -691,7 +692,7 @@ test('falha de rede: mensagem e nada se perde', async ({ page }) => {
   await preencherTudo(page, exemplo);
   await confirmar(page);
   await expect(page.getByText('Não conseguimos registrar agora. Suas respostas estão salvas neste aparelho; tente de novo em instantes.')).toBeVisible();
-  await expect(page.getByLabel('Número')).toHaveValue('1000');
+  await expect(motivacao(page)).toHaveValue(exemplo.respostas.motivacao);
   await expect(page.getByRole('button', { name: 'Confirmar meu credenciamento' })).toBeEnabled();
   await expect(page.locator('#aviso-envio')).toBeFocused(); // M-3
 });
@@ -770,5 +771,5 @@ test('nenhum dado pessoal vai para o dataLayer', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /Credenciamento confirmado/ })).toBeVisible();
   const camada = await page.evaluate(() => JSON.stringify(window.dataLayer));
   expect(camada).toContain('credenciamento_enviado');
-  for (const pessoal of ['ana.souza', 'Ana Souza', '91234', 'Paulista', 'anasouza']) expect(camada).not.toContain(pessoal);
+  for (const pessoal of ['ana.souza', 'Ana Souza', '91234', 'Indicação de uma colega']) expect(camada).not.toContain(pessoal);
 });
