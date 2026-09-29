@@ -203,10 +203,10 @@
         ativa: function () {
           return chave !== null;
         },
-        /** Etapa 4 desenhada: carrega o script (uma vez só) e põe um widget novo em `elemento`. */
+        /** Última etapa desenhada: carrega o script (uma vez só) e põe um widget novo em `elemento`. */
         montar: function (elemento) {
           if (chave === null) return;
-          remover(); // o widget anterior ficou na etapa 4 que já saiu da tela
+          remover(); // o widget anterior ficou na última etapa, que já saiu da tela
           caixa = elemento;
           dica = criarDica(elemento);
           if (script === 'pronto') desenhar();

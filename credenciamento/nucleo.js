@@ -1,20 +1,24 @@
 // credenciamento/nucleo.js
 // Regras sem tela da página de credenciamento: servidor, canal, preenchimento
-// pelo "#", rascunho, máscaras, corretor de e-mail, validação e montagem do envio.
+// pelo "#", rascunho, etapas visíveis, máscara, corretor de e-mail, validação
+// e montagem do envio.
 // Regras e mensagens espelham o servidor (dashboard: src/lib/credenciamento/validar.ts).
+// Decisão do dono (29/09/2026): sem endereço e sem Instagram — o servidor
+// ainda manda a 4ª etapa (sem perguntas; era a do endereço) e os textos
+// antigos durante a transição, mas a página só mostra as etapas que têm
+// perguntas e nunca pede nem manda Instagram ou endereço.
 (function () {
   'use strict';
 
   var PRODUCAO = 'https://dashboard.rodrigorosar.com.br';
   var CHAVE_RASCUNHO = 'wpdp-credenciamento-ed8-rascunho';
   var OUTRO = '__outro__';
-  var UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
   var DOMINIOS = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com.br', 'yahoo.com', 'icloud.com', 'live.com', 'uol.com.br', 'bol.com.br', 'terra.com.br'];
   var CHAVES_CANAL = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+  var CONTATOS = ['email', 'nome', 'whatsapp'];
   // C2: mesma gramática do servidor — "valid e-mail address" do WHATWG com
   // pelo menos um ponto no domínio (2+ rótulos), aplicada já em minúsculas.
   var EMAIL = /^[a-z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/;
-  var HANDLE = /^[a-z0-9._]{1,30}$/;
   var LOCAL = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
   var MENSAGENS = {
     obrigatorio: 'Preencha este campo.',
@@ -24,11 +28,7 @@
     longo: 'Texto muito longo.',
     email: 'Confira o e-mail: parece que falta algo.',
     whatsapp: 'Informe o WhatsApp com DDD.',
-    instagram: 'Use só letras, números, ponto e _ no @.',
-    cep: 'Informe um CEP com 8 números.',
-    uf: 'Escolha o estado.',
     consentimento: 'Para concluir, marque a autorização.',
-    cepNaoEncontrado: 'CEP não encontrado. Preencha o endereço manualmente.',
     falhaEnvio: 'Não conseguimos registrar agora. Suas respostas estão salvas neste aparelho; tente de novo em instantes.',
   };
 
@@ -100,14 +100,48 @@
     }
   }
 
+  function temPerguntas(etapa) {
+    return etapa.perguntas.length > 0;
+  }
+
   /**
-   * Formato mínimo do cardápio vindo do servidor: 4 etapas e edição/versão
-   * como texto não vazio (C4). Sem edição, `undefined === undefined` faria
+   * Etapas que aparecem na tela: só as que têm perguntas, na ordem do
+   * servidor. A tela numera por posição aqui (1, 2, 3…), não pelo "numero"
+   * do servidor — hoje dá no mesmo, porque a etapa sem perguntas é a última.
+   */
+  function etapasVisiveis(formulario) {
+    return formulario.etapas.filter(temPerguntas);
+  }
+
+  function totalEtapas(formulario) {
+    return etapasVisiveis(formulario).length;
+  }
+
+  /**
+   * Etapa salva (rascunho, 409) sempre vira uma etapa que existe: inteira,
+   * entre 1 e a última visível. Rascunho da página anterior pode estar na
+   * etapa 4 (a do endereço, que saiu) — volta na última; gravação parcial ou
+   * formato antigo (ex.: 2.5, texto) nunca quebram a página (M-6).
+   */
+  function limitarEtapa(valor, formulario) {
+    var n = Math.trunc(Number(valor)) || 1;
+    return Math.min(Math.max(1, n), totalEtapas(formulario));
+  }
+
+  /**
+   * Formato mínimo do cardápio vindo do servidor: edição/versão como texto
+   * não vazio (C4) e etapas com a lista de perguntas, com pelo menos uma
+   * etapa que tenha perguntas. Sem edição, `undefined === undefined` faria
    * todo rascunho sem edição parecer "da mesma edição" e reabriria a mescla.
+   * Hoje o servidor manda 4 etapas (a 4ª sem perguntas); 3 também valem.
    */
   function formularioValido(f) {
     var textoCheio = function (v) { return typeof v === 'string' && v !== ''; };
-    return !!f && textoCheio(f.edicao) && textoCheio(f.versao) && Array.isArray(f.etapas) && f.etapas.length === 4;
+    var etapaValida = function (e) { return !!e && Array.isArray(e.perguntas); };
+    return (
+      !!f && textoCheio(f.edicao) && textoCheio(f.versao) &&
+      Array.isArray(f.etapas) && f.etapas.length > 0 && f.etapas.every(etapaValida) && f.etapas.some(temPerguntas)
+    );
   }
 
   function perguntasDe(formulario) {
@@ -136,9 +170,6 @@
       email: '',
       nome: '',
       whatsapp: '',
-      instagram: '',
-      semInstagram: false,
-      endereco: { moraExterior: false, cep: '', logradouro: '', numero: '', complemento: '', bairro: '', cidade: '', uf: '', pais: '', enderecoCompleto: '' },
       respostas: respostas,
       consentimento: false,
     };
@@ -203,6 +234,11 @@
     return base !== null && typeof base === 'object' && 'marcadas' in base ? ajustarCaixas(salvo, regra) : salvo;
   }
 
+  /**
+   * Rascunho → estado atual, campo a campo. Só entra o que o estado de hoje
+   * tem: Instagram e endereço de um rascunho da página anterior ficam de
+   * fora (não voltam, não vão no envio, não são regravados).
+   */
   function mesclarDados(base, salvo) {
     if (!salvo || typeof salvo !== 'object') return base;
     var regrasPorPergunta = base._regrasPorPergunta || {};
@@ -211,18 +247,10 @@
       var s = salvo.respostas ? salvo.respostas[id] : undefined;
       respostas[id] = aproveitarResposta(base.respostas[id], s, regrasPorPergunta[id]);
     });
-    var endereco = {};
-    Object.keys(base.endereco).forEach(function (k) {
-      var s = salvo.endereco ? salvo.endereco[k] : undefined;
-      endereco[k] = typeof base.endereco[k] === 'boolean' ? s === true : typeof s === 'string' ? s : base.endereco[k];
-    });
     return {
       email: texto(salvo.email),
       nome: texto(salvo.nome),
       whatsapp: texto(salvo.whatsapp),
-      instagram: texto(salvo.instagram),
-      semInstagram: salvo.semInstagram === true,
-      endereco: endereco,
       respostas: respostas,
       consentimento: salvo.consentimento === true,
     };
@@ -287,31 +315,11 @@
     return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
   }
 
-  function mascaraCep(valor) {
-    var d = texto(valor).replace(/\D/g, '').slice(0, 8);
-    return d.length > 5 ? d.slice(0, 5) + '-' + d.slice(5) : d;
-  }
-
   function entre(valor, min, max) {
     var t = texto(valor).trim();
     if (t.length < min) return MENSAGENS.obrigatorio;
     if (t.length > max) return MENSAGENS.longo;
     return null;
-  }
-
-  function normalizarInstagram(valor) {
-    var bruto = texto(valor).trim().replace(/\s+/g, ' ');
-    var url = bruto.match(/instagram\.com\/([^/?#\s]+)/i);
-    if (url) {
-      // M-7: espelho do servidor (normalizar.ts) — link de post, reel,
-      // stories, explore ou tv não é perfil; mesma expressão de lá.
-      if (/^(p|reel|reels|stories|explore|tv)($|\/)/.test(url[1])) return null;
-      bruto = url[1];
-    }
-    bruto = bruto.replace(/^@+/, '').toLowerCase();
-    if (!HANDLE.test(bruto)) return null;
-    if (bruto.charAt(0) === '.' || bruto.charAt(bruto.length - 1) === '.' || bruto.indexOf('..') >= 0) return null;
-    return bruto;
   }
 
   function validarContato(chave, d) {
@@ -320,16 +328,8 @@
       return e.length <= 254 && EMAIL.test(e) ? null : MENSAGENS.email;
     }
     if (chave === 'nome') return entre(d.nome, 3, 120);
-    if (chave === 'whatsapp') {
-      var n = texto(d.whatsapp).replace(/\D/g, '').length;
-      return n >= 10 && n <= 15 ? null : MENSAGENS.whatsapp;
-    }
-    if (chave === 'instagram') {
-      if (d.semInstagram) return null;
-      if (!texto(d.instagram).trim()) return MENSAGENS.obrigatorio;
-      return normalizarInstagram(d.instagram) ? null : MENSAGENS.instagram;
-    }
-    return null;
+    var n = texto(d.whatsapp).replace(/\D/g, '').length;
+    return n >= 10 && n <= 15 ? null : MENSAGENS.whatsapp;
   }
 
   function validarPergunta(p, r) {
@@ -358,54 +358,50 @@
     return ot.length > 200 ? MENSAGENS.longo : null;
   }
 
+  /**
+   * Erros da etapa visível `n` (1 = primeira): os contatos ficam na
+   * primeira, as perguntas em cada uma e a autorização no fim da última.
+   */
   function errosDaEtapa(n, d, formulario) {
     var erros = {};
     function anotar(chave, mensagem) {
       if (mensagem) erros[chave] = mensagem;
     }
     if (n === 1) {
-      ['email', 'nome', 'whatsapp', 'instagram'].forEach(function (c) {
+      CONTATOS.forEach(function (c) {
         anotar(c, validarContato(c, d));
       });
     }
-    var etapa = formulario.etapas[n - 1];
+    var etapa = etapasVisiveis(formulario)[n - 1];
     (etapa ? etapa.perguntas : []).forEach(function (p) {
       anotar('respostas.' + p.id, validarPergunta(p, d.respostas[p.id]));
     });
-    if (n === 4) {
-      var e = d.endereco;
-      if (e.moraExterior) {
-        anotar('endereco.pais', entre(e.pais, 2, 60));
-        anotar('endereco.enderecoCompleto', entre(e.enderecoCompleto, 10, 500));
-      } else {
-        anotar('endereco.cep', texto(e.cep).replace(/\D/g, '').length === 8 ? null : MENSAGENS.cep);
-        anotar('endereco.logradouro', entre(e.logradouro, 2, 200));
-        anotar('endereco.numero', entre(e.numero, 1, 20));
-        anotar('endereco.complemento', texto(e.complemento).trim().length > 100 ? MENSAGENS.longo : null);
-        anotar('endereco.bairro', entre(e.bairro, 2, 100));
-        anotar('endereco.cidade', entre(e.cidade, 2, 100));
-        anotar('endereco.uf', UFS.indexOf(e.uf) >= 0 ? null : MENSAGENS.uf);
-      }
+    if (n === totalEtapas(formulario)) {
       anotar('consentimento', d.consentimento === true ? null : MENSAGENS.consentimento);
     }
     return erros;
   }
 
-  /** Primeira etapa (1 a 4) com erro; se nenhuma tem erro, `atual` (409 e rascunho migrado, N-2). */
+  /**
+   * Primeira etapa visível com erro; se nenhuma tem erro, `atual` (409 e
+   * rascunho migrado, N-2) — já limitada às etapas que existem.
+   */
   function primeiraEtapaComErro(dados, formulario, atual) {
-    for (var n = 1; n <= 4; n++) {
+    var total = totalEtapas(formulario);
+    for (var n = 1; n <= total; n++) {
       if (Object.keys(errosDaEtapa(n, dados, formulario)).length) return n;
     }
-    return atual;
+    return limitarEtapa(atual, formulario);
   }
 
   function etapaDoCampo(chave, formulario) {
-    if (chave.indexOf('endereco') === 0 || chave === 'consentimento') return 4;
+    if (chave === 'consentimento') return totalEtapas(formulario);
     if (chave.indexOf('respostas.') === 0) {
       var id = chave.slice('respostas.'.length);
-      for (var i = 0; i < formulario.etapas.length; i++) {
-        var achou = formulario.etapas[i].perguntas.some(function (p) { return p.id === id; });
-        if (achou) return formulario.etapas[i].numero;
+      var visiveis = etapasVisiveis(formulario);
+      for (var i = 0; i < visiveis.length; i++) {
+        var achou = visiveis[i].perguntas.some(function (p) { return p.id === id; });
+        if (achou) return i + 1;
       }
     }
     return 1;
@@ -437,8 +433,8 @@
     return saida;
   }
 
+  /** Corpo do POST: sem Instagram e sem endereço (o servidor aceita sem as duas coisas). */
   function montarEnvio(formulario, d, canal, inicioMs, agoraMs, honeypot) {
-    var e = d.endereco;
     var duracaoS = Math.round((agoraMs - inicioMs) / 1000);
     return {
       edicao: formulario.edicao,
@@ -446,20 +442,6 @@
       email: texto(d.email).trim(),
       nome: texto(d.nome).trim(),
       whatsapp: texto(d.whatsapp).trim(),
-      instagram: d.semInstagram ? null : texto(d.instagram).trim(),
-      semInstagram: d.semInstagram === true,
-      endereco: e.moraExterior
-        ? { moraExterior: true, pais: texto(e.pais).trim(), enderecoCompleto: texto(e.enderecoCompleto).trim() }
-        : {
-            moraExterior: false,
-            cep: texto(e.cep).trim(),
-            logradouro: texto(e.logradouro).trim(),
-            numero: texto(e.numero).trim(),
-            complemento: texto(e.complemento).trim(),
-            bairro: texto(e.bairro).trim(),
-            cidade: texto(e.cidade).trim(),
-            uf: texto(e.uf).trim(),
-          },
       respostas: montarRespostas(formulario, d.respostas),
       consentimento: d.consentimento === true,
       canal: canal,
@@ -470,7 +452,6 @@
 
   window.CredNucleo = Object.freeze({
     OUTRO: OUTRO,
-    UFS: UFS,
     MENSAGENS: MENSAGENS,
     apiBase: apiBase,
     lerCanal: lerCanal,
@@ -480,6 +461,9 @@
     salvarRascunho: salvarRascunho,
     apagarRascunho: apagarRascunho,
     formularioValido: formularioValido,
+    etapasVisiveis: etapasVisiveis,
+    totalEtapas: totalEtapas,
+    limitarEtapa: limitarEtapa,
     estadoInicial: estadoInicial,
     definir: definir,
     obter: obter,
@@ -487,7 +471,6 @@
     migrarDados: migrarDados,
     sugerirEmail: sugerirEmail,
     mascaraWhatsapp: mascaraWhatsapp,
-    mascaraCep: mascaraCep,
     validarPergunta: validarPergunta,
     errosDaEtapa: errosDaEtapa,
     primeiraEtapaComErro: primeiraEtapaComErro,

@@ -82,7 +82,7 @@ test('tela estreita (320 px): widget compacto, que cabe na caixa', async ({ page
   expect(r.renders[0].size).toBe('compact');
 });
 
-test('o script do Turnstile só carrega na etapa 4, uma vez só', async ({ page }) => {
+test('o script do Turnstile só carrega na última etapa (a 3), uma vez só', async ({ page }) => {
   const pedidos = vigiarTurnstile(page);
   await prepararRotas(page, { formularioResposta: COM_CHAVE });
   await servirTurnstile(page);
@@ -90,15 +90,14 @@ test('o script do Turnstile só carrega na etapa 4, uma vez só', async ({ page 
   await preencherEtapa1(page, exemplo);
   await avancar(page);
   await responderEtapa(page, 2, exemplo.respostas);
+  expect(pedidos).toEqual([]); // nada nas etapas 1 e 2
   await avancar(page);
-  await responderEtapa(page, 3, exemplo.respostas);
-  expect(pedidos).toEqual([]); // nada nas etapas 1 a 3
-  await avancar(page);
+  await expect(page.getByText('Etapa 3 de 3')).toBeVisible();
   await expect.poll(() => renders(page)).toBe(1);
   await page.getByRole('button', { name: 'Voltar' }).click();
-  await expect(page.getByText('Etapa 3 de 4')).toBeVisible();
+  await expect(page.getByText('Etapa 2 de 3')).toBeVisible();
   await avancar(page);
-  await expect.poll(() => renders(page)).toBe(2); // widget novo na etapa 4 redesenhada...
+  await expect.poll(() => renders(page)).toBe(2); // widget novo na etapa 3 redesenhada...
   expect(pedidos).toHaveLength(1); // ...sem pedir o script de novo
   expect((await registro(page)).removes).toEqual(['w1']); // e o antigo sai
 });
@@ -216,8 +215,8 @@ test('durante a espera do anti-robô, campos e "Começar do zero" ficam travados
   await servirTurnstile(page, { interativo: true });
   await page.goto(URL_TESTE);
   await preencherTudo(page, exemplo);
-  await expect.poll(() => lerRascunho(page)).toMatchObject({ etapa: 4, dados: { consentimento: true } });
-  await page.reload(); // rascunho na etapa 4: aparece "Começar do zero"
+  await expect.poll(() => lerRascunho(page)).toMatchObject({ etapa: 3, dados: { consentimento: true } });
+  await page.reload(); // rascunho na etapa 3: aparece "Começar do zero"
   await expect(page.getByText('Continuamos de onde você parou.')).toBeVisible();
   await expect.poll(() => renders(page)).toBe(1);
   await confirmar(page);
@@ -261,18 +260,19 @@ test('antes do POST valida de novo: o que ficou inválido na espera não é envi
 
 // Item 1 (proteção da ordem trava/destrava): erro 400 de campo da mesma etapa
 // precisa do formulário já destravado para o foco chegar ao campo.
-test('erro 400 de um campo da etapa 4: foco no campo, com o formulário já destravado', async ({ page }) => {
+test('erro 400 de um campo da última etapa: foco no campo, com o formulário já destravado', async ({ page }) => {
   await prepararRotas(page, {
     formularioResposta: COM_CHAVE,
-    respostasEnvio: [{ status: 400, json: { ok: false, erro: 'Revise os campos destacados.', campos: { 'endereco.numero': 'Informe o número.' } } }],
+    respostasEnvio: [{ status: 400, json: { ok: false, erro: 'Revise os campos destacados.', campos: { 'respostas.motivacao': 'Texto muito longo.' } } }],
   });
   await servirTurnstile(page);
   await page.goto(URL_TESTE);
   await preencherTudo(page, exemplo);
   await confirmar(page);
-  await expect(page.locator('#erro-endereco-numero')).toHaveText('Informe o número.');
-  await expect(page.getByLabel('Número')).toBeFocused();
-  expect(await dentroDeInert(page.getByLabel('Número'))).toBe(false);
+  const motivacao = page.locator('[data-pergunta="motivacao"]').getByRole('textbox');
+  await expect(page.locator('#erro-respostas-motivacao')).toHaveText('Texto muito longo.');
+  await expect(motivacao).toBeFocused();
+  expect(await dentroDeInert(motivacao)).toBe(false);
 });
 
 // Item 2: widget que já falhou ANTES do clique não custa os 5 s de espera.
@@ -336,10 +336,10 @@ test('o token do Turnstile nunca vai para o rascunho nem para o dataLayer', asyn
   await page.goto(URL_TESTE);
   await preencherTudo(page, exemplo);
   await expect.poll(() => renders(page)).toBe(1);
-  await page.getByLabel('Complemento (opcional)').fill('ap 13'); // grava o rascunho com o token já em memória
+  await page.locator('[data-pergunta="motivacao"]').getByRole('textbox').fill('Outra motivação'); // grava o rascunho com o token já em memória
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem('wpdp-credenciamento-ed8-rascunho') || ''))
-    .toContain('ap 13');
+    .toContain('Outra motivação');
   await confirmar(page);
   await expect(page.getByText('Instabilidade momentânea.')).toBeVisible();
   expect(enviados[0].turnstileToken).toBe('tok-1'); // o token existia em memória

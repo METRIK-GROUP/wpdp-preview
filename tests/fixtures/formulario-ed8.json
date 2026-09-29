@@ -409,8 +409,8 @@
   ],
   "campos": {
     "email": {
-      "rotulo": "E-mail (use o mesmo da compra)",
-      "ajuda": "É por ele que vamos te identificar e enviar seu acesso."
+      "rotulo": "E-mail",
+      "ajuda": null
     },
     "nome": {
       "rotulo": "Nome completo"
@@ -427,7 +427,7 @@
       "texto": "Durante o workshop vamos sortear livros e outros prêmios entre os participantes credenciados. Se você for sorteado(a), é para este endereço que enviamos. Ele é usado só para isso.",
       "moraExterior": "Moro fora do Brasil"
     },
-    "consentimento": "Autorizo o Instituto METRIK a usar meus dados para organizar minha participação no workshop, me enviar comunicações sobre ele e, se eu for sorteado(a), enviar o prêmio ao endereço informado."
+    "consentimento": "Autorizo o Instituto METRIK a usar meus dados para organizar minha participação no workshop e me enviar comunicações sobre ele."
   },
   "protecao": {
     "turnstileSiteKey": null
