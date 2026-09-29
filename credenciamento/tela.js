@@ -721,9 +721,13 @@
   // buscarFormulario (busca o cardápio e confere o formato mínimo) e o prazo
   // de 45 s por tentativa moram em carga.js (window.CredCarga) — junto com a
   // retentativa automática e a mensagem de espera, ver `carga` mais abaixo.
+  // #app não entra mais como aria-busy="true" aqui (nem no HTML estático):
+  // a mensagem de espera de carga.js é filha de #app, e um ancestral
+  // "ocupado" tende a calar o aviso dela para quem usa leitor de tela; as
+  // três telas de saída (render/renderFalhaCarga/renderEncerrado) seguem
+  // marcando aria-busy="false" ao terminar, sem mudança.
   function carregar() {
     limpar(app);
-    app.setAttribute('aria-busy', 'true');
     app.appendChild(el('div', { classe: 'esqueleto', 'aria-hidden': 'true' }, [el('span'), el('span'), el('span')]));
     carga.buscarComRetentativa(carga.buscarFormulario)
       .then(function (f) {

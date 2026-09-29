@@ -38,6 +38,8 @@
     .esqueleto{display:grid;gap:14px}
     .esqueleto span{display:block;height:48px;border-radius:12px;background:linear-gradient(90deg,#eeece6 0%,#f7f6f2 50%,#eeece6 100%);background-size:200% 100%;animation:brilho 1.2s linear infinite}
     @keyframes brilho{to{background-position:-200% 0}}
+    #carregando-espera{margin:0}
+    #carregando-espera:not(:empty){margin:14px 0 8px}
     .progresso{margin-bottom:20px}
     .progresso__texto{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--g7);margin-bottom:6px}
     .progresso__barra{height:6px;border-radius:999px;background:#E5E3DC;overflow:hidden}
@@ -154,7 +156,7 @@
       </ul>
       <p class="intro__tempo">Leva cerca de 5 minutos. Seu progresso fica salvo neste aparelho.</p>
     </section>
-    <div id="app" class="cartao" aria-busy="true">
+    <div id="app" class="cartao">
       <div class="esqueleto" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
       <p class="sr-only" id="carregando-inicial">Carregando o formulário…</p>
     </div>

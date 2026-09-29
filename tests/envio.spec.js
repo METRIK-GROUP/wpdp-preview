@@ -1,6 +1,6 @@
 // tests/envio.spec.js
 import { expect, test } from '@playwright/test';
-import { exemplo, formulario, prepararRotas, preencherTudo, SUCESSO, URL_TESTE } from './ajudantes.js';
+import { avancarRelogio, exemplo, formulario, prepararRotas, preencherTudo, SUCESSO, URL_TESTE } from './ajudantes.js';
 
 const confirmar = (page) => page.getByRole('button', { name: 'Confirmar meu credenciamento' }).click();
 
@@ -579,7 +579,8 @@ test('recarga da mesma versão mantém a autorização marcada', async ({ page }
 });
 
 // M-2: o envio (POST) espera até ~35 s antes de desistir — em pico o servidor
-// pode demorar (banco, e-mail); a carga do formulário (GET) segue com 15 s.
+// pode demorar (banco, e-mail); a carga do formulário (GET) tem prazo
+// próprio de 45 s por tentativa (fix "página espera o servidor acordar").
 // Relógio falso do Playwright: nada de esperar 35 s de verdade.
 const FALHA_ENVIO = 'Não conseguimos registrar agora. Suas respostas estão salvas neste aparelho; tente de novo em instantes.';
 
@@ -654,14 +655,14 @@ test('sem primeiro nome válido, o título do sucesso fica só "Credenciamento c
 });
 
 // Fix "página espera o servidor acordar": o prazo da carga do formulário
-// agora é 45 s por tentativa, com uma retentativa automática antes de
-// desistir (era 15 s, sem retentativa — visto em produção, o servidor levou
-// até 38,9 s para responder pela primeira vez depois de um deploy do
-// dashboard; o prazo antigo derrubava gente real por um problema que se
-// resolvia sozinho em segundos). As duas tentativas passam pelo mesmo
-// `preso`: quem desiste é sempre o prazo do CLIENTE (relógio falso), nunca o
-// servidor simulado — por isso 16 s (o antigo prazo +1 s) já não é mais
-// suficiente para a tela de falha aparecer.
+// agora é 45 s por tentativa, com uma retentativa automática (depois de uma
+// pausa de ~1,5 s) antes de desistir (era 15 s, sem retentativa — visto em
+// produção, o servidor levou até 38,9 s para responder pela primeira vez
+// depois de um deploy do dashboard; o prazo antigo derrubava gente real por
+// um problema que se resolvia sozinho em segundos). As duas tentativas
+// passam pelo mesmo `preso`: quem desiste é sempre o prazo do CLIENTE
+// (relógio falso), nunca o servidor simulado — por isso 16 s (o antigo
+// prazo +1 s) já não é mais suficiente para a tela de falha aparecer.
 test('carga do formulário só desiste depois de 45 s × 2 tentativas (antes eram 15 s sem retentativa)', async ({ page }) => {
   await page.clock.install();
   let soltar = () => {};
@@ -675,8 +676,9 @@ test('carga do formulário só desiste depois de 45 s × 2 tentativas (antes era
     await page.goto(URL_TESTE);
     await page.clock.fastForward(16_000);
     await expect(page.getByText('Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.')).toHaveCount(0);
-    await page.clock.fastForward(46_000); // estoura o prazo (45 s) da 1ª tentativa e dispara a retentativa automática
-    await page.clock.fastForward(46_000); // estoura o prazo da retentativa também
+    // Passos pequenos (não um salto só): a cadeia prazo → pausa → prazo de
+    // novo encadeia com mais confiança assim (ver avancarRelogio em ajudantes.js).
+    await avancarRelogio(page, 96_000); // estoura o prazo (45 s) da 1ª tentativa + pausa (1,5 s) + o prazo (45 s) da retentativa
     await expect(page.getByText('Não conseguimos carregar o formulário agora. Verifique sua internet e tente de novo.')).toBeVisible();
   } finally {
     soltar();
