@@ -1,0 +1,435 @@
+{
+  "edicao": "ed8",
+  "versao": "ed8-v1",
+  "aberto": true,
+  "titulo": "Workshop Projeto de Primeira + IA",
+  "datasTexto": "17 e 18 de outubro · 9h às 17h · ao vivo pelo Zoom",
+  "grupoUrl": "https://chat.whatsapp.com/IGTAhvFF5wAHjnnAu2fw3l",
+  "etapas": [
+    {
+      "numero": 1,
+      "titulo": "Seus dados",
+      "ajuda": null,
+      "perguntas": [
+        {
+          "id": "acesso_evento",
+          "rotulo": "Sobre o seu acesso ao evento, você adquiriu:",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "Apenas o ingresso (acesso somente ao vivo, sem replay)",
+            "Ingresso + conteúdo editado por 1 ano.",
+            "Por enquanto só o ingresso, mas vou adquirir o editado antes do evento iniciar (data limite)"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "genero",
+          "rotulo": "Gênero:",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "Feminino",
+            "Masculino"
+          ],
+          "permiteOutro": true
+        }
+      ]
+    },
+    {
+      "numero": 2,
+      "titulo": "Perfil profissional",
+      "ajuda": "Esta etapa é para entender o seu momento profissional.",
+      "perguntas": [
+        {
+          "id": "idade",
+          "rotulo": "Qual sua idade?",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "Até 20 anos",
+            "21 a 25 anos",
+            "26 a 35 anos",
+            "36 a 40 anos",
+            "41 a 50 anos",
+            "51 anos ou mais"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "formacao",
+          "rotulo": "Sua formação na área:",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "Arquitetura e Urbanismo",
+            "Design de Interiores",
+            "Engenharia",
+            "Design de produto",
+            "Técnico em edificações"
+          ],
+          "permiteOutro": true
+        },
+        {
+          "id": "pos_graduacao",
+          "rotulo": "Possui pós graduação? Marque mais de uma se necessário.",
+          "ajuda": null,
+          "tipo": "caixas_selecao",
+          "obrigatoria": false,
+          "opcoes": [
+            "Não possuo.",
+            "Na área de gestão de negócios.",
+            "Na área de projetos. (BIM, área específica, etc..)",
+            "Na área de gestão de projetos."
+          ],
+          "permiteOutro": true
+        },
+        {
+          "id": "tempo_atuacao",
+          "rotulo": "Tempo de atuação na área (pós formado)",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": false,
+          "opcoes": [
+            "Ainda não atuo",
+            "Até 1 ano",
+            "1 a 3 anos",
+            "3 a 5 anos",
+            "5 a 10 anos",
+            "Mais de 10 anos"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "time_atual",
+          "rotulo": "Time atual do escritório, contando você e SEM contar freelas.",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": false,
+          "opcoes": [
+            "Ainda não atuo",
+            "Trabalho em outro escritório",
+            "Trabalho sozinho(a)",
+            "2 pessoas",
+            "3 pessoas",
+            "4 pessoas",
+            "5 - 7 pessoas",
+            "8 - 10 pessoas",
+            "10+ pessoas"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "tempo_escritorio",
+          "rotulo": "Quanto tempo tem o seu escritório?",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": false,
+          "opcoes": [
+            "Ainda não tenho meu próprio escritório.",
+            "De 0 a 2 anos",
+            "De 2 a 5 anos",
+            "De 6 a 10 anos",
+            "De 11 a 15 anos",
+            "De 16 a 20 anos",
+            "Mais de 20 anos"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "formato_time",
+          "rotulo": "Seu time atua em que formato?",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "Não tenho equipe",
+            "Todo home office",
+            "Híbrido (parte presencial, parte home office)",
+            "Todo presencial.",
+            "Não atuo ainda"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "estrutura_fisica",
+          "rotulo": "Estrutura física do escritório",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "Home office, trabalho da minha casa.",
+            "Espaço físico alugado (fora de casa)",
+            "Espaço físico próprio (fora de casa)",
+            "Coworking"
+          ],
+          "permiteOutro": true
+        },
+        {
+          "id": "faturamento",
+          "rotulo": "Faturamento médio mensal com serviços de projetos e obras.",
+          "ajuda": "! Dados sigilosos, não se preocupe, só queremos validar se você está recebendo quanto deveria.\n\n1) Faturamento é a média mensal que você vendeu nos últimos 12 meses, não é quanto você tira pra você.\n2) Se você trabalha em outro escritório, marque a opção \"tenho salário fixo\"",
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "Tenho salário fixo",
+            "Ainda não faturo com projetos",
+            "Até R$5.000",
+            "R$5.001 a R$10.000",
+            "R$10.001 a R$30.000",
+            "R$30.001 a R$60.000",
+            "Acima de R$60.000"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "renda",
+          "rotulo": "Qual sua renda mensal?",
+          "ajuda": "Agora sim, quanto você tira para você, independente da fonte.",
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "Até R$2.000",
+            "R$2.000 a R$3.000",
+            "R$3.001 a R$4.000",
+            "R$4.000 a R$5.000",
+            "R$5.001 a R$7.000",
+            "R$7.000 a R$10.000",
+            "R$11.000 a 15.000",
+            "Mais de R$15.000"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "margem_lucro",
+          "rotulo": "Qual sua margem de lucro média por projeto? O lucro líquido que sobra pro escritório em cada projeto depois de descontar tudo.",
+          "ajuda": "Por que isso importa? Processos e padronização são uma alavanca de aumento de margem, metrificar isso vai te ajudar a perceber sua melhora concreta aplicando o PDP. \n\nO que importa é quanto sobra, vamos trabalhar nisso.",
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "Não faturo com projetos ainda.",
+            "Não sei dizer.",
+            "De 0 a 10%",
+            "11 a 20%",
+            "21 a 30%",
+            "31 a 40%",
+            "41 a 50%",
+            "50% +"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "servicos",
+          "rotulo": "Quais serviços você vende?",
+          "ajuda": null,
+          "tipo": "caixas_selecao",
+          "obrigatoria": true,
+          "opcoes": [
+            "Ainda não vendo nenhum desses serviços",
+            "Projetos de interiores",
+            "Projetos de arquitetura",
+            "Projetos complementares",
+            "Paisagismo",
+            "Consultorias",
+            "Acompanhamento (visitas pontuais)",
+            "Gerenciamento de obra (além de acompanhar, também faz gerencia fornecedores e cronogramas)",
+            "Gestão Turn Key (cliente só chega depois de pronto)"
+          ],
+          "permiteOutro": true
+        }
+      ]
+    },
+    {
+      "numero": 3,
+      "titulo": "Seu momento",
+      "ajuda": null,
+      "perguntas": [
+        {
+          "id": "por_que_agora",
+          "rotulo": "Por que esse Workshop é importante para você agora?",
+          "ajuda": null,
+          "tipo": "paragrafo",
+          "obrigatoria": true,
+          "opcoes": [],
+          "permiteOutro": false
+        },
+        {
+          "id": "expectativa",
+          "rotulo": "O que você espera que esse Workshop mude na sua rotina atual?",
+          "ajuda": null,
+          "tipo": "paragrafo",
+          "obrigatoria": true,
+          "opcoes": [],
+          "permiteOutro": false
+        },
+        {
+          "id": "resultado_pratico",
+          "rotulo": "Qual resultado prático, mesmo pequeno, já faria diferença real na sua vida hoje?",
+          "ajuda": null,
+          "tipo": "paragrafo",
+          "obrigatoria": true,
+          "opcoes": [],
+          "permiteOutro": false
+        },
+        {
+          "id": "impedimento",
+          "rotulo": "O que hoje mais te impede de avançar como você gostaria no seu negócio?",
+          "ajuda": null,
+          "tipo": "paragrafo",
+          "obrigatoria": true,
+          "opcoes": [],
+          "permiteOutro": false
+        },
+        {
+          "id": "motivo_trava",
+          "rotulo": "Quando algo não anda no seu escritório, o principal motivo costuma ser:",
+          "ajuda": null,
+          "tipo": "caixas_selecao",
+          "obrigatoria": true,
+          "opcoes": [
+            "Falta de clareza",
+            "Falta de constância",
+            "Falta de tempo",
+            "Falta de apoio ou referência",
+            "Medo de errar / se expor",
+            "Procrastinação"
+          ],
+          "permiteOutro": true
+        },
+        {
+          "id": "perfil_programa",
+          "rotulo": "Quando você entra em um programa novo, você tende mais a:",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "Observar bastante antes de agir",
+            "Executar quando alguém orienta passo a passo",
+            "Adaptar rapidamente à sua realidade",
+            "Testar, errar e ajustar sozinho(a)"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "frase_momento",
+          "rotulo": "Qual frase mais representa você hoje?",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "Sei o que fazer, mas não executo",
+            "Executo, mas vivo apagando incêndio",
+            "Tenho resultado, mas falta estrutura",
+            "Quero escalar sem perder qualidade",
+            "Quero voltar a gostar do meu negócio"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "etapas_voce",
+          "rotulo": "Quais etapas do processo de projeto VOCÊ precisa melhorar?",
+          "ajuda": "Pode marcar mais de uma.",
+          "tipo": "caixas_selecao",
+          "obrigatoria": true,
+          "opcoes": [
+            "Pré Projeto (contrato, briefing, levantamento e organização antes de começar)",
+            "Layout",
+            "Criação",
+            "Apresentação e aprovação",
+            "Executivos Fase 1 (civil, instalações e acabamentos)",
+            "Executivos Fase 2 (mobiliário sobmedida, acessórios e complementos)."
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "etapas_time",
+          "rotulo": "Quais etapas do processo de projeto seu TIME precisa melhorar? (para delegar melhor)",
+          "ajuda": "Pode marcar mais de uma.",
+          "tipo": "caixas_selecao",
+          "obrigatoria": true,
+          "opcoes": [
+            "Não tenho time ainda.",
+            "Pré Projeto (contrato, briefing, levantamento e organização antes de começar)",
+            "Layout",
+            "Criação",
+            "Apresentação e aprovação",
+            "Executivos Fase 1 (civil, instalações e acabamentos)",
+            "Executivos Fase 2 (mobiliário sobmedida, acessórios e complementos)."
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "apetite",
+          "rotulo": "Se você fosse investir em um treinamento avançado hoje, o que faz mais sentido para o seu momento?",
+          "ajuda": null,
+          "tipo": "multipla_escolha",
+          "obrigatoria": true,
+          "opcoes": [
+            "O pacote completo: controle de tempo, processo de projeto estruturado e Inteligência Artificial aplicada em cima disso",
+            "Só Inteligência Artificial: meu tempo e meu processo já estão organizados, quero apenas dominar as ferramentas de IA"
+          ],
+          "permiteOutro": false
+        },
+        {
+          "id": "motivacao",
+          "rotulo": "O que te motivou a se inscrever neste Workshop?",
+          "ajuda": null,
+          "tipo": "texto_curto",
+          "obrigatoria": true,
+          "opcoes": [],
+          "permiteOutro": false
+        },
+        {
+          "id": "comprometimento",
+          "rotulo": "Quanto você está disposto(a) a se comprometer com a participação desse Workshop?",
+          "ajuda": null,
+          "tipo": "escala",
+          "obrigatoria": true,
+          "opcoes": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "permiteOutro": false
+        }
+      ]
+    },
+    {
+      "numero": 4,
+      "titulo": "Onde enviar seu prêmio 🎁",
+      "ajuda": null,
+      "perguntas": []
+    }
+  ],
+  "campos": {
+    "email": {
+      "rotulo": "E-mail (use o mesmo da compra)",
+      "ajuda": "É por ele que vamos te identificar e enviar seu acesso."
+    },
+    "nome": {
+      "rotulo": "Nome completo"
+    },
+    "whatsapp": {
+      "rotulo": "WhatsApp com DDD"
+    },
+    "instagram": {
+      "rotulo": "Seu @ no Instagram",
+      "semInstagram": "Não tenho Instagram"
+    },
+    "endereco": {
+      "titulo": "Onde enviar seu prêmio 🎁",
+      "texto": "Durante o workshop vamos sortear livros e outros prêmios entre os participantes credenciados. Se você for sorteado(a), é para este endereço que enviamos. Ele é usado só para isso.",
+      "moraExterior": "Moro fora do Brasil"
+    },
+    "consentimento": "Autorizo o Instituto METRIK a usar meus dados para organizar minha participação no workshop, me enviar comunicações sobre ele e, se eu for sorteado(a), enviar o prêmio ao endereço informado."
+  },
+  "protecao": {
+    "turnstileSiteKey": null
+  }
+}

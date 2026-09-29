@@ -1,0 +1,14 @@
+{
+  "name": "wpdp-preview",
+  "private": true,
+  "type": "module",
+  "description": "Site do Workshop PDP + IA. Dependências só para testes; o site é estático.",
+  "scripts": {
+    "test": "playwright test",
+    "servidor": "node tests/servidor.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0"
+  }
+}

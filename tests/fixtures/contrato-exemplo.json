@@ -1,0 +1,111 @@
+{
+  "edicao": "ed8",
+  "versao": "ed8-v1",
+  "email": "ana.souza@exemplo.com.br",
+  "nome": "Ana Souza",
+  "whatsapp": "(11) 91234-5678",
+  "instagram": "@anasouza.arq",
+  "semInstagram": false,
+  "endereco": {
+    "moraExterior": false,
+    "cep": "01310-100",
+    "logradouro": "Av. Paulista",
+    "numero": "1000",
+    "complemento": "ap 12",
+    "bairro": "Bela Vista",
+    "cidade": "São Paulo",
+    "uf": "SP"
+  },
+  "respostas": {
+    "acesso_evento": {
+      "opcao": "Ingresso + conteúdo editado por 1 ano."
+    },
+    "genero": {
+      "opcao": "Feminino"
+    },
+    "idade": {
+      "opcao": "26 a 35 anos"
+    },
+    "formacao": {
+      "opcao": "Arquitetura e Urbanismo"
+    },
+    "pos_graduacao": {
+      "opcoes": [
+        "Na área de projetos. (BIM, área específica, etc..)"
+      ],
+      "outro": null
+    },
+    "tempo_atuacao": {
+      "opcao": "5 a 10 anos"
+    },
+    "time_atual": {
+      "opcao": "3 pessoas"
+    },
+    "tempo_escritorio": {
+      "opcao": "De 2 a 5 anos"
+    },
+    "formato_time": {
+      "opcao": "Híbrido (parte presencial, parte home office)"
+    },
+    "estrutura_fisica": {
+      "outro": "Sala compartilhada com uma engenheira"
+    },
+    "faturamento": {
+      "opcao": "R$10.001 a R$30.000"
+    },
+    "renda": {
+      "opcao": "R$7.000 a R$10.000"
+    },
+    "margem_lucro": {
+      "opcao": "21 a 30%"
+    },
+    "servicos": {
+      "opcoes": [
+        "Projetos de interiores",
+        "Gerenciamento de obra (além de acompanhar, também faz gerencia fornecedores e cronogramas)"
+      ],
+      "outro": "Consultoria de iluminação"
+    },
+    "por_que_agora": "Quero organizar meu processo antes de contratar a segunda pessoa.",
+    "expectativa": "Parar de refazer o layout três vezes por projeto.",
+    "resultado_pratico": "Fechar o briefing em uma reunião só.",
+    "impedimento": "Falta de tempo para padronizar o que eu já sei fazer.",
+    "motivo_trava": {
+      "opcoes": [
+        "Falta de tempo",
+        "Procrastinação"
+      ],
+      "outro": null
+    },
+    "perfil_programa": {
+      "opcao": "Adaptar rapidamente à sua realidade"
+    },
+    "frase_momento": {
+      "opcao": "Tenho resultado, mas falta estrutura"
+    },
+    "etapas_voce": {
+      "opcoes": [
+        "Pré Projeto (contrato, briefing, levantamento e organização antes de começar)",
+        "Executivos Fase 1 (civil, instalações e acabamentos)"
+      ],
+      "outro": null
+    },
+    "etapas_time": {
+      "opcoes": [
+        "Layout"
+      ],
+      "outro": null
+    },
+    "apetite": {
+      "opcao": "O pacote completo: controle de tempo, processo de projeto estruturado e Inteligência Artificial aplicada em cima disso"
+    },
+    "motivacao": "Indicação de uma colega que fez a edição passada.",
+    "comprometimento": 5
+  },
+  "consentimento": true,
+  "canal": {
+    "utm_source": "grupo"
+  },
+  "tempoPreenchimentoS": 312,
+  "empresa_site": ""
+}
