@@ -1,7 +1,7 @@
 // tests/acessibilidade.spec.js
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { avancar, COM_CHAVE, exemplo, prepararRotas, preencherEtapa1, preencherTudo, responderEtapa, servirTurnstile, URL_TESTE } from './ajudantes.js';
+import { avancar, COM_CHAVE, exemplo, formulario, prepararRotas, preencherEtapa1, preencherTudo, responderEtapa, servirTurnstile, URL_TESTE } from './ajudantes.js';
 
 async function semViolacoesGraves(page) {
   const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
@@ -85,6 +85,30 @@ test('falha ao carregar um script da página', async ({ page }) => {
   await page.goto(URL_TESTE);
   await expect(page.getByRole('button', { name: 'Tentar de novo' })).toBeVisible();
   await semViolacoesGraves(page);
+});
+
+// Fix "página espera o servidor acordar": confere que a mensagem calma perto
+// do esqueleto ("Carregando o formulário…") não introduz violação de
+// acessibilidade enquanto fica visível (relógio falso para chegar aos ~8 s
+// sem esperar de verdade; a resposta do servidor simulado fica pendurada até
+// o teste liberar).
+test('sem violações graves de acessibilidade com a mensagem de espera da carga visível', async ({ page }) => {
+  let liberar;
+  const pronta = new Promise((resolver) => {
+    liberar = resolver;
+  });
+  await prepararRotas(page);
+  await page.route('**/api/public/credenciamento/formulario*', async (r) => {
+    await pronta;
+    return r.fulfill({ json: formulario });
+  });
+  await page.clock.install();
+  await page.goto(URL_TESTE);
+  await page.clock.fastForward(8_001);
+  await expect(page.getByText('Carregando o formulário… pode levar alguns segundos.')).toBeVisible();
+  await semViolacoesGraves(page);
+  liberar();
+  await expect(page.getByText('Etapa 1 de 4')).toBeVisible();
 });
 
 test('tudo se faz pelo teclado: Enter avança a etapa', async ({ page }) => {

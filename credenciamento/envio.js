@@ -46,7 +46,8 @@
       var gtm = ctx.gtm;
       var app = ctx.app;
       // M-2: o POST espera até 35 s (em pico o servidor pode demorar: banco,
-      // e-mail); as buscas GET seguem com o prazo padrão de buscar() (15 s).
+      // e-mail); a busca do formulário (GET, inclusive a sem cache do 409)
+      // tem prazo próprio de 45 s por tentativa (LIMITE_CARGA_MS, em carga.js).
       var LIMITE_ENVIO_MS = 35000;
 
       // ---------------------------------------------------------------- envio

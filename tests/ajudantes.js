@@ -9,6 +9,24 @@ export const exemplo = JSON.parse(readFileSync(new URL('./fixtures/contrato-exem
 /** Mesma origem da página: o servidor simulado responde em localhost:4173 (sem CORS no teste). */
 export const URL_TESTE = '/credenciamento/?api=http://localhost:4173&utm_source=grupo';
 
+/**
+ * Avança o relógio falso (page.clock) em passos pequenos em vez de um salto
+ * só. Uma cadeia de vários prazos encadeados (ex.: prazo esgotado → promise
+ * → pausa antes da retentativa → promise → outro prazo esgotado) pode não
+ * encadear de forma confiável dentro de um `fastForward` só — passos
+ * menores dão mais chances de a fila de microtarefas (a reação de cada
+ * prazo, incluindo o próximo `setTimeout` que ela agenda) assentar antes do
+ * próximo avanço.
+ */
+export async function avancarRelogio(page, totalMs, passoMs = 1000) {
+  let restante = totalMs;
+  while (restante > 0) {
+    const passo = Math.min(passoMs, restante);
+    await page.clock.fastForward(passo);
+    restante -= passo;
+  }
+}
+
 export const SUCESSO = {
   ok: true,
   primeiroNome: 'Ana',

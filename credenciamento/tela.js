@@ -1,16 +1,18 @@
 // credenciamento/tela.js
-// Tela da página de credenciamento: busca o cardápio no servidor, monta as 4
-// etapas, guarda rascunho no aparelho e preenche o endereço pelo CEP. Regras
-// sem tela ficam em nucleo.js (window.CredNucleo); o envio em si e as telas
-// de resultado (sucesso/encerrado/erros do servidor) ficam em envio.js
-// (window.CredEnvio), que este arquivo monta por injeção de dependência ao
-// final (ver `var envio = window.CredEnvio.criar({...})`).
+// Tela da página de credenciamento: monta as 4 etapas, guarda rascunho no
+// aparelho e preenche o endereço pelo CEP. Regras sem tela ficam em
+// nucleo.js (window.CredNucleo); o envio em si e as telas de resultado
+// (sucesso/encerrado/erros do servidor) ficam em envio.js (window.CredEnvio);
+// a busca resiliente do cardápio no servidor (prazo de 45 s, retentativa
+// automática e a mensagem de espera) fica em carga.js (window.CredCarga).
+// Este arquivo monta os três por injeção de dependência ao final (ver
+// `var carga = window.CredCarga.criar({...})` e `var envio = window.CredEnvio.criar({...})`).
 (function () {
   'use strict';
 
   var N = window.CredNucleo;
   var app = document.getElementById('app');
-  var LIMITE_MS = 15000;
+  var LIMITE_MS = 15000; // prazo padrão de buscar() — hoje só usado se um chamador futuro não passar `limite` explícito
   var LIMITE_CEP_MS = 5000;
   var PAUSA_TOQUE_MS = 350;
   var armazem = N.armazenamento();
@@ -716,31 +718,18 @@
     render();
   }
 
-  /**
-   * Busca o cardápio no servidor e confere o formato mínimo. Usada tanto na
-   * carga inicial quanto na recuperação do 409 (I-1) — nesse segundo caso,
-   * `semCache: true` força ignorar o cache da CDN (query descartável +
-   * `cache: 'no-store'`), porque um 409 significa que o cardápio ACABOU de
-   * mudar no servidor e a resposta antiga em cache não serviria.
-   */
-  function buscarFormulario(opcoes) {
-    var semCache = !!(opcoes && opcoes.semCache);
-    var url = N.apiBase(window.location) + '/api/public/credenciamento/formulario';
-    if (semCache) url += (url.indexOf('?') >= 0 ? '&' : '?') + '_=' + Date.now();
-    var init = { headers: { Accept: 'application/json' } };
-    if (semCache) init.cache = 'no-store';
-    return buscar(url, init).then(function (res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      if (!N.formularioValido(res.dados)) throw new Error('formato inesperado'); // C4: exige edição e versão
-      return res.dados;
-    });
-  }
-
+  // buscarFormulario (busca o cardápio e confere o formato mínimo) e o prazo
+  // de 45 s por tentativa moram em carga.js (window.CredCarga) — junto com a
+  // retentativa automática e a mensagem de espera, ver `carga` mais abaixo.
+  // #app não entra mais como aria-busy="true" aqui (nem no HTML estático):
+  // a mensagem de espera de carga.js é filha de #app, e um ancestral
+  // "ocupado" tende a calar o aviso dela para quem usa leitor de tela; as
+  // três telas de saída (render/renderFalhaCarga/renderEncerrado) seguem
+  // marcando aria-busy="false" ao terminar, sem mudança.
   function carregar() {
     limpar(app);
-    app.setAttribute('aria-busy', 'true');
     app.appendChild(el('div', { classe: 'esqueleto', 'aria-hidden': 'true' }, [el('span'), el('span'), el('span')]));
-    buscarFormulario()
+    carga.buscarComRetentativa(carga.buscarFormulario)
       .then(function (f) {
         estado.formulario = f;
         protecao.configurar(f); // C1: Turnstile só se o GET trouxer a chave do site
@@ -753,10 +742,12 @@
       .catch(renderFalhaCarga);
   }
 
-  // Fábrica congelada (fix round 2): envio.js recebe por injeção só o que
-  // precisa — o mesmo objeto `estado` por referência (mutações feitas por
-  // envio.js aparecem aqui e vice-versa), sem nenhum estado global novo.
+  // Fábricas congeladas (fix round 2): envio.js e carga.js recebem por
+  // injeção só o que precisam — o mesmo objeto `estado` por referência
+  // (mutações feitas por envio.js aparecem aqui e vice-versa), sem nenhum
+  // estado global novo.
   var protecao = window.CredProtecao.criar(); // C1: verificação anti-robô opcional (protecao.js)
+  var carga = window.CredCarga.criar({ N: N, el: el, buscar: buscar, app: app }); // busca resiliente do cardápio (carga.js)
   var envio = window.CredEnvio.criar({
     estado: estado,
     N: N,
@@ -764,7 +755,7 @@
     el: el,
     limpar: limpar,
     buscar: buscar,
-    buscarFormulario: buscarFormulario,
+    buscarFormulario: carga.buscarFormulario,
     render: render,
     irParaErros: irParaErros,
     mostrarErros: mostrarErros,
