@@ -50,7 +50,10 @@ test('estrutura: noindex, prévia do link, logo prioritário e título', async (
   const logo = page.locator('header img');
   await expect(logo).toHaveAttribute('fetchpriority', 'high');
   expect(await logo.getAttribute('loading')).toBeNull();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Parabéns, você ganhou um livro! 🎁');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Parabéns! Você ganhou um livro');
+  // Logo do Workshop visível em tamanho de marca (não miniatura).
+  expect((await logo.boundingBox()).height).toBeGreaterThanOrEqual(44);
+  await expect(page.getByRole('list', { name: 'Como funciona' }).getByRole('listitem')).toHaveCount(3);
   await expect(page.getByRole('button', { name: 'Enviar meu endereço' })).toBeVisible();
 });
 

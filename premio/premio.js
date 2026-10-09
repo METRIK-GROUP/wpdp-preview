@@ -199,6 +199,26 @@
   }
 
   // ---------- sucesso ----------
+  var CORES_CONFETE = ['#0F766E', '#2DD4BF', '#F59E0B', '#EC4899', '#8B5CF6', '#3B82F6'];
+  /** Confete decorativo da confirmação (some com prefers-reduced-motion, pelo CSS). */
+  function festa() {
+    var caixa = document.createElement('div');
+    caixa.className = 'festa';
+    caixa.setAttribute('aria-hidden', 'true');
+    for (var i = 0; i < 22; i += 1) {
+      var peca = document.createElement('i');
+      var angulo = (Math.PI * 2 * i) / 22;
+      var distancia = 90 + Math.random() * 90;
+      peca.style.background = CORES_CONFETE[i % CORES_CONFETE.length];
+      peca.style.setProperty('--x', Math.round(Math.cos(angulo) * distancia) + 'px');
+      peca.style.setProperty('--y', Math.round(Math.sin(angulo) * distancia + 60) + 'px');
+      peca.style.setProperty('--r', Math.round(Math.random() * 540 - 270) + 'deg');
+      peca.style.animationDelay = Math.round(Math.random() * 120) + 'ms';
+      caixa.appendChild(peca);
+    }
+    return caixa;
+  }
+
   function mostrarSucesso(primeiroNome) {
     apagarRascunho();
     var app = $('app');
@@ -215,7 +235,7 @@
     p1.textContent = 'Recebemos o seu endereço. Agora é com a gente: vamos comprar o seu livro e enviar para você.';
     var p2 = document.createElement('p');
     p2.textContent = 'Se precisarmos confirmar alguma coisa, falamos com você pelo Instagram ou pelo WhatsApp.';
-    [icone, titulo, p1, p2].forEach(function (n) { caixa.appendChild(n); });
+    [festa(), icone, titulo, p1, p2].forEach(function (n) { caixa.appendChild(n); });
     app.textContent = '';
     app.appendChild(caixa);
     titulo.focus();
