@@ -1189,7 +1189,7 @@ footer a:hover::after { width: 100%; }
 </head>
 <body class="bg-m-black">
 
-<!-- ===== Barra de Urgência (ativa Qui 15/10 23h59 BRT → Sex 16/10 23h59 BRT) ===== -->
+<!-- ===== Barra de Urgência (fase "últimos dias": Ter 13/10 → Qui 15/10 23h59 BRT; fase "encerram hoje": Qui 15/10 23h59 → Sex 16/10 23h59 BRT) ===== -->
 <style>
   #urg-bar{position:fixed;top:0;left:0;right:0;z-index:60;display:none;color:#fff;font-family:Inter,sans-serif;
     background:rgba(220,38,38,0.82);
@@ -1203,7 +1203,7 @@ footer a:hover::after { width: 100%; }
   #urg-bar .urg-sep{opacity:.55}
   #urg-bar .urg-cd{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;letter-spacing:.04em}
   #urg-bar .urg-cd b{font-weight:500;opacity:.85;margin-right:6px;font-size:12.5px}
-  #urg-bar .urg-cta{background:#fff;color:#B91C1C;font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;text-decoration:none;white-space:nowrap;transition:transform .15s ease;box-shadow:0 1px 0 rgba(0,0,0,.05)}
+  #urg-bar .urg-cta{display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#B91C1C;font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;text-decoration:none;white-space:nowrap;transition:transform .15s ease;box-shadow:0 1px 0 rgba(0,0,0,.05)}
   #urg-bar .urg-cta:hover{transform:scale(1.04)}
   #urg-bar .urg-pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;margin-right:7px;animation:urg-blink 1.3s ease-in-out infinite;box-shadow:0 0 8px rgba(255,255,255,.7)}
   #urg-bar .urg-mobile{display:none}
@@ -1218,20 +1218,20 @@ footer a:hover::after { width: 100%; }
   }
   /* Com a barra ativa, a sticky nav fica escondida (evita duas barras repetidas) */
   body.urg-on #sn{display:none}
-  /* Texto da barra de ingressos: "deste lote" no dia a dia; "últimos ingressos" só com a tarja de urgência ligada */
+  /* Texto da barra de ingressos: "deste lote" no dia a dia; "últimos ingressos" só na fase "encerram hoje" */
   .ingr-urg{display:none}
-  body.urg-on .ingr-lote{display:none}
-  body.urg-on .ingr-urg{display:inline}
+  body.urg-hoje .ingr-lote{display:none}
+  body.urg-hoje .ingr-urg{display:inline}
 </style>
 <div id="urg-bar" role="region" aria-label="Aviso — inscrições encerram hoje">
   <div class="urg-wrap">
     <span class="urg-line urg-desktop">
-      <span class="urg-strong"><span class="urg-pulse"></span>Inscrições encerram hoje</span>
+      <span class="urg-strong"><span class="urg-pulse"></span><span id="urg-label">Inscrições encerram hoje</span></span>
       <span class="urg-sep">·</span>
       <span class="urg-cd"><b>Faltam</b><span id="urg-countdown">--:--:--</span></span>
     </span>
     <span class="urg-line urg-mobile">
-      <span class="urg-strong"><span class="urg-pulse"></span>Encerram hoje</span>
+      <span class="urg-strong"><span class="urg-pulse"></span><span id="urg-label-m">Encerram hoje</span></span>
       <span class="urg-sep">·</span>
       <span class="urg-cd"><span id="urg-countdown-m">--:--:--</span></span>
     </span>
@@ -1240,31 +1240,52 @@ footer a:hover::after { width: 100%; }
 </div>
 <script>
 (function(){
-  // ATIVAÇÃO: Qui 15/10/2026 23:59 BRT  |  ENCERRA: Sex 16/10/2026 23:59 BRT (workshop começa Sáb 17/10 09:00)
-  var START = Date.parse('2026-10-15T23:59:00-03:00');
-  var END   = Date.parse('2026-10-16T23:59:00-03:00');
+  // FASE "ÚLTIMOS DIAS": Ter 13/10/2026 00:00 BRT → Qui 15/10 23:59 (contagem com dias)
+  // FASE "ENCERRAM HOJE": Qui 15/10/2026 23:59 BRT → Sex 16/10 23:59 (workshop começa Sáb 17/10 09:00)
+  var PRE_START = Date.parse('2026-10-13T00:00:00-03:00');
+  var START     = Date.parse('2026-10-15T23:59:00-03:00');
+  var END       = Date.parse('2026-10-16T23:59:00-03:00');
+  var LABELS = {
+    dias: {d:'Últimos dias de inscrição', m:'Últimos dias', aria:'Aviso — últimos dias de inscrição'},
+    hoje: {d:'Inscrições encerram hoje',  m:'Encerram hoje', aria:'Aviso — inscrições encerram hoje'}
+  };
   var bar = document.getElementById('urg-bar');
   var cd  = document.getElementById('urg-countdown');
   var cdM = document.getElementById('urg-countdown-m');
-  // ?preview=1 força exibição antes do START (só para conferência)
-  var force = /[?&]preview=1\b/.test(location.search);
+  var lb  = document.getElementById('urg-label');
+  var lbM = document.getElementById('urg-label-m');
+  // Só para conferência: ?preview=1 mostra a fase do momento mesmo antes do PRE_START; ?preview=hoje força a fase "encerram hoje"
+  var qs = location.search;
+  var forceHoje = /[?&]preview=hoje\b/.test(qs);
+  var force = forceHoje || /[?&]preview=1\b/.test(qs);
   function pad(n){return (n<10?'0':'')+n}
-  function tick(){
-    var now = Date.now();
-    var active = force ? (now < END) : (now >= START && now < END);
-    if(!active){
-      bar.style.display='none';
-      document.body.classList.remove('urg-on');
-      return;
-    }
-    bar.style.display='block';
-    document.body.classList.add('urg-on');
-    var left = END - now;
-    if(left < 0) left = 0;
-    var h = Math.floor(left/3600000);
+  function fmt(left, withDays){
+    var d = withDays ? Math.floor(left/86400000) : 0;
+    var h = Math.floor((left - d*86400000)/3600000);
     var m = Math.floor((left%3600000)/60000);
     var s = Math.floor((left%60000)/1000);
-    var txt = pad(h)+':'+pad(m)+':'+pad(s);
+    return (d ? d+'d ' : '')+pad(h)+':'+pad(m)+':'+pad(s);
+  }
+  function tick(){
+    var now = Date.now();
+    var active = force ? (now < END) : (now >= PRE_START && now < END);
+    if(!active){
+      bar.style.display='none';
+      document.body.classList.remove('urg-on','urg-hoje');
+      document.body.style.paddingTop='';
+      return;
+    }
+    var fase = (forceHoje || now >= START) ? 'hoje' : 'dias';
+    bar.style.display='block';
+    // Empurra a página pra baixo da barra fixa (senão ela cobre o topo do hero)
+    document.body.style.paddingTop = bar.offsetHeight+'px';
+    document.body.classList.add('urg-on');
+    document.body.classList.toggle('urg-hoje', fase === 'hoje');
+    lb.textContent = LABELS[fase].d;
+    lbM.textContent = LABELS[fase].m;
+    bar.setAttribute('aria-label', LABELS[fase].aria);
+    var left = Math.max(END - now, 0);
+    var txt = fmt(left, fase === 'dias');
     cd.textContent = txt;
     if(cdM) cdM.textContent = txt;
   }
